@@ -5,6 +5,15 @@
    - Chat / class diary / photo upload all go through your Apps Script
    =================================================================== */
 
+/* ===================================================================
+   MEC CA Study Buddy — Frontend SPA (Apps Script edition)
+   ... */
+
+// 🔧 ONE-TIME SETUP: paste your deployed Apps Script Web App URL here.
+// Once set, EVERY device (mobile/desktop) skips the URL step and only asks
+// for the PIN. This is what makes setup truly one-time across devices.
+const DEFAULT_BACKEND_URL = "https://script.google.com/macros/s/AKfycbxLTvO6v7h-c_PBoDozByo4FOAJ7Gk7WqbsroObPXLnAkNvExbJ-Fc6rMCNHlSyxx-I/exec";
+
 // ---------- i18n ----------
 const I18N = {
   en: {
@@ -139,7 +148,23 @@ async function apiStatus(url) {
 //  BOOT  (decide: setup wizard / pin lock / app)
 // ===================================================================
 async function boot() {
-  if (!cfg || !cfg.url) return renderSetup();
+  // If a backend URL is baked into the app, every device uses it automatically
+  // (no URL re-entry) — only the PIN is needed. True one-time setup.
+  const baked = DEFAULT_BACKEND_URL && !DEFAULT_BACKEND_URL.startsWith("PASTE_");
+  if (!cfg || !cfg.url) {
+    if (baked) {
+      try {
+        const st = await apiStatus(DEFAULT_BACKEND_URL);
+        cfg = { url: DEFAULT_BACKEND_URL, lang: (st && st.lang) || "hi" };
+        state.lang = cfg.lang;
+        if (st && st.pinSet) { saveLS(LS.cfg, cfg); return renderLock(); }   // just ask PIN
+        // backend not configured yet → run wizard from step 2 (URL prefilled)
+        wiz = { step: 2, url: DEFAULT_BACKEND_URL, status: st, driveId: "", photosId: "", groqKey: "", lang: "hi", pin: "", pin2: "" };
+        return renderSetup();
+      } catch (e) { return renderSetup(); }
+    }
+    return renderSetup();
+  }
   if (!session.pinHash) return renderLock();
   try {
     const r = await api("verify");
