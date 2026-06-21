@@ -1,0 +1,38 @@
+/* MEC CA Study Buddy — custom styles on top of Tailwind */
+:root { --brand: #0d9488; --brand2: #6366f1; }
+
+html { scroll-behavior: smooth; }
+body { -webkit-tap-highlight-color: transparent; }
+
+/* Safe-area padding for mobile notches */
+.safe-bottom { padding-bottom: calc(env(safe-area-inset-bottom) + 0.5rem); }
+.safe-top { padding-top: env(safe-area-inset-top); }
+
+/* Hide scrollbars but keep scroll */
+.no-sb::-webkit-scrollbar { display: none; }
+.no-sb { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Chat bubble typing dots */
+.typing span {
+  display: inline-block; width: 6px; height: 6px; margin: 0 1px;
+  background: currentColor; border-radius: 9999px; opacity: .4;
+  animation: blink 1.2s infinite both;
+}
+.typing span:nth-child(2) { animation-delay: .2s; }
+.typing span:nth-child(3) { animation-delay: .4s; }
+@keyframes blink { 0%,80%,100%{opacity:.25;transform:translateY(0)} 40%{opacity:1;transform:translateY(-2px)} }
+
+/* Smooth view fade */
+.view-enter { animation: fade .25s ease both; }
+@keyframes fade { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+/* Markdown-ish chat content */
+.msg-body p { margin: 0 0 .5rem; }
+.msg-body ul { margin: .25rem 0 .5rem 1rem; list-style: disc; }
+.msg-body ol { margin: .25rem 0 .5rem 1.1rem; list-style: decimal; }
+.msg-body code { background: rgba(125,125,125,.18); padding: .05rem .3rem; border-radius: .25rem; font-size: .85em; }
+.msg-body strong { font-weight: 700; }
+.msg-body h3 { font-weight: 700; margin: .4rem 0 .2rem; }
+
+/* active nav glow */
+.nav-active { color: var(--brand); }
