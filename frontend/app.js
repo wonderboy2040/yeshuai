@@ -31,6 +31,10 @@ const I18N = {
     chatPlaceholder: "Type your doubt… (Maths, Eco, Commerce)", clearMem: "Clear chat",
     streak: "Day streak", classesLogged: "Classes logged", topicsCovered: "Topics covered",
     uploadPhoto: "Upload notes / diagram photo", photoSaved: "Photo backed up ✓", uploading: "Uploading…",
+    micTip: "Speak your doubt", listening: "Listening…", diagramTip: "Make a diagram",
+    papersTitle: "Model & Previous Papers", papersHint: "Generate a model paper or find previous papers.",
+    genPaper: "Generate model paper", findPrev: "Find previous papers", selectSubjFirst: "Select a subject first",
+    diagramOf: "Diagram of…", makeDiagram: "Make a labelled diagram for this topic",
     // setup / lock
     setupTitle: "First-time Setup", step: "Step",
     s1Title: "Connect your backend", s1Hint: "Paste the Google Apps Script Web App URL you deployed.",
@@ -61,6 +65,10 @@ const I18N = {
     chatPlaceholder: "Apna doubt likho… (Maths, Eco, Commerce)", clearMem: "Chat clear karo",
     streak: "Din ka streak", classesLogged: "Classes logged", topicsCovered: "Topics cover hue",
     uploadPhoto: "Notes / diagram photo upload karo", photoSaved: "Photo backup ho gaya ✓", uploading: "Upload ho raha…",
+    micTip: "Bol ke doubt pucho", listening: "Sun raha hun…", diagramTip: "Diagram banao",
+    papersTitle: "Model & Previous Papers", papersHint: "Model paper banwao ya previous papers dhoondo.",
+    genPaper: "Model paper banao", findPrev: "Previous papers dhoondo", selectSubjFirst: "Pehle subject choose karo",
+    diagramOf: "Diagram banao…", makeDiagram: "Is topic ka ek labelled diagram banao",
     setupTitle: "Pehli baar Setup", step: "Step",
     s1Title: "Apna backend connect karo", s1Hint: "Jo Google Apps Script Web App URL deploy kiya woh paste karo.",
     urlPh: "https://script.google.com/macros/s/..../exec", testBtn: "Connection test karo",
@@ -373,7 +381,7 @@ function render() {
   main.appendChild((views[state.view] || HomeView)());
   app.appendChild(main);
   app.appendChild(BottomNav());
-  if (state.view === "chat") scrollChat();
+  if (state.view === "chat") { scrollChat(); runMermaid(); }
 }
 
 function Header() {
@@ -523,7 +531,31 @@ function ExamView() {
       ? `Mere exam me ${days} din bache hain. ${list} ke liye day-wise study plan banao with important questions aur revision tips.`
       : `My exam is in ${days} days. Make a day-wise study plan for ${list} with important questions and revision tips.`), 60);
   };
-  wrap.appendChild(card); return wrap;
+  wrap.appendChild(card);
+
+  // ---- Model & Previous Papers ----
+  const papers = el(`<div class="space-y-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
+      <div><h3 class="text-sm font-bold">📄 ${t().papersTitle}</h3>
+        <p class="text-xs text-slate-500 dark:text-slate-400">${t().papersHint}</p></div>
+      <select id="paperSub" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2">
+        ${SUBJECTS.map(s => `<option value="${s.name}">${s.icon} ${s.name}</option>`).join("")}</select>
+      <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+        <button id="genPaper" class="rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 py-2.5 text-sm font-semibold text-white">📝 ${t().genPaper}</button>
+        <button id="findPrev" class="rounded-xl border border-slate-300 dark:border-slate-700 py-2.5 text-sm font-semibold">🔎 ${t().findPrev}</button>
+      </div></div>`);
+  papers.querySelector("#genPaper").onclick = () => {
+    const sub = papers.querySelector("#paperSub").value;
+    go("chat"); setTimeout(() => sendMessage(state.lang === "hi"
+      ? `${sub} ka ek full MODEL QUESTION PAPER banao TSBIE Intermediate 1st year exam pattern ke hisaab se — sections, marks aur important questions ke saath.`
+      : `Create a full MODEL QUESTION PAPER for ${sub} as per the TSBIE Intermediate 1st year exam pattern — with sections, marks and important questions.`), 60);
+  };
+  papers.querySelector("#findPrev").onclick = () => {
+    const sub = papers.querySelector("#paperSub").value;
+    const q = encodeURIComponent(`TS Inter 1st year ${sub} previous question papers TSBIE`);
+    window.open(`https://www.google.com/search?q=${q}`, "_blank");
+  };
+  wrap.appendChild(papers);
+  return wrap;
 }
 
 // ---------- CHAT ----------
@@ -538,21 +570,69 @@ function ChatView() {
       <div><div class="text-4xl">🎓</div><p class="mt-2 text-xs">${state.lang === "hi" ? "Apna pehla doubt pucho!" : "Ask your first doubt!"}</p></div></div>`));
   else state.chat.forEach(m => scroll.appendChild(Bubble(m.role, m.content)));
   wrap.appendChild(scroll);
-  const bar = el(`<form id="chatForm" class="safe-bottom mt-2 flex items-end gap-2">
-      <textarea id="chatInput" rows="1" placeholder="${t().chatPlaceholder}" class="max-h-28 flex-1 resize-none rounded-2xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2.5"></textarea>
+  const bar = el(`<form id="chatForm" class="safe-bottom mt-2 flex items-end gap-1.5">
+      <button type="button" id="micBtn" title="${t().micTip}" class="grid h-11 w-9 shrink-0 place-items-center rounded-2xl border border-slate-300 dark:border-slate-700 text-lg">🎤</button>
+      <textarea id="chatInput" rows="1" placeholder="${t().chatPlaceholder}" class="max-h-28 flex-1 resize-none rounded-2xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3.5 py-2.5"></textarea>
+      <button type="button" id="diagBtn" title="${t().diagramTip}" class="grid h-11 w-9 shrink-0 place-items-center rounded-2xl border border-slate-300 dark:border-slate-700 text-lg">📊</button>
       <button class="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-teal-500 to-indigo-600 text-white">➤</button></form>`);
   const inp = bar.querySelector("#chatInput");
   inp.addEventListener("input", () => { inp.style.height = "auto"; inp.style.height = Math.min(inp.scrollHeight, 112) + "px"; });
   inp.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); bar.requestSubmit(); } });
   bar.onsubmit = e => { e.preventDefault(); const v = inp.value.trim(); if (!v) return; inp.value = ""; inp.style.height = "auto"; sendMessage(v); };
+  bar.querySelector("#micBtn").onclick = () => startVoice(inp, bar.querySelector("#micBtn"));
+  bar.querySelector("#diagBtn").onclick = () => {
+    const v = inp.value.trim(); if (!v) { inp.focus(); return; }
+    inp.value = ""; inp.style.height = "auto";
+    sendMessage((state.lang === "hi" ? "Is topic ka ek labelled Mermaid diagram banao: " : "Make a labelled Mermaid diagram for: ") + v);
+  };
   wrap.appendChild(bar); return wrap;
+}
+
+function startVoice(inp, btn) {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { alert(state.lang === "hi" ? "Is browser me voice support nahi hai." : "Voice not supported in this browser."); return; }
+  if (window.__rec) { window.__rec.stop(); return; }
+  const rec = new SR();
+  rec.lang = state.lang === "hi" ? "hi-IN" : "en-IN";
+  rec.interimResults = true; rec.continuous = false;
+  window.__rec = rec;
+  btn.classList.add("animate-pulse", "text-rose-500");
+  const startText = inp.value;
+  rec.onresult = (e) => {
+    let txt = "";
+    for (let i = e.resultIndex; i < e.results.length; i++) txt += e.results[i][0].transcript;
+    inp.value = (startText + " " + txt).trim();
+    inp.dispatchEvent(new Event("input"));
+  };
+  rec.onerror = () => {};
+  rec.onend = () => { btn.classList.remove("animate-pulse", "text-rose-500"); window.__rec = null; };
+  rec.start();
+}
+
+function renderAssistant(content) {
+  // pull out ```mermaid fenced blocks and turn them into renderable divs
+  const blocks = [];
+  let s = content.replace(/```mermaid\s*([\s\S]*?)```/g, (m, code) => {
+    const i = blocks.length; blocks.push(code.trim()); return `\u0000M${i}\u0000`;
+  });
+  let html = mdToHtml(s);
+  html = html.replace(/\u0000M(\d+)\u0000/g, (m, i) =>
+    `<div class="mermaid my-2 rounded-xl bg-white p-2 overflow-x-auto text-center">${blocks[i].replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div>`);
+  return html;
+}
+function runMermaid() {
+  const nodes = document.querySelectorAll('.mermaid:not([data-processed])');
+  if (!nodes.length) return;
+  if (window.mermaid && window.mermaid.run) {
+    try { window.mermaid.run({ nodes }); } catch (e) {}
+  } else { setTimeout(runMermaid, 300); } // module still loading
 }
 
 function Bubble(role, content) {
   const me = role === "user";
-  return el(`<div class="flex ${me ? "justify-end" : "justify-start"}"><div class="max-w-[85%] rounded-2xl px-3.5 py-2.5 ${me
+  return el(`<div class="flex ${me ? "justify-end" : "justify-start"}"><div class="max-w-[88%] rounded-2xl px-3.5 py-2.5 ${me
       ? "bg-gradient-to-br from-teal-500 to-indigo-600 text-white rounded-br-sm" : "bg-slate-100 dark:bg-slate-800 rounded-bl-sm"}">
-      <div class="msg-body text-[13px] leading-relaxed">${me ? content.replace(/</g, "&lt;") : mdToHtml(content)}</div></div></div>`);
+      <div class="msg-body text-[13px] leading-relaxed">${me ? content.replace(/</g, "&lt;") : renderAssistant(content)}</div></div></div>`);
 }
 function scrollChat() { const s = document.getElementById("chatScroll"); if (s) s.scrollTop = s.scrollHeight; }
 
@@ -573,7 +653,7 @@ async function sendMessage(text) {
   }
   typing.remove();
   state.chat.push({ role: "assistant", content: reply }); saveLS(LS.chat, state.chat);
-  scroll && scroll.appendChild(Bubble("assistant", reply)); scrollChat();
+  scroll && scroll.appendChild(Bubble("assistant", reply)); scrollChat(); runMermaid();
 }
 
 // ---------- BOTTOM NAV ----------
