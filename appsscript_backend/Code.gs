@@ -247,3 +247,13 @@ function authorizeNow() {
   UrlFetchApp.fetch('https://api.groq.com', { muteHttpExceptions: true });
   return 'authorized';
 }
+
+/* Run this in the editor to TEST Drive access + verify your Folder ID.
+   Select testDrive → Run → check the Execution log. */
+function testDrive() {
+  var id = extractDriveId(PROPS.getProperty('DRIVE_FOLDER_ID'));
+  if (!id) { Logger.log('❌ DRIVE_FOLDER_ID is empty. Set it in the app Setup wizard.'); return; }
+  Logger.log('Folder ID being used: ' + id);
+  var f = DriveApp.getFolderById(id);          // forces Drive consent + checks the ID
+  Logger.log('✅ Drive OK. Folder name: ' + f.getName());
+}
