@@ -2,11 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
   <meta name="theme-color" content="#0d9488">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="MEC Study Buddy">
+  <meta name="mobile-web-app-capable" content="yes">
   <title>MEC CA Study Buddy</title>
   <link rel="icon" type="image/jpeg" href="assets/logo.jpeg">
   <link rel="apple-touch-icon" href="assets/logo.jpeg">
+  <link rel="manifest" href="manifest.json">
   <script
     src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.0/dist/index.global.js"
     integrity="sha384-nWTzRTCY/9V4Bo352ehygr1c4cnst4XN6lMR3fipakEQrhVpc0hEM5Dii3Amz0sT"
@@ -27,6 +32,11 @@
     mermaid.initialize({ startOnLoad: false, securityLevel: 'loose',
       theme: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default' });
     window.mermaid = mermaid;
+  </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    }
   </script>
 </head>
 <body class="min-h-dvh text-sm antialiased bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100">
