@@ -22,7 +22,7 @@ const I18N = {
     subjectsTitle: "Your MEC Subjects", openChat: "Ask about this",
     examTitle: "Exam & Test Preparation", examHint: "Get a study plan, important questions & revision tips.",
     makePlan: "Make my plan", chatTitle: "24x7 AI Professor",
-    chatPlaceholder: "Type your doubt… (Maths, Eco, Commerce)", clearMem: "Clear chat",
+    chatPlaceholder: "Type your doubt… (Maths, Eco, Accounts)", clearMem: "Clear chat",
     streak: "Day streak", classesLogged: "Classes logged", topicsCovered: "Topics covered",
     uploadPhoto: "Upload notes / diagram photo", photoSaved: "Photo backed up ✓", uploading: "Uploading…",
     micTip: "Speak your doubt", listening: "Listening…", diagramTip: "Make a diagram",
@@ -47,6 +47,16 @@ const I18N = {
     nameLabel: "Your name",
     camera: "Camera", attachFiles: "Attach Files", filesSelected: "file(s) selected",
     removeFile: "Remove", uploadComplete: "All files uploaded ✓", askAI: "Ask Professor",
+    tricksTitle: "MEC & CA Tricks & Tips", tricksHint: "Quick formulas, shortcuts and motivation for your CA journey",
+    trickFormula: "Formula", trickTip: "Pro Tip", trickExample: "Example",
+    dailyMotivation: "Daily Motivation", tricksCount: "tricks", studyTips: "Study Tips",
+    tip1: "Do 5 problems daily — consistency works better than intensity",
+    tip2: "Write formulas 3 times to memorize them — muscle memory works wonders!",
+    tip3: "Trigonometry: memorize basic identities first, derive the rest",
+    tip4: "Calculus: understand 'rate of change' — the rest comes with practice",
+    tip5: "Economics graphs: draw them for 5 mins daily — you'll never forget",
+    tip6: "Commerce terms: create a short story around each term to remember",
+    tip7: "Accounting: keep the double-entry rule clear — every debit has an equal credit",
   },
 
   hi: {
@@ -61,7 +71,7 @@ const I18N = {
     subjectsTitle: "Aapke MEC Subjects", openChat: "Iske baare me pucho",
     examTitle: "Exam & Test ki Taiyari", examHint: "Study plan, important questions aur revision tips lo.",
     makePlan: "Mera plan banao", chatTitle: "24x7 AI Professor",
-    chatPlaceholder: "Apna doubt likho… (Maths, Eco, Commerce)", clearMem: "Chat clear karo",
+    chatPlaceholder: "Apna doubt likho… (Maths, Eco, Accounts)", clearMem: "Chat clear karo",
     streak: "Din ka streak", classesLogged: "Classes logged", topicsCovered: "Topics cover hue",
     uploadPhoto: "Notes / diagram photo upload karo", photoSaved: "Photo backup ho gaya ✓", uploading: "Upload ho raha…",
     micTip: "Bol ke doubt pucho", listening: "Sun raha hun…", diagramTip: "Diagram banao",
@@ -95,6 +105,7 @@ const I18N = {
     tip4: "Calculus: 'rate of change' samjho — baaki practice se aayega",
     tip5: "Economics graphs: roz 5 mins draw karo — hamesha yaad rahega",
     tip6: "Commerce terms: har term ke around chhoti story banao, yaad rahega",
+    tip7: "Accounting: double entry rule clear rakho — har debit ka ek credit hota hai",
     trickM1: "Logarithm Power Rule: log(aᵇ) = b·log(a) — exponent neeche aata hai",
     trickM2: "Matrix Multiplication: row × column — pehle row, phir column, add karo",
     trickM3: "Differentiation: d/dx(xⁿ) = nxⁿ⁻¹ — power neeche aata hai, power ek kam",
@@ -181,21 +192,39 @@ const MATH_TRICKS = [
     ] },
   { id: "commerce", subject: "Commerce", color: "from-blue-500 to-indigo-600", icon: "🏦",
     tricks: [
-      { title: "Journal Entry — Golden Rules", formula: "Debit: Receiver / What comes in / Expenses\nCredit: Giver / What goes out / Incomes",
-        tip: "Personal A/c: Debit receiver, Credit giver. Real A/c: Debit what comes in, Credit what goes out",
-        example: "Cash sales: Debit Cash A/c, Credit Sales A/c" },
-      { title: "Balance Sheet Equation", formula: "Assets = Liabilities + Owner's Equity",
-        tip: "Hamesha balance! Company ke paas jo hai (Assets) = kis ka hai (Liabilities + Equity)",
-        example: "Assets=1000, Liabilities=400 → Equity=600" },
-      { title: "Break-Even Point", formula: "BEP = Fixed Costs / (Selling Price - Variable Cost per unit)",
-        tip: "Jab total revenue = total cost. Iske upar profit, neeche loss",
-        example: "FC=50000, SP=100, VC=50 per unit → BEP = 50000/50 = 1000 units" },
-      { title: "Ratio Analysis — Current Ratio", formula: "Current Ratio = Current Assets / Current Liabilities",
-        tip: "Ideal = 2:1. 1 se kam = liquidity problem. 3 se zyada = idle funds",
-        example: "CA=200000, CL=100000 → Ratio=2 (perfect!)" },
-      { title: "Depreciation — Straight Line", formula: "Annual Dep = (Cost - Scrap Value) / Useful Life",
-        tip: "Har saal equal depreciation. Simple aur commonly used method",
-        example: "Machine cost 1L, scrap 10K, life 10 yrs → Dep = 9000/year" },
+      { title: "Forms of Business Organisation", formula: "Sole Proprietor (1) | Partnership (2-50) | Company (Joint Stock)",
+        tip: "Sole Proprietorship features unlimited liability. Joint Stock Company features a separate legal entity and limited liability.",
+        example: "Local retail store = Sole Proprietorship. Tata Motors = Joint Stock Company" },
+      { title: "Trade Classification", formula: "Trade = Home Trade (Wholesale, Retail) + Foreign Trade (Import, Export, Entrepot)",
+        tip: "Entrepot trade means importing goods from one country to export them to another country.",
+        example: "Importing raw materials from Dubai, processing in India, and exporting to UK" },
+      { title: "Business Finance Sources", formula: "Long Term (Equity, Debentures) | Short Term (Bank Overdraft, Trade Credit)",
+        tip: "Equity shares carry voting rights but no fixed dividend. Debentures carry fixed interest but no voting rights.",
+        example: "Issuing equity shares to construct a new corporate office (Long-term)" },
+      { title: "MSME Classification", formula: "Micro (Inv ≤ 1cr, T/O ≤ 5cr) | Small (Inv ≤ 10cr, T/O ≤ 50cr) | Medium (Inv ≤ 50cr, T/O ≤ 250cr)",
+        tip: "MSME criteria are now uniform for both manufacturing and services sector based on investment and turnover.",
+        example: "A firm with ₹80 Lakh investment and ₹3 Crore turnover is a Micro enterprise" },
+      { title: "E-Commerce Types", formula: "B2B (Business-to-Business) | B2C (Business-to-Consumer) | C2C (Consumer-to-Consumer)",
+        tip: "C2C involves direct transaction between consumers, usually facilitated by an online marketplace.",
+        example: "Amazon = B2C. Alibaba = B2B. OLX/eBay = C2C" },
+    ] },
+  { id: "accounts", subject: "Accountancy", color: "from-fuchsia-500 to-purple-600", icon: "🧮",
+    tricks: [
+      { title: "Accounting Equation", formula: "Assets = Liabilities + Capital",
+        tip: "Dono sides hamesha equal hone chahiye. Business transaction se is balance pe koi farq nahi padta.",
+        example: "Started business with cash ₹50,000 → Cash (Asset) +50,000 & Capital +50,000" },
+      { title: "Golden Rules of Accounting", formula: "Real: Debit what comes in, Credit what goes out\nPersonal: Debit the receiver, Credit the giver\nNominal: Debit expenses & losses, Credit incomes & gains",
+        tip: "Rule pehle identify karo (Asset = Real, Person = Personal, Expense/Income = Nominal) phir entry banao.",
+        example: "Paid salary ₹5,000 → Salary (Nominal - Debit) & Cash (Real - Credit)" },
+      { title: "Bank Reconciliation Statement (BRS)", formula: "Cash Book Balance +/- Adjustments = Pass Book Balance",
+        tip: "Agar Cash Book se shuru kar rahe ho: jo items Pass Book ko badhate hain unhe (+) karo, jo kam karte hain unhe (-) karo.",
+        example: "Cheque issued but not presented → Add (+) to Cash Book balance to reach Pass Book balance" },
+      { title: "Depreciation — Straight Line Method (SLM)", formula: "Annual Depreciation = (Asset Cost - Scrap Value) / Useful Life",
+        tip: "SLM me har saal depreciation ki amount SAME rehti hai. Depreciation rate = (Depreciation / Cost) * 100",
+        example: "Cost ₹1,00,000, Scrap ₹10,000, Life 10 years → Depreciation = ₹9,000 per year" },
+      { title: "Bills of Exchange — Due Date Calculation", formula: "Due Date = Date of Drawing + Bill Term + 3 Days of Grace",
+        tip: "Hamesha 3 days of grace add karna mat bhoolna, chahe koi bhi scenario ho (unless public holiday)!",
+        example: "Bill drawn on Jan 1 for 2 months → Due Date is March 1 + 3 days = March 4" }
     ] },
 ];
 
@@ -237,6 +266,12 @@ const SUBJECTS = [
                "Joint Stock Company","Formation of a Company","Commencement of Business","Business Finance",
                "Sources of Business Finance","Micro, Small & Medium Enterprises (MSME)",
                "Multinational Companies (MNCs)","Current Trends in Business (E-business)"] },
+  { id: "accounts", name: "Accountancy", icon: "🧮", color: "from-fuchsia-500 to-purple-600",
+    tag: "Principles of Accounting · Ledger · Final Accounts",
+    chapters: ["Introduction to Accounting", "Journal and Ledger", "Subsidiary Books", "Cash Book",
+               "Bank Reconciliation Statement (BRS)", "Trial Balance and Rectification of Errors",
+               "Depreciation Accounting", "Bills of Exchange", "Final Accounts of Sole Trader",
+               "Computerised Accounting"] },
 ];
 
 // ---------- STATE ----------
@@ -645,7 +680,7 @@ function SubjectsView() {
             ${s.chapters.length > 6 ? `<span class="rounded-full bg-slate-100 dark:bg-slate-800 px-2.5 py-1 text-[11px]">+${s.chapters.length - 6} more</span>` : ""}</div>
           <div class="mt-3 flex gap-2">
             <button class="askSub flex-1 rounded-xl bg-slate-900 dark:bg-white dark:text-slate-900 py-2 text-xs font-semibold text-white">${t().openChat}</button>
-            ${(s.id === "maths1a" || s.id === "maths1b") ? `<button class="tricksSub flex-1 rounded-xl border border-slate-300 dark:border-slate-700 py-2 text-xs font-semibold">🧠 ${t().nav.tricks}</button>` : ""}
+            <button class="tricksSub flex-1 rounded-xl border border-slate-300 dark:border-slate-700 py-2 text-xs font-semibold">🧠 ${t().nav.tricks}</button>
           </div></div></div>`);
     card.querySelector(".askSub").onclick = () => { go("chat"); setTimeout(() => sendMessage(state.lang === "hi"
         ? `${s.name} ka ek important chapter samjhao aur 3 exam questions do.`
