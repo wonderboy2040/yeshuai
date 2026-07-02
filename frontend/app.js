@@ -12,7 +12,7 @@ const MAX_RETRIES = 2;
 const I18N = {
   en: {
     appName: "MEC Study Buddy", tagline: "Your 24x7 CA Professor — always with you",
-    nav: { home: "Home", subjects: "Subjects", today: "Today", exam: "Exams", chat: "Chat", tricks: "Tricks", tools: "Tools" },
+    nav: { home: "Home", subjects: "Subjects", today: "Today", exam: "Exams", chat: "Chat", tricks: "Tricks" },
     greetMorning: "Good morning", greetAfternoon: "Good afternoon", greetEvening: "Good evening",
     welcome: "Ready to study, future CA? 🎓",
     quickAsk: "Ask the Professor", logToday: "Log today's class", myNotes: "My Notes", examPrep: "Exam Prep",
@@ -57,43 +57,11 @@ const I18N = {
     tip5: "Economics graphs: draw them for 5 mins daily — you'll never forget",
     tip6: "Commerce terms: create a short story around each term to remember",
     tip7: "Accounting: keep the double-entry rule clear — every debit has an equal credit",
-    // MCQ Quiz
-    mcqTitle: "MCQ Practice Tests", mcqHint: "Test your knowledge with subject-wise MCQs. Get instant feedback.",
-    mcqStart: "Start Quiz", mcqScore: "Score", mcqCorrect: "Correct", mcqWrong: "Wrong",
-    mcqNext: "Next", mcqResult: "Quiz Complete!", mcqSelectSubj: "Select Subject",
-    mcqAccuracy: "Accuracy", mcqRetry: "Try Again", mcqTotal: "Total Questions",
-    mcqExplain: "Explanation", mcqGenByAI: "Generate AI Questions",
-    // Flashcards
-    fcTitle: "Flashcards", fcHint: "Master formulas & concepts with spaced repetition",
-    fcFront: "Front", fcBack: "Back", fcFlip: "Flip", fcEasy: "Easy (3 days)",
-    fcMedium: "Medium (1 day)", fcHard: "Hard (now)", fcBox: "Box", fcNewCard: "New Flashcard",
-    fcReview: "Review Cards", fcDone: "Done for now!", fcDue: "Due for review",
-    fcAddNew: "Add New Card", fcSubject: "Subject", fcFrontLabel: "Question / Formula",
-    fcBackLabel: "Answer / Explanation", fcAdd: "Add Card", fcEmpty: "No flashcards yet. Add your first!",
-    // Pomodoro Timer
-    pomTitle: "Focus Timer", pomHint: "Study with Pomodoro technique — 25 min focus, 5 min break",
-    pomWork: "Focus", pomBreak: "Break", pomStart: "Start", pomPause: "Pause",
-    pomReset: "Reset", pomSessions: "Sessions today", pomFocusTime: "Total focus time",
-    pomComplete: "Time's up! Take a break 🎉", pomBreakComplete: "Break over! Back to work 💪",
-    // Progress Dashboard
-    progTitle: "My Progress", progHint: "Track your study journey — stay motivated!",
-    progStreak: "Streak", progLogs: "Diary Entries", progTopics: "Topics",
-    progQuizScore: "Quiz Avg", progFocusHours: "Focus Hours", progThisWeek: "This Week",
-    progNoData: "Start studying to see your progress!",
-    // Doubt Library
-    doubtTitle: "Doubt Library", doubtHint: "Search previously asked doubts and AI answers",
-    doubtSearch: "Search doubts…", doubtEmpty: "No doubts found. Ask the Professor!",
-    doubtClear: "Clear search",
-    // Voice Notes
-    recordNote: "Record Voice Note", recording: "Recording… tap to stop",
-    stopRecording: "Stop", playback: "Playback", saveNote: "Save Note",
-    // Tools nav
-    tools: "Tools",
   },
 
   hi: {
     appName: "MEC Study Buddy", tagline: "Aapke 24x7 CA Professor — hamesha saath",
-    nav: { home: "Home", subjects: "Subjects", today: "Aaj", exam: "Exam", chat: "Chat", tricks: "Tricks", tools: "Tools" },
+    nav: { home: "Home", subjects: "Subjects", today: "Aaj", exam: "Exam", chat: "Chat", tricks: "Tricks" },
     greetMorning: "Good morning", greetAfternoon: "Good afternoon", greetEvening: "Good evening",
     welcome: "Padhne ke liye ready ho, future CA? 🎓",
     quickAsk: "Professor se pucho", logToday: "Aaj ki class likho", myNotes: "Mere Notes", examPrep: "Exam Prep",
@@ -138,38 +106,16 @@ const I18N = {
     tip5: "Economics graphs: roz 5 mins draw karo — hamesha yaad rahega",
     tip6: "Commerce terms: har term ke around chhoti story banao, yaad rahega",
     tip7: "Accounting: double entry rule clear rakho — har debit ka ek credit hota hai",
-    // MCQ Quiz
-    mcqTitle: "MCQ Practice Test", mcqHint: "Subject-wise MCQs se apni knowledge test karo. Instant feedback milega.",
-    mcqStart: "Quiz Start karo", mcqScore: "Score", mcqCorrect: "Sahi", mcqWrong: "Galat",
-    mcqNext: "Agla", mcqResult: "Quiz Complete!", mcqSelectSubj: "Subject chuno",
-    mcqAccuracy: "Accuracy", mcqRetry: "Phir se try karo", mcqTotal: "Total Questions",
-    mcqExplain: "Explanation", mcqGenByAI: "AI se questions banao",
-    // Flashcards
-    fcTitle: "Flashcards", fcHint: "Spaced repetition se formulas aur concepts yaad karo",
-    fcFront: "Aage", fcBack: "Peeche", fcFlip: "Palat do", fcEasy: "Easy (3 din)",
-    fcMedium: "Medium (1 din)", fcHard: "Hard (abhi)", fcBox: "Box", fcNewCard: "Naya Flashcard",
-    fcReview: "Review karo", fcDone: "Abhi ke liye ho gaya!", fcDue: "Review due hai",
-    fcAddNew: "Naya Card Add karo", fcSubject: "Subject", fcFrontLabel: "Sawaal / Formula",
-    fcBackLabel: "Jawaab / Explanation", fcAdd: "Card Add karo", fcEmpty: "Abhi koi flashcard nahi. Pehla add karo!",
-    // Pomodoro Timer
-    pomTitle: "Focus Timer", pomHint: "Pomodoro technique se padho — 25 min focus, 5 min break",
-    pomWork: "Focus", pomBreak: "Break", pomStart: "Shuru", pomPause: "Ruko",
-    pomReset: "Reset", pomSessions: "Aaj ke sessions", pomFocusTime: "Total focus time",
-    pomComplete: "Time ho gaya! Break lo 🎉", pomBreakComplete: "Break khatam! Padhai karo 💪",
-    // Progress Dashboard
-    progTitle: "Meri Progress", progHint: "Apni study journey track karo — motivated raho!",
-    progStreak: "Streak", progLogs: "Diary Entries", progTopics: "Topics",
-    progQuizScore: "Quiz Avg", progFocusHours: "Focus Hours", progThisWeek: "Is hafte",
-    progNoData: "Progress dekhne ke liye padhai shuru karo!",
-    // Doubt Library
-    doubtTitle: "Doubt Library", doubtHint: "Pehle puchhe gaye doubts aur AI answers search karo",
-    doubtSearch: "Doubts search karo…", doubtEmpty: "Koi doubt nahi mila. Professor se pucho!",
-    doubtClear: "Search clear karo",
-    // Voice Notes
-    recordNote: "Voice Note Record karo", recording: "Record ho raha… tap karo rukne ke liye",
-    stopRecording: "Ruko", playback: "Sunno", saveNote: "Note Save karo",
-    // Tools nav
-    tools: "Tools",
+    trickM1: "Logarithm Power Rule: log(aᵇ) = b·log(a) — exponent neeche aata hai",
+    trickM2: "Matrix Multiplication: row × column — pehle row, phir column, add karo",
+    trickM3: "Differentiation: d/dx(xⁿ) = nxⁿ⁻¹ — power neeche aata hai, power ek kam",
+    trickM4: "Integration: ∫xⁿdx = xⁿ⁺¹/(n+1) + C — power ek badhao, usi se divide",
+    trickM5: "Trig Identity: sin²θ + cos²θ = 1 — yaad rahe hamesha",
+    trickM6: "Limits: (sin x)/x → 1 jab x → 0 — standard limit hai, yaad rakho",
+    trickM7: "Straight Line: slope m = (y₂-y₁)/(x₂-x₁) — rise over run",
+    trickM8: "Vectors: dot product = |a||b|cosθ — magnitude × cos of angle",
+    trickM9: "Functions: composite fog means f(g(x)) — andar se bahar",
+    trickM10: "Probability: P(A∪B) = P(A)+P(B)-P(A∩B) — dono ko add, common subtract",
   }
 };
 
@@ -296,39 +242,6 @@ const MOTIVATIONS = [
   { en: "You don't have to be great to start, but you have to start to be great.", hi: "Great hone ke liye start karna zaroori hai, start karne ke liye great hona nahi." },
 ];
 
-// ---------- MCQ QUESTION BANK (5 per subject) ----------
-const MCQ_BANK = [
-  { subject: "Maths Paper-IA", q: "What is the domain of f(x) = 1/(x-3)?", opts: ["All real numbers", "x ≠ 3", "x > 3", "x < 3"], ans: 1, exp: "Denominator cannot be zero, so x-3 ≠ 0 → x ≠ 3" },
-  { subject: "Maths Paper-IA", q: "det[2 3; 4 5] = ?", opts: ["-2", "2", "10-12= -2", "22"], ans: 0, exp: "det = (2×5) - (3×4) = 10-12 = -2" },
-  { subject: "Maths Paper-IA", q: "sin²θ + cos²θ = ?", opts: ["0", "1", "-1", "sinθ"], ans: 1, exp: "This is the fundamental trig identity — always equals 1" },
-  { subject: "Maths Paper-IA", q: "Which is NOT a scalar quantity?", opts: ["Mass", "Speed", "Velocity", "Temperature"], ans: 2, exp: "Velocity has both magnitude and direction — it's a vector" },
-  { subject: "Maths Paper-IA", q: "What is the order of a 2×3 matrix?", opts: ["2", "3", "2×3", "3×2"], ans: 2, exp: "Order is rows × columns = 2×3" },
-  { subject: "Maths Paper-IB", q: "Slope of line through (1,2) and (3,6) is:", opts: ["1", "2", "4", "1/2"], ans: 1, exp: "m = (6-2)/(3-1) = 4/2 = 2" },
-  { subject: "Maths Paper-IB", q: "d/dx(x⁵) = ?", opts: ["5x⁴", "x⁴", "5x⁵", "4x⁵"], ans: 0, exp: "Power rule: d/dx(xⁿ) = n·xⁿ⁻¹ → 5x⁴" },
-  { subject: "Maths Paper-IB", q: "Distance between (1,2) and (4,6) is:", opts: ["5", "4", "7", "25"], ans: 0, exp: "d = √[(4-1)²+(6-2)²] = √(9+16)=√25=5" },
-  { subject: "Maths Paper-IB", q: "lim(x→0) sin x / x = ?", opts: ["0", "1", "∞", "undefined"], ans: 1, exp: "Standard limit: lim(x→0) sin x / x = 1" },
-  { subject: "Maths Paper-IB", q: "Which is a scalar quantity?", opts: ["Force", "Velocity", "Speed", "Acceleration"], ans: 2, exp: "Speed has only magnitude, no direction" },
-  { subject: "Economics", q: "GDP = ?", opts: ["C+I+G+(X-M)", "C+I+G", "C+I", "C+G+X"], ans: 0, exp: "GDP = Consumption + Investment + Govt Spending + Net Exports" },
-  { subject: "Economics", q: "When Ed > 1, demand is:", opts: ["Inelastic", "Elastic", "Unit elastic", "Perfectly inelastic"], ans: 1, exp: "Ed > 1 means demand changes more than price → elastic" },
-  { subject: "Economics", q: "CRR = 10% → Money Multiplier = ?", opts: ["10", "5", "20", "1"], ans: 0, exp: "Multiplier = 1/CRR = 1/0.10 = 10" },
-  { subject: "Economics", q: "Who gave the 'Law of Demand'?", opts: ["Marshall", "Keynes", "Adam Smith", "Ricardo"], ans: 0, exp: "Alfred Marshall propounded the Law of Demand" },
-  { subject: "Economics", q: "Inflation target of RBI is:", opts: ["2%", "4%", "6%", "8%"], ans: 1, exp: "RBI inflation target is 4% with ±2% tolerance band" },
-  { subject: "Commerce", q: "Sole Proprietorship has:", opts: ["Limited liability", "Unlimited liability", "Separate legal entity", "Perpetual succession"], ans: 1, exp: "Sole proprietor has unlimited personal liability" },
-  { subject: "Commerce", q: "Which is NOT a type of trade?", opts: ["Wholesale", "Retail", "Export", "Production"], ans: 3, exp: "Production is not a type of trade; trade involves buying/selling" },
-  { subject: "Commerce", q: "MSME: Micro enterprise investment limit:", opts: ["≤ ₹1 cr", "≤ ₹10 cr", "≤ ₹50 cr", "≤ ₹5 cr"], ans: 0, exp: "Micro: Investment ≤ ₹1 crore" },
-  { subject: "Commerce", q: "E-commerce B2C example:", opts: ["Amazon", "Alibaba", "OLX", "eBay"], ans: 0, exp: "Amazon sells to consumers → B2C" },
-  { subject: "Commerce", q: "Joint Stock Company features:", opts: ["Unlimited liability", "No separate entity", "Separate legal entity", "Only 5 members"], ans: 2, exp: "Company has separate legal entity distinct from its members" },
-  { subject: "Accountancy", q: "Accounting Equation: Assets = ?", opts: ["Liabilities + Capital", "Liabilities - Capital", "Capital - Liabilities", "Expenses + Income"], ans: 0, exp: "Assets = Liabilities + Capital (fundamental equation)" },
-  { subject: "Accountancy", q: "Paid salary ₹5000. Which account rule?", opts: ["Real", "Personal", "Nominal", "None"], ans: 2, exp: "Salary is an expense → Nominal account: Debit expenses" },
-  { subject: "Accountancy", q: "Depreciation SLM: Cost ₹1L, Scrap ₹10K, Life 10 yrs → Annual Dep = ?", opts: ["₹10,000", "₹9,000", "₹11,000", "₹5,000"], ans: 1, exp: "(1,00,000 - 10,000)/10 = ₹9,000 per year" },
-  { subject: "Accountancy", q: "BRS: Cheque issued but not presented →", opts: ["Add to Cash Book", "Subtract from Cash Book", "Add to Pass Book", "No adjustment"], ans: 0, exp: "Add to Cash Book balance to reach Pass Book balance" },
-  { subject: "Accountancy", q: "Bills of Exchange: Days of grace = ?", opts: ["1", "2", "3", "7"], ans: 2, exp: "3 days of grace are added to the bill term" },
-];
-
-// ---------- FLASHCARD HELPERS ----------
-const FC_BOXES = [1, 2, 3];
-const FC_INTERVALS = [0, 1, 3, 7];
-
 // ---------- STATE ----------
 const SUBJECTS = [
   { id: "maths1a", name: "Maths Paper-IA", icon: "📐", color: "from-orange-500 to-amber-600",
@@ -362,8 +275,17 @@ const SUBJECTS = [
 ];
 
 // ---------- STATE ----------
-const LS = { cfg: "mec_cfg", logs: "mec_logs", chat: "mec_chat", streak: "mec_streak", lastDay: "mec_lastday",
-  flashcards: "mec_fc", quizScores: "mec_quiz", pomodoros: "mec_pomo", focusTotal: "mec_focus", voiceNotes: "mec_voice" };
+const LS = {
+  cfg: "mec_cfg", logs: "mec_logs", chat: "mec_chat",
+  streak: "mec_streak", lastDay: "mec_lastday",
+  // NEW FEATURE storage keys (v2)
+  flashcards: "mec_flashcards_v2",
+  bookmarks: "mec_bookmarks_v2",
+  quizResults: "mec_quiz_results_v2",
+  syllabus: "mec_syllabus_v2",
+  pomoStats: "mec_pomo_stats_v2",
+  examGoal: "mec_exam_goal_v2",
+};
 let cfg = JSON.parse(localStorage.getItem(LS.cfg) || "null");
 let session = { pinHash: sessionStorage.getItem("mec_pin") || null, unlocked: false };
 let state = {
@@ -371,11 +293,13 @@ let state = {
   logs: JSON.parse(localStorage.getItem(LS.logs) || "[]"),
   chat: JSON.parse(localStorage.getItem(LS.chat) || "[]"),
   pendingFiles: [],
+  // NEW FEATURE state (v2)
   flashcards: JSON.parse(localStorage.getItem(LS.flashcards) || "[]"),
-  quizScores: JSON.parse(localStorage.getItem(LS.quizScores) || "[]"),
-  pomodoros: parseInt(localStorage.getItem(LS.pomodoros) || "0"),
-  focusTotal: parseInt(localStorage.getItem(LS.focusTotal) || "0"),
-  voiceNotes: JSON.parse(localStorage.getItem(LS.voiceNotes) || "[]"),
+  bookmarks: JSON.parse(localStorage.getItem(LS.bookmarks) || "[]"),
+  quizResults: JSON.parse(localStorage.getItem(LS.quizResults) || "[]"),
+  syllabus: JSON.parse(localStorage.getItem(LS.syllabus) || "{}"),
+  pomoStats: JSON.parse(localStorage.getItem(LS.pomoStats) || "{\"sessions\":[],\"todayMinutes\":0,\"todayDate\":\"\"}"),
+  examGoal: JSON.parse(localStorage.getItem(LS.examGoal) || "null"),
 };
 const t = () => I18N[state.lang];
 const saveLS = (k, v) => localStorage.setItem(k, JSON.stringify(v));
@@ -395,7 +319,7 @@ function mdToHtml(s) {
     .replace(/^(.*)$/s, "<p>$1</p>");
 }
 function getStudentName() {
-  return cfg && cfg.studentName ? cfg.studentName : "Student";
+  return cfg && cfg.studentName ? cfg.studentName : "Yeshaswini";
 }
 function sanitize(str) {
   return String(str || "").replace(/[<>]/g, "").trim();
@@ -444,8 +368,6 @@ window.addEventListener("offline", () => { state.online = false; if (session.unl
 //  BOOT
 // ===================================================================
 async function boot() {
-  const app = document.getElementById("app");
-  app.innerHTML = `<div class="flex min-h-dvh items-center justify-center"><div class="text-center"><div class="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-teal-500 to-indigo-600 text-3xl text-white shadow-lg animate-pulse">🎓</div><p class="mt-4 text-sm text-slate-500">Loading MEC Study Buddy...</p></div></div>`;
   const baked = DEFAULT_BACKEND_URL && !DEFAULT_BACKEND_URL.startsWith("PASTE_");
   if (!cfg || !cfg.url) {
     if (baked) {
@@ -678,7 +600,7 @@ function render() {
   if (!state.online) {
     main.appendChild(el(`<div class="mb-3 rounded-xl bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 p-3 text-center text-xs text-amber-700 dark:text-amber-300">📡 ${t().offline}</div>`));
   }
-  const views = { home: HomeView, subjects: SubjectsView, today: TodayView, exam: ExamView, chat: ChatView, tricks: TricksView, mcq: MCQView, flashcards: FlashcardsView, pomodoro: PomodoroView, progress: ProgressView, doubts: DoubtsView, tools: ToolsView };
+  const views = { home: HomeView, subjects: SubjectsView, today: TodayView, exam: ExamView, chat: ChatView, tricks: TricksView, focus: FocusView, flashcards: FlashcardsView, quiz: QuizView, analytics: AnalyticsView, bookmarks: BookmarksView };
   main.appendChild((views[state.view] || HomeView)());
   app.appendChild(main);
   app.appendChild(AIAgentFAB());
@@ -693,12 +615,14 @@ function Header() {
         <div class="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-teal-500 to-indigo-600 text-white text-lg shadow">🎓</div>
         <div class="min-w-0 flex-1"><h1 class="truncate text-base font-bold leading-tight">${t().appName}</h1>
           <p class="truncate text-[11px] text-slate-500 dark:text-slate-400">${t().tagline}</p></div>
+        <button id="moreBtn" class="shrink-0 rounded-full border border-slate-300 dark:border-slate-700 px-3 py-1.5 text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-800" title="More features">⚡ More</button>
         <button id="langBtn" class="shrink-0 rounded-full border border-slate-300 dark:border-slate-700 px-3 py-1.5 text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-800">
           ${state.lang === "hi" ? "🇮🇳 Hinglish" : "🇬🇧 English"}</button>
       </div></header>`);
   h.querySelector("#langBtn").onclick = () => {
     state.lang = state.lang === "hi" ? "en" : "hi"; cfg.lang = state.lang; saveLS(LS.cfg, cfg); render();
   };
+  h.querySelector("#moreBtn").onclick = () => openMoreSheet();
   return h;
 }
 
@@ -725,398 +649,6 @@ function StatCard(label, value, icon) {
   return `<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 text-center">
     <div class="text-2xl">${icon}</div><div class="mt-1 text-xl font-extrabold">${value}</div>
     <div class="text-[11px] text-slate-500 dark:text-slate-400">${label}</div></div>`;
-}
-
-// ===================================================================
-//  MCQ QUIZ VIEW
-// ===================================================================
-function MCQView() {
-  const T = t();
-  const wrap = el(`<div class="space-y-4"><div><h2 class="px-1 text-lg font-bold">📝 ${T.mcqTitle}</h2>
-    <p class="px-1 text-xs text-slate-500 dark:text-slate-400">${T.mcqHint}</p></div></div>`);
-
-  const saved = state.quizScores || [];
-  const avg = saved.length ? Math.round(saved.reduce((a,b)=>a+b,0)/saved.length) : 0;
-
-  wrap.appendChild(el(`<div class="grid grid-cols-3 gap-2">${StatCard(T.mcqTotal, saved.length, "📋")}${StatCard(T.mcqAccuracy, avg + "%", "🎯")}${StatCard(T.classesLogged, saved.filter(s=>s>=80).length, "🏆")}</div>`));
-
-  const subjGrid = el(`<div class="grid grid-cols-2 gap-2"></div>`);
-  SUBJECTS.forEach(s => {
-    const prev = saved.filter(sc => sc.subject === s.name).length;
-    const card = el(`<button class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 text-center hover:shadow-md transition">
-      <span class="text-2xl">${s.icon}</span><p class="mt-1 text-xs font-bold">${s.name}</p>
-      <p class="text-[10px] text-slate-400">${prev} tests done</p></button>`);
-    card.onclick = () => startMCQ(s.name);
-    subjGrid.appendChild(card);
-  });
-  wrap.appendChild(subjGrid);
-
-  // AI Question Generator
-  const aiBtn = el(`<button class="w-full rounded-xl bg-gradient-to-r from-purple-500 to-pink-600 py-2.5 text-sm font-semibold text-white">🤖 ${T.mcqGenByAI}</button>`);
-  aiBtn.onclick = () => { go("chat"); setTimeout(() => sendMessage(state.lang === "hi"
-    ? "Mujhe MEC subjects ke 10 MCQ questions do with answers and explanation"
-    : "Give me 10 MCQ questions on MEC subjects with answers and explanation"), 60); };
-  wrap.appendChild(aiBtn);
-
-  return wrap;
-}
-
-function startMCQ(subject) {
-  const T = t();
-  const questions = MCQ_BANK.filter(q => q.subject === subject);
-  if (!questions.length) { alert("No questions for this subject yet!"); return; }
-  let idx = 0, correct = 0, wrong = 0, answered = false;
-  const wrap = el(`<div class="space-y-4"></div>`);
-  const card = el(`<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 space-y-3"></div>`);
-
-  function renderQuestion() {
-    card.innerHTML = "";
-    if (idx >= questions.length) return showResult();
-    const q = questions[idx];
-    card.appendChild(el(`<div class="flex items-center justify-between"><span class="text-[11px] font-semibold text-teal-600">${subject}</span><span class="text-[11px] text-slate-400">${idx+1}/${questions.length}</span></div>`));
-    card.appendChild(el(`<p class="text-sm font-bold">${q.q}</p>`));
-    const optsDiv = el(`<div class="space-y-1.5"></div>`);
-    q.opts.forEach((o, i) => {
-      const btn = el(`<button class="opt-btn w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2.5 text-left text-xs hover:bg-slate-100 dark:hover:bg-slate-700 transition">${String.fromCharCode(65+i)}. ${o}</button>`);
-      btn.onclick = () => {
-        if (answered) return;
-        answered = true;
-        document.querySelectorAll(".opt-btn").forEach(b => b.style.pointerEvents = "none");
-        if (i === q.ans) { correct++; btn.classList.replace("border-slate-200", "border-emerald-500"); btn.classList.add("bg-emerald-50","dark:bg-emerald-900/30"); }
-        else { wrong++; btn.classList.replace("border-slate-200", "border-rose-500"); btn.classList.add("bg-rose-50","dark:bg-rose-900/30");
-          const correctBtn = document.querySelectorAll(".opt-btn")[q.ans];
-          if (correctBtn) { correctBtn.classList.replace("border-slate-200", "border-emerald-500"); correctBtn.classList.add("bg-emerald-50","dark:bg-emerald-900/30"); } }
-        const expDiv = el(`<div class="rounded-xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 p-2.5"><p class="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400">💡 ${T.mcqExplain}</p><p class="text-[11px] mt-0.5 text-slate-600 dark:text-slate-300">${q.exp}</p></div>`);
-        card.appendChild(expDiv);
-        nextBtn.classList.remove("hidden");
-      };
-      optsDiv.appendChild(btn);
-    });
-    card.appendChild(optsDiv);
-    const nextBtn = el(`<button class="next-btn hidden w-full rounded-xl bg-gradient-to-r from-teal-500 to-indigo-600 py-2.5 text-sm font-semibold text-white">${idx < questions.length-1 ? T.mcqNext : T.mcqResult}</button>`);
-    nextBtn.onclick = () => { idx++; answered = false; renderQuestion(); };
-    card.appendChild(nextBtn);
-  }
-
-  function showResult() {
-    const pct = Math.round(correct/questions.length*100);
-    const grade = pct >= 80 ? "🏆" : pct >= 50 ? "👍" : "💪";
-    card.innerHTML = `<div class="text-center py-4 space-y-3"><div class="text-5xl">${grade}</div>
-      <h3 class="text-lg font-bold">${T.mcqResult}</h3>
-      <div class="grid grid-cols-3 gap-2">${StatCard(T.mcqCorrect, correct, "✅")}${StatCard(T.mcqWrong, wrong, "❌")}${StatCard(T.mcqAccuracy, pct+"%", "🎯")}</div>
-      <button class="retry-btn w-full rounded-xl bg-gradient-to-r from-teal-500 to-indigo-600 py-2.5 text-sm font-semibold text-white">${T.mcqRetry}</button>
-      <button class="back-btn w-full rounded-xl border border-slate-300 dark:border-slate-700 py-2.5 text-sm font-semibold">← ${T.back}</button></div>`;
-    card.querySelector(".retry-btn").onclick = () => { state.view = "mcq"; startMCQ(subject); };
-    card.querySelector(".back-btn").onclick = () => go("mcq");
-    const scores = state.quizScores || [];
-    scores.push({ subject, score: pct, date: new Date().toISOString() });
-    state.quizScores = scores;
-    saveLS(LS.quizScores, scores);
-  }
-
-  renderQuestion();
-  const app = document.getElementById("app");
-  const main = app.querySelector("main") || app;
-  const backBtn = el(`<button class="mb-2 text-xs text-slate-500 hover:underline" onclick="go('mcq')">← ${T.mcqTitle}</button>`);
-  main.innerHTML = ""; main.appendChild(backBtn); main.appendChild(card);
-  window.scrollTo({ top: 0 });
-}
-
-// ===================================================================
-//  FLASHCARDS VIEW
-// ===================================================================
-function FlashcardsView() {
-  const T = t();
-  const wrap = el(`<div class="space-y-4"><div><h2 class="px-1 text-lg font-bold">🃏 ${T.fcTitle}</h2>
-    <p class="px-1 text-xs text-slate-500 dark:text-slate-400">${T.fcHint}</p></div></div>`);
-
-  const cards = state.flashcards || [];
-  const due = cards.filter(c => new Date(c.nextReview) <= new Date());
-  const total = cards.length;
-
-  // Stats
-  wrap.appendChild(el(`<div class="grid grid-cols-3 gap-2">${StatCard(T.fcDue, due.length, "📖")}${StatCard(T.fcBox+" 1", cards.filter(c=>c.box===1).length, "🟢")}${StatCard(T.mcqTotal, total, "🃏")}</div>`));
-
-  // Review section
-  const reviewSec = el(`<div class="space-y-2"></div>`);
-  if (due.length) {
-    let dueIdx = 0;
-    const reviewCard = el(`<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 text-center space-y-3 min-h-[200px] flex flex-col items-center justify-center"></div>`);
-
-    function showCard() {
-      if (dueIdx >= due.length) { reviewCard.innerHTML = `<div class="py-6 text-center"><div class="text-4xl">🎉</div><p class="mt-2 text-sm font-bold">${T.fcDone}</p></div>`; return; }
-      const c = due[dueIdx];
-      reviewCard.innerHTML = `<p class="text-[11px] font-semibold text-teal-600">${c.subject} · ${T.fcBox} ${c.box}</p>
-        <p class="text-sm font-bold mt-1" id="fcFront">${c.front}</p>
-        <div id="fcBack" class="hidden mt-1"><div class="rounded-xl bg-slate-100 dark:bg-slate-800 p-3"><p class="text-xs">${c.back}</p></div></div>
-        <button id="fcFlipBtn" class="rounded-full bg-gradient-to-r from-teal-500 to-indigo-600 px-6 py-2 text-xs font-semibold text-white">${T.fcFlip}</button>
-        <div id="fcRating" class="hidden flex gap-2 mt-2">
-          <button data-days="7" class="flex-1 rounded-xl bg-emerald-500 py-2 text-xs font-semibold text-white">${T.fcEasy}</button>
-          <button data-days="1" class="flex-1 rounded-xl bg-amber-500 py-2 text-xs font-semibold text-white">${T.fcMedium}</button>
-          <button data-days="0" class="flex-1 rounded-xl bg-rose-500 py-2 text-xs font-semibold text-white">${T.fcHard}</button>
-        </div>`;
-      reviewCard.querySelector("#fcFlipBtn").onclick = () => {
-        document.getElementById("fcBack").classList.remove("hidden");
-        document.getElementById("fcFlipBtn").classList.add("hidden");
-        document.getElementById("fcRating").classList.remove("hidden");
-      };
-      reviewCard.querySelectorAll("#fcRating button").forEach(b => {
-        b.onclick = () => {
-          const days = parseInt(b.dataset.days);
-          const c2 = state.flashcards.find(x => x.id === c.id);
-          if (c2) {
-            c2.box = days === 0 ? 1 : Math.min(c2.box + 1, 3);
-            c2.nextReview = new Date(Date.now() + (days || FC_INTERVALS[c2.box] || 1) * 86400000).toISOString();
-            c2.timesReviewed = (c2.timesReviewed || 0) + 1;
-          }
-          saveLS(LS.flashcards, state.flashcards);
-          dueIdx++;
-          showCard();
-        };
-      });
-    }
-    showCard();
-    reviewSec.appendChild(reviewCard);
-  } else {
-    reviewSec.appendChild(el(`<div class="rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 p-6 text-center"><div class="text-4xl">✅</div><p class="mt-2 text-sm font-bold">${T.fcDone}</p><p class="text-xs text-slate-400">${total ? "Come back later!" : T.fcEmpty}</p></div>`));
-  }
-  wrap.appendChild(reviewSec);
-
-  // Add new card form
-  const addSec = el(`<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 space-y-3">
-    <h3 class="text-sm font-bold">➕ ${T.fcAddNew}</h3>
-    <select id="fcSubj" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2">${SUBJECTS.map(s => `<option value="${s.name}">${s.icon} ${s.name}</option>`).join("")}</select>
-    <input id="fcFrontInp" placeholder="${T.fcFrontLabel}" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2">
-    <textarea id="fcBackInp" rows="2" placeholder="${T.fcBackLabel}" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2"></textarea>
-    <button id="fcAddBtn" class="w-full rounded-xl bg-gradient-to-r from-teal-500 to-indigo-600 py-2.5 text-sm font-semibold text-white">${T.fcAdd}</button></div>`);
-  addSec.querySelector("#fcAddBtn").onclick = () => {
-    const subj = addSec.querySelector("#fcSubj").value;
-    const front = addSec.querySelector("#fcFrontInp").value.trim();
-    const back = addSec.querySelector("#fcBackInp").value.trim();
-    if (!front || !back) return;
-    state.flashcards.push({ id: Date.now(), subject: subj, front, back, box: 1, nextReview: new Date().toISOString(), timesReviewed: 0 });
-    saveLS(LS.flashcards, state.flashcards);
-    addSec.querySelector("#fcFrontInp").value = ""; addSec.querySelector("#fcBackInp").value = "";
-    go("flashcards");
-  };
-  wrap.appendChild(addSec);
-
-  // All cards list
-  if (total) {
-    const list = el(`<div class="space-y-1"><h3 class="px-1 text-xs font-semibold text-slate-400">${T.mcqTotal}: ${total}</h3></div>`);
-    cards.forEach(c => {
-      list.appendChild(el(`<div class="flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-2.5">
-        <span class="shrink-0 text-lg">${(SUBJECTS.find(s=>s.name===c.subject)||{}).icon||"📘"}</span>
-        <div class="min-w-0 flex-1"><p class="truncate text-xs font-semibold">${c.front}</p><p class="text-[10px] text-slate-400">${T.fcBox} ${c.box} · ${new Date(c.nextReview) <= new Date() ? "🔴 Due" : "✅ Reviewed"}</p></div>
-        <button class="del-fc text-[10px] text-rose-400 hover:text-rose-600" data-id="${c.id}">✕</button></div>`));
-    });
-    list.querySelectorAll(".del-fc").forEach(b => b.onclick = () => {
-      state.flashcards = state.flashcards.filter(x => x.id !== parseInt(b.dataset.id));
-      saveLS(LS.flashcards, state.flashcards); go("flashcards");
-    });
-    wrap.appendChild(list);
-  }
-
-  return wrap;
-}
-
-// ===================================================================
-//  POMODORO TIMER VIEW
-// ===================================================================
-let _pomoInterval = null;
-const POMO_WORK = 25 * 60;
-const POMO_BREAK = 5 * 60;
-
-function PomodoroView() {
-  const T = t();
-  let timeLeft = POMO_WORK, isWork = true, running = false;
-
-  const wrap = el(`<div class="space-y-4"><div><h2 class="px-1 text-lg font-bold">⏱ ${T.pomTitle}</h2>
-    <p class="px-1 text-xs text-slate-500 dark:text-slate-400">${T.pomHint}</p></div></div>`);
-
-  // Stats
-  wrap.appendChild(el(`<div class="grid grid-cols-2 gap-2">${StatCard(T.pomSessions, state.pomodoros, "🍅")}${StatCard(T.progFocusHours, Math.floor(state.focusTotal/60)+"h "+state.focusTotal%60+"m", "🔥")}</div>`));
-
-  const timerCard = el(`<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 text-center space-y-4">
-    <p id="pomoPhase" class="text-xs font-semibold text-teal-600 uppercase tracking-wide">${T.pomWork}</p>
-    <div id="pomoDisplay" class="text-6xl font-extrabold tabular-nums">25:00</div>
-    <div class="flex justify-center gap-3">
-      <button id="pomoStart" class="rounded-full bg-gradient-to-r from-teal-500 to-indigo-600 px-8 py-2.5 text-sm font-semibold text-white">${T.pomStart}</button>
-      <button id="pomoReset" class="rounded-full border border-slate-300 dark:border-slate-700 px-6 py-2.5 text-sm font-semibold">${T.pomReset}</button>
-    </div></div>`);
-
-  function updateDisplay() {
-    const m = String(Math.floor(timeLeft/60)).padStart(2, "0");
-    const s = String(timeLeft%60).padStart(2, "0");
-    const d = timerCard.querySelector("#pomoDisplay");
-    if (d) d.textContent = `${m}:${s}`;
-    const ph = timerCard.querySelector("#pomoPhase");
-    if (ph) ph.textContent = isWork ? T.pomWork : T.pomBreak;
-  }
-
-  timerCard.querySelector("#pomoStart").onclick = () => {
-    if (running) {
-      running = false;
-      clearInterval(_pomoInterval);
-      timerCard.querySelector("#pomoStart").textContent = T.pomStart;
-      document.title = "MEC Study Buddy";
-      return;
-    }
-    running = true;
-    timerCard.querySelector("#pomoStart").textContent = T.pomPause;
-    _pomoInterval = setInterval(() => {
-      timeLeft--;
-      updateDisplay();
-      document.title = `${Math.floor(timeLeft/60)}:${String(timeLeft%60).padStart(2,"0")} - Study Buddy`;
-      if (timeLeft <= 0) {
-        clearInterval(_pomoInterval); running = false;
-        if (isWork) {
-          state.pomodoros++; localStorage.setItem(LS.pomodoros, state.pomodoros);
-          state.focusTotal += POMO_WORK/60; localStorage.setItem(LS.focusTotal, state.focusTotal);
-          alert(T.pomComplete);
-          isWork = false; timeLeft = POMO_BREAK;
-        } else {
-          alert(T.pomBreakComplete);
-          isWork = true; timeLeft = POMO_WORK;
-        }
-        updateDisplay();
-        timerCard.querySelector("#pomoStart").textContent = T.pomStart;
-        document.title = "MEC Study Buddy";
-      }
-    }, 1000);
-  };
-
-  timerCard.querySelector("#pomoReset").onclick = () => {
-    clearInterval(_pomoInterval); running = false;
-    isWork = true; timeLeft = POMO_WORK;
-    updateDisplay();
-    timerCard.querySelector("#pomoStart").textContent = T.pomStart;
-    document.title = "MEC Study Buddy";
-  };
-
-  wrap.appendChild(timerCard);
-  return wrap;
-}
-
-// ===================================================================
-//  PROGRESS DASHBOARD VIEW
-// ===================================================================
-function ProgressView() {
-  const T = t();
-  const wrap = el(`<div class="space-y-4"><div><h2 class="px-1 text-lg font-bold">📊 ${T.progTitle}</h2>
-    <p class="px-1 text-xs text-slate-500 dark:text-slate-400">${T.progHint}</p></div></div>`);
-
-  const streak = updateStreak();
-  const topics = new Set(state.logs.map(l => l.subject + "|" + l.topic)).size;
-  const savedScores = state.quizScores || [];
-  const avg = savedScores.length ? Math.round(savedScores.reduce((a,b)=>a.score+b.score,0)/savedScores.length) : 0;
-
-  // Stats row
-  wrap.appendChild(el(`<div class="grid grid-cols-2 gap-2 sm:grid-cols-4">${StatCard(T.progStreak, streak+" 🔥", "📅")}${StatCard(T.progLogs, state.logs.length, "📚")}${StatCard(T.progTopics, topics, "✅")}${StatCard(T.progQuizScore, avg+"%", "🎯")}</div>`));
-
-  // Focus time
-  const focusH = Math.floor(state.focusTotal/60);
-  const focusM = state.focusTotal%60;
-  wrap.appendChild(el(`<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
-    <h3 class="text-xs font-semibold text-slate-500 mb-2">🔥 ${T.progFocusHours}</h3>
-    <p class="text-2xl font-extrabold">${focusH}h ${focusM}m</p>
-    <p class="text-[11px] text-slate-400">${T.pomSessions}: ${state.pomodoros}</p></div>`));
-
-  // Weekly activity (simple bar chart)
-  const days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-  const weekData = days.map((_, i) => {
-    const d = new Date(); d.setDate(d.getDate() - (6-i));
-    return state.logs.filter(l => l.date && new Date(l.date).toDateString() === d.toDateString()).length;
-  });
-  const maxVal = Math.max(...weekData, 1);
-  const chart = el(`<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
-    <h3 class="mb-3 text-xs font-semibold text-slate-500">📊 ${T.progThisWeek}</h3>
-    <div class="flex items-end gap-1.5" style="height:80px">${weekData.map((v, i) => `<div class="flex flex-1 flex-col items-center justify-end gap-1"><div class="w-full rounded-t-md bg-gradient-to-t from-teal-500 to-indigo-600 transition-all" style="height:${Math.max(2, (v/maxVal)*70)}px;opacity:${0.4+(v/maxVal)*0.6}"></div><span class="text-[8px] text-slate-400">${days[i].slice(0,2)}</span></div>`).join("")}</div></div>`);
-  wrap.appendChild(chart);
-
-  if (!state.logs.length && !savedScores.length && !state.pomodoros) {
-    wrap.appendChild(el(`<div class="rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 p-8 text-center"><div class="text-4xl">📈</div><p class="mt-2 text-sm text-slate-500">${T.progNoData}</p></div>`));
-  }
-
-  return wrap;
-}
-
-// ===================================================================
-//  DOUBT LIBRARY VIEW
-// ===================================================================
-function DoubtsView() {
-  const T = t();
-  const wrap = el(`<div class="space-y-4"><div><h2 class="px-1 text-lg font-bold">💡 ${T.doubtTitle}</h2>
-    <p class="px-1 text-xs text-slate-500 dark:text-slate-400">${T.doubtHint}</p></div></div>`);
-
-  const chat = state.chat || [];
-  const pairs = [];
-  for (let i = 0; i < chat.length-1; i += 2) {
-    if (chat[i].role === "user" && chat[i+1].role === "assistant") {
-      pairs.push({ q: chat[i].content, a: chat[i+1].content, i });
-    }
-  }
-
-  const searchBox = el(`<div class="flex gap-2"><input id="doubtSearch" placeholder="${T.doubtSearch}" class="flex-1 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2">
-    <button id="doubtClear" class="shrink-0 rounded-xl border border-slate-300 dark:border-slate-700 px-3 py-2 text-xs">✕</button></div>`);
-  wrap.appendChild(searchBox);
-
-  const list = el(`<div id="doubtList" class="space-y-2"></div>`);
-  function renderDoubts(filter = "") {
-    list.innerHTML = "";
-    const filtered = filter ? pairs.filter(p => p.q.toLowerCase().includes(filter.toLowerCase()) || p.a.toLowerCase().includes(filter.toLowerCase())) : pairs;
-    if (!filtered.length) {
-      list.appendChild(el(`<div class="rounded-xl border border-dashed border-slate-300 dark:border-slate-700 p-6 text-center"><div class="text-3xl">🔍</div><p class="mt-1 text-xs text-slate-500">${T.doubtEmpty}</p></div>`));
-      return;
-    }
-    filtered.slice(-20).reverse().forEach(p => {
-      const card = el(`<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 space-y-1.5">
-        <div class="flex items-start gap-2"><span class="shrink-0 mt-0.5 text-xs">💬</span><p class="text-xs font-semibold">${sanitize(p.q.slice(0,200))}</p></div>
-        <div class="flex items-start gap-2 pl-5"><span class="shrink-0 mt-0.5 text-xs">🤖</span><div class="msg-body text-[11px] text-slate-600 dark:text-slate-300">${renderAssistant(p.a.slice(0,300))}</div></div>
-      </div>`);
-      list.appendChild(card);
-    });
-  }
-  renderDoubts();
-  wrap.appendChild(list);
-
-  searchBox.querySelector("#doubtSearch").oninput = (e) => renderDoubts(e.target.value);
-  searchBox.querySelector("#doubtClear").onclick = () => {
-    searchBox.querySelector("#doubtSearch").value = "";
-    renderDoubts();
-  };
-
-  return wrap;
-}
-
-// ===================================================================
-//  TOOLS HUB VIEW
-// ===================================================================
-function ToolsView() {
-  const T = t();
-  const wrap = el(`<div class="space-y-4"><div><h2 class="px-1 text-lg font-bold">🧰 ${T.tools}</h2>
-    <p class="px-1 text-xs text-slate-500 dark:text-slate-400">All study tools at your fingertips</p></div></div>`);
-
-  const toolCards = [
-    { id: "mcq", icon: "📝", label: T.mcqTitle, desc: T.mcqHint, color: "from-orange-500 to-amber-600" },
-    { id: "flashcards", icon: "🃏", label: T.fcTitle, desc: T.fcHint, color: "from-teal-500 to-emerald-600" },
-    { id: "pomodoro", icon: "⏱", label: T.pomTitle, desc: T.pomHint, color: "from-rose-500 to-red-600" },
-    { id: "progress", icon: "📊", label: T.progTitle, desc: T.progHint, color: "from-indigo-500 to-violet-600" },
-    { id: "doubts", icon: "💡", label: T.doubtTitle, desc: T.doubtHint, color: "from-purple-500 to-pink-600" },
-    { id: "chat", icon: "🤖", label: T.chatTitle, desc: "24x7 AI Professor — ask anything!", color: "from-cyan-500 to-blue-600" },
-  ];
-
-  const grid = el(`<div class="grid grid-cols-1 gap-3 sm:grid-cols-2"></div>`);
-  toolCards.forEach(t => {
-    const card = el(`<div class="cursor-pointer rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden hover:shadow-md transition">
-      <div class="bg-gradient-to-r ${t.color} p-3.5 text-white"><span class="text-2xl">${t.icon}</span><h3 class="mt-1 text-sm font-bold">${t.label}</h3></div>
-      <div class="p-3"><p class="text-[11px] text-slate-500 dark:text-slate-400">${t.desc}</p></div></div>`);
-    card.onclick = () => { if (t.id === "chat") { go("chat"); return; } go(t.id); };
-    grid.appendChild(card);
-  });
-  wrap.appendChild(grid);
-
-  return wrap;
 }
 
 function HomeView() {
@@ -1149,22 +681,6 @@ function HomeView() {
       <div><p class="text-[11px] font-semibold text-teal-600 dark:text-teal-400">${t().dailyMotivation}</p>
         <p class="mt-1 text-sm leading-relaxed">"${state.lang === "hi" ? mot.hi : mot.en}"</p></div></div></section>`);
   wrap.appendChild(motQuote);
-
-  // Study Tools section
-  const toolItems = [
-    { v: "mcq", icon: "📝", label: t().mcqTitle, c: "from-orange-400 to-amber-500" },
-    { v: "flashcards", icon: "🃏", label: t().fcTitle, c: "from-teal-400 to-emerald-500" },
-    { v: "pomodoro", icon: "⏱", label: t().pomTitle, c: "from-rose-400 to-red-500" },
-    { v: "progress", icon: "📊", label: t().progTitle, c: "from-indigo-400 to-violet-500" },
-    { v: "doubts", icon: "💡", label: t().doubtTitle, c: "from-purple-400 to-pink-500" },
-  ];
-  const toolsSec = el(`<section><h3 class="mb-2 px-1 text-sm font-bold">🧰 ${t().tools}</h3><div class="grid grid-cols-3 gap-2 sm:grid-cols-5"></div></section>`);
-  const tGrid = toolsSec.querySelector("div");
-  toolItems.forEach(a => { const b = el(`<button class="flex flex-col items-center gap-1 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-2.5 hover:shadow-sm transition">
-      <span class="grid h-8 w-8 place-items-center rounded-xl bg-gradient-to-br ${a.c} text-sm text-white">${a.icon}</span>
-      <span class="text-[9px] font-semibold text-center leading-tight">${a.label}</span></button>`); b.onclick = () => go(a.v); tGrid.appendChild(b); });
-  wrap.appendChild(toolsSec);
-
   const recent = el(`<section><h3 class="mb-2 px-1 text-sm font-bold">${t().recent}</h3></section>`);
   recent.appendChild(LogList(state.logs.slice(0, 3))); wrap.appendChild(recent);
   wrap.querySelector("#goChat").onclick = () => go("chat");
@@ -1201,7 +717,7 @@ function SubjectsView() {
 let _fileList = [];
 
 function TodayView() {
-  _fileList = state.pendingFiles || [];
+  _fileList = [];
   const wrap = el(`<div class="space-y-4"><div><h2 class="px-1 text-lg font-bold">📝 ${t().todayTitle}</h2>
       <p class="px-1 text-xs text-slate-500 dark:text-slate-400">${t().todayHint}</p></div></div>`);
   const opts = SUBJECTS.map(s => `<option value="${s.name}">${s.icon} ${s.name}</option>`).join("");
@@ -1255,7 +771,6 @@ function TodayView() {
   function addFile(f) {
     if (f.size > 5 * 1024 * 1024) { alert(`File too large: ${f.name} (max 5 MB)`); return; }
     _fileList.push(f);
-    state.pendingFiles = _fileList;
   }
 
   function renderFilePreview(ctx) {
@@ -1294,7 +809,7 @@ function TodayView() {
       try {
         const r = await api("upload", { filename: f.name, mime: f.type, data: result });
         if (r && r.ok && r.link) uploaded.push(r.link);
-      } catch (er) { console.error("Upload failed:", er); }
+      } catch (er) {}
     }
 
     const entry = {
@@ -1305,7 +820,7 @@ function TodayView() {
     };
     state.logs.unshift(entry); saveLS(LS.logs, state.logs);
     try { await api("log", { entry }); } catch (e2) {}
-    _fileList = []; state.pendingFiles = [];
+    _fileList = [];
     btn.textContent = t().saved;
     setTimeout(() => go("today"), 700);
   };
@@ -1478,19 +993,14 @@ function ChatView() {
   const inp = bar.querySelector("#chatInput");
   inp.addEventListener("input", () => { inp.style.height = "auto"; inp.style.height = Math.min(inp.scrollHeight, 112) + "px"; });
   inp.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); bar.requestSubmit(); } });
-  bar.onsubmit = e => { e.preventDefault(); const v = inp.value.trim(); if (!v) return; inp.value = ""; inp.style.height = "auto"; inp.blur(); sendMessage(v); };
+  bar.onsubmit = e => { e.preventDefault(); const v = inp.value.trim(); if (!v) return; inp.value = ""; inp.style.height = "auto"; sendMessage(v); };
   bar.querySelector("#micBtn").onclick = () => startVoice(inp, bar.querySelector("#micBtn"));
   bar.querySelector("#diagBtn").onclick = () => {
     const v = inp.value.trim(); if (!v) { inp.focus(); return; }
     inp.value = ""; inp.style.height = "auto";
     sendMessage((state.lang === "hi" ? "Is topic ka ek labelled Mermaid diagram banao: " : "Make a labelled Mermaid diagram for: ") + v);
   };
-  wrap.appendChild(bar);
-
-  // Send pending message from other views
-  if (_pendingSend) { const ps = _pendingSend; _pendingSend = null; setTimeout(() => sendMessage(ps), 100); }
-
-  return wrap;
+  wrap.appendChild(bar); return wrap;
 }
 
 function startVoice(inp, btn) {
@@ -1527,25 +1037,47 @@ function runMermaid() {
   const nodes = document.querySelectorAll('.mermaid:not([data-processed])');
   if (!nodes.length) return;
   if (window.mermaid && window.mermaid.run) {
-    try { nodes.forEach(n => n.setAttribute('data-processed', 'true')); window.mermaid.run({ nodes }); } catch (e) { console.error("Mermaid render error:", e); }
+    try { nodes.forEach(n => n.setAttribute('data-processed', 'true')); window.mermaid.run({ nodes }); } catch (e) {}
   } else { setTimeout(runMermaid, 300); }
 }
 
 function Bubble(role, content) {
   const me = role === "user";
+  // For assistant bubbles, add a small bookmark button so students can save important explanations
+  const bookmarkBtn = !me
+    ? `<button class="bmBtn mt-1.5 rounded-md bg-slate-200/60 dark:bg-slate-700/60 px-2 py-0.5 text-[10px] text-slate-600 dark:text-slate-300 hover:bg-amber-200 dark:hover:bg-amber-900/40" title="Save to Doubt Bookmarks">⭐ Save</button>`
+    : "";
   return el(`<div class="flex ${me ? "justify-end" : "justify-start"}"><div class="max-w-[88%] rounded-2xl px-3.5 py-2.5 ${me
       ? "bg-gradient-to-br from-teal-500 to-indigo-600 text-white rounded-br-sm" : "bg-slate-100 dark:bg-slate-800 rounded-bl-sm"}">
-      <div class="msg-body text-[13px] leading-relaxed">${me ? sanitize(content) : renderAssistant(content)}</div></div></div>`);
+      <div class="msg-body text-[13px] leading-relaxed">${me ? sanitize(content) : renderAssistant(content)}</div>${bookmarkBtn}</div></div>`);
 }
+
+// Wire up bookmark buttons after each render — delegated
+document.addEventListener("click", function (e) {
+  const btn = e.target.closest(".bmBtn");
+  if (!btn) return;
+  const bubble = btn.closest(".flex");
+  const body = bubble && bubble.querySelector(".msg-body");
+  if (!body) return;
+  const text = body.innerText || body.textContent || "";
+  if (!text.trim()) return;
+  // Avoid duplicates by content hash (first 80 chars)
+  const key = text.trim().slice(0, 80);
+  const exists = state.bookmarks.some(b => (b.text || "").slice(0, 80) === key);
+  if (exists) { btn.textContent = "✓ Saved"; return; }
+  state.bookmarks.unshift({ text: text.trim(), date: new Date().toISOString(), subject: "" });
+  if (state.bookmarks.length > 200) state.bookmarks = state.bookmarks.slice(0, 200);
+  saveLS(LS.bookmarks, state.bookmarks);
+  btn.textContent = "✓ Saved";
+  btn.classList.add("bg-amber-200", "dark:bg-amber-900/40");
+});
 function scrollChat() { const s = document.getElementById("chatScroll"); if (s) s.scrollTop = s.scrollHeight; }
 
-let _pendingSend = null;
-
 async function sendMessage(text) {
+  if (state.view !== "chat") go("chat");
   state.chat.push({ role: "user", content: text });
   if (state.chat.length > MAX_CHAT_HISTORY) state.chat = state.chat.slice(-MAX_CHAT_HISTORY);
   saveLS(LS.chat, state.chat);
-  if (state.view !== "chat") { _pendingSend = text; go("chat"); return; }
   const scroll = document.getElementById("chatScroll");
   if (scroll && scroll.querySelector(".place-items-center")) scroll.innerHTML = "";
   scroll && scroll.appendChild(Bubble("user", text));
@@ -1569,8 +1101,8 @@ async function sendMessage(text) {
 function BottomNav() {
   const items = [
     { v: "home", icon: "🏠", label: t().nav.home }, { v: "subjects", icon: "📚", label: t().nav.subjects },
-    { v: "today", icon: "📝", label: t().nav.today }, { v: "exam", icon: "🎯", label: t().nav.exam },
-    { v: "tools", icon: "🧰", label: t().tools }, { v: "chat", icon: "💬", label: t().nav.chat }];
+    { v: "tricks", icon: "🧠", label: t().nav.tricks }, { v: "today", icon: "📝", label: t().nav.today },
+    { v: "exam", icon: "🎯", label: t().nav.exam }, { v: "chat", icon: "💬", label: t().nav.chat }];
   const nav = el(`<nav class="safe-bottom fixed inset-x-0 bottom-0 z-20 border-t border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur">
       <div class="mx-auto flex w-full max-w-3xl items-stretch justify-around px-1 pt-1.5"></div></nav>`);
   const row = nav.firstElementChild;
@@ -1589,6 +1121,641 @@ window.addEventListener("error", (e) => {
 window.addEventListener("unhandledrejection", (e) => {
   console.error("Unhandled rejection:", e.reason);
 });
+
+// ===================================================================
+//  NEW FEATURES (v2) — Pomodoro, Flashcards, Mock Test, Analytics, Bookmarks, Syllabus Tracker
+// ===================================================================
+
+// ---------- "More" sheet (header button) ----------
+function openMoreSheet() {
+  const items = [
+    { v: "focus", icon: "🍅", label: state.lang === "hi" ? "Pomodoro Timer" : "Pomodoro Timer", desc: state.lang === "hi" ? "25 min focus + 5 min break" : "25 min focus + 5 min break" },
+    { v: "flashcards", icon: "🃏", label: state.lang === "hi" ? "Flashcards" : "Flashcards", desc: state.lang === "hi" ? "Formulas & definitions yaad karo" : "Memorize formulas & definitions" },
+    { v: "quiz", icon: "❓", label: state.lang === "hi" ? "Mock Test (MCQ)" : "Mock Test (MCQ)", desc: state.lang === "hi" ? "Self-scoring quiz banao" : "Self-scored AI quiz" },
+    { v: "bookmarks", icon: "⭐", label: state.lang === "hi" ? "Doubt Bookmarks" : "Doubt Bookmarks", desc: state.lang === "hi" ? "Saved AI explanations" : "Saved AI explanations" },
+    { v: "analytics", icon: "📊", label: state.lang === "hi" ? "Performance Analytics" : "Performance Analytics", desc: state.lang === "hi" ? "Progress + syllabus tracker" : "Progress + syllabus tracker" },
+  ];
+  const overlay = el(`<div id="moreSheet" class="fixed inset-0 z-40 flex items-end justify-center bg-black/40">
+    <div class="w-full max-w-md rounded-t-3xl bg-white dark:bg-slate-900 p-5 pb-8 shadow-2xl view-enter">
+      <div class="mb-3 flex items-center justify-between">
+        <h3 class="text-lg font-bold">${state.lang === "hi" ? "📋 More Features" : "📋 More Features"}</h3>
+        <button id="closeMore" class="grid h-8 w-8 place-items-center rounded-full bg-slate-100 dark:bg-slate-800 text-lg">✕</button>
+      </div>
+      <div class="space-y-2"></div>
+    </div>
+  </div>`);
+  const list = overlay.querySelector("div.space-y-2");
+  items.forEach(it => {
+    const row = el(`<button class="flex w-full items-center gap-3 rounded-2xl border border-slate-200 dark:border-slate-800 p-3 text-left hover:bg-slate-50 dark:hover:bg-slate-800">
+      <span class="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-teal-500 to-indigo-600 text-xl text-white">${it.icon}</span>
+      <div class="flex-1"><p class="text-sm font-semibold">${it.label}</p><p class="text-[11px] text-slate-500">${it.desc}</p></div>
+      <span class="text-slate-400">›</span>
+    </button>`);
+    row.onclick = () => { overlay.remove(); go(it.v); };
+    list.appendChild(row);
+  });
+  overlay.querySelector("#closeMore").onclick = () => overlay.remove();
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+}
+
+// ===================================================================
+//  1. POMODORO FOCUS TIMER
+// ===================================================================
+let _pomo = { running: false, mode: "work", remaining: 25 * 60, timer: null };
+
+function fmtTime(sec) {
+  const m = Math.floor(sec / 60).toString().padStart(2, "0");
+  const s = (sec % 60).toString().padStart(2, "0");
+  return `${m}:${s}`;
+}
+
+function FocusView() {
+  const wrap = el(`<div class="space-y-4"></div>`);
+  wrap.appendChild(el(`<div><h2 class="px-1 text-lg font-bold">🍅 ${state.lang === "hi" ? "Pomodoro Focus Timer" : "Pomodoro Focus Timer"}</h2>
+    <p class="px-1 text-xs text-slate-500 dark:text-slate-400">${state.lang === "hi" ? "25 minute focus, 5 minute break. Consistency = top marks." : "25 min focus, 5 min break. Consistency = top marks."}</p></div>`));
+
+  // Timer card
+  const card = el(`<div class="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 text-center">
+    <p id="pomoMode" class="text-xs font-semibold uppercase tracking-wide ${_pomo.mode === "work" ? "text-rose-500" : "text-emerald-500"}">${_pomo.mode === "work" ? (state.lang === "hi" ? "🎯 Focus Time" : "🎯 Focus Time") : (state.lang === "hi" ? "☕ Break Time" : "☕ Break Time")}</p>
+    <div id="pomoTime" class="my-4 font-mono text-6xl font-bold tracking-tight">${fmtTime(_pomo.remaining)}</div>
+    <div class="flex justify-center gap-2">
+      <button id="pomoStart" class="rounded-xl bg-gradient-to-r from-teal-500 to-indigo-600 px-6 py-2.5 font-semibold text-white">${_pomo.running ? (state.lang === "hi" ? "⏸ Pause" : "⏸ Pause") : (state.lang === "hi" ? "▶ Start" : "▶ Start")}</button>
+      <button id="pomoReset" class="rounded-xl border border-slate-300 dark:border-slate-700 px-5 py-2.5 font-semibold">${state.lang === "hi" ? "↺ Reset" : "↺ Reset"}</button>
+      <button id="pomoSkip" class="rounded-xl border border-slate-300 dark:border-slate-700 px-5 py-2.5 font-semibold">${state.lang === "hi" ? "⏭ Skip" : "⏭ Skip"}</button>
+    </div>
+  </div>`);
+  wrap.appendChild(card);
+
+  // Stats card
+  const stats = state.pomoStats || { sessions: [], todayMinutes: 0, todayDate: "" };
+  const today = new Date().toDateString();
+  if (stats.todayDate !== today) { stats.todayDate = today; stats.todayMinutes = 0; }
+  const todaySessions = stats.sessions.filter(s => new Date(s.date).toDateString() === today).length;
+  const totalSessions = stats.sessions.length;
+  const totalMinutes = stats.sessions.reduce((a, s) => a + (s.minutes || 0), 0);
+
+  wrap.appendChild(el(`<div class="grid grid-cols-3 gap-3">
+    ${StatCard(state.lang === "hi" ? "Aaj ke sessions" : "Today's sessions", todaySessions, "🎯")}
+    ${StatCard(state.lang === "hi" ? "Aaj ke minutes" : "Today's minutes", stats.todayMinutes, "⏱")}
+    ${StatCard(state.lang === "hi" ? "Total sessions" : "Total sessions", totalSessions, "🏆")}
+  </div>`));
+
+  wrap.appendChild(el(`<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 text-xs text-slate-600 dark:text-slate-300">
+    <p class="font-semibold text-slate-800 dark:text-slate-100 mb-1">💡 ${state.lang === "hi" ? "Pomodoro Trick" : "Pomodoro Trick"}</p>
+    ${state.lang === "hi"
+      ? "25 minute me sirf EK topic par dhyaan do. Phone ko door rakho. Har session ke baad 5 minute break lo — paani pio, chhodo, walk karo. 4 sessions ke baad 20 minute ka long break lo. Aise 4 ghante me 8 topics cover ho jayenge."
+      : "Focus on ONE topic for 25 minutes. Keep phone away. After each session, take a 5-min break — drink water, walk. After 4 sessions, take a 20-min long break. This way you can cover 8 topics in 4 hours."}
+  </div>`));
+
+  // Wire up
+  const startBtn = card.querySelector("#pomoStart");
+  const resetBtn = card.querySelector("#pomoReset");
+  const skipBtn = card.querySelector("#pomoSkip");
+  const timeEl = card.querySelector("#pomoTime");
+  const modeEl = card.querySelector("#pomoMode");
+
+  function updateUI() {
+    timeEl.textContent = fmtTime(_pomo.remaining);
+    modeEl.textContent = _pomo.mode === "work" ? (state.lang === "hi" ? "🎯 Focus Time" : "🎯 Focus Time") : (state.lang === "hi" ? "☕ Break Time" : "☕ Break Time");
+    modeEl.className = `text-xs font-semibold uppercase tracking-wide ${_pomo.mode === "work" ? "text-rose-500" : "text-emerald-500"}`;
+    startBtn.textContent = _pomo.running ? (state.lang === "hi" ? "⏸ Pause" : "⏸ Pause") : (state.lang === "hi" ? "▶ Start" : "▶ Start");
+  }
+
+  function tick() {
+    if (!_pomo.running) return;
+    _pomo.remaining--;
+    if (_pomo.remaining <= 0) {
+      // Session complete
+      if (_pomo.mode === "work") {
+        // Log session
+        stats.sessions.push({ date: new Date().toISOString(), minutes: 25, mode: "work" });
+        stats.todayMinutes = (stats.todayMinutes || 0) + 25;
+        if (stats.sessions.length > 500) stats.sessions = stats.sessions.slice(-500);
+        state.pomoStats = stats;
+        saveLS(LS.pomoStats, stats);
+        _pomo.mode = "break";
+        _pomo.remaining = 5 * 60;
+        try { navigator.vibrate && navigator.vibrate(200); } catch (e) {}
+        alert(state.lang === "hi" ? "🎯 25 minute ho gaye! 5 minute break lo." : "🎯 25 min done! Take a 5-min break.");
+      } else {
+        _pomo.mode = "work";
+        _pomo.remaining = 25 * 60;
+        try { navigator.vibrate && navigator.vibrate([100, 50, 100]); } catch (e) {}
+        alert(state.lang === "hi" ? "☕ Break khatam! Wapas focus karo." : "☕ Break over! Back to focus.");
+      }
+    }
+    updateUI();
+  }
+
+  startBtn.onclick = () => {
+    if (_pomo.running) {
+      _pomo.running = false;
+      clearInterval(_pomo.timer);
+    } else {
+      _pomo.running = true;
+      _pomo.timer = setInterval(tick, 1000);
+    }
+    updateUI();
+  };
+  resetBtn.onclick = () => {
+    _pomo.running = false; clearInterval(_pomo.timer);
+    _pomo.mode = "work"; _pomo.remaining = 25 * 60;
+    updateUI();
+  };
+  skipBtn.onclick = () => {
+    _pomo.remaining = 1; tick();
+  };
+
+  return wrap;
+}
+
+// ===================================================================
+//  2. FLASHCARDS
+// ===================================================================
+function FlashcardsView() {
+  const wrap = el(`<div class="space-y-4"></div>`);
+  wrap.appendChild(el(`<div><h2 class="px-1 text-lg font-bold">🃏 ${state.lang === "hi" ? "Flashcards" : "Flashcards"}</h2>
+    <p class="px-1 text-xs text-slate-500 dark:text-slate-400">${state.lang === "hi" ? "Formulas & definitions yaad karo — flip karke check karo." : "Memorize formulas & definitions — flip to check."}</p></div>`));
+
+  // Add new card form
+  const addForm = el(`<form class="space-y-2 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
+    <div class="flex items-center justify-between">
+      <h3 class="text-sm font-bold">➕ ${state.lang === "hi" ? "Naya card banao" : "Add new card"}</h3>
+      <button type="button" id="aiFillBtn" class="rounded-lg bg-slate-100 dark:bg-slate-800 px-2 py-1 text-[10px] font-semibold">🤖 AI se bharo</button>
+    </div>
+    <select id="fcSubj" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2 text-xs">
+      ${SUBJECTS.map(s => `<option value="${s.name}">${s.icon} ${s.name}</option>`).join("")}
+    </select>
+    <textarea id="fcFront" rows="2" placeholder="${state.lang === "hi" ? "Front (sawal / term)" : "Front (question / term)"}" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2 text-xs"></textarea>
+    <textarea id="fcBack" rows="3" placeholder="${state.lang === "hi" ? "Back (jawab / formula)" : "Back (answer / formula)"}" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2 text-xs"></textarea>
+    <button type="submit" class="w-full rounded-xl bg-gradient-to-r from-teal-500 to-indigo-600 py-2 text-xs font-semibold text-white">${state.lang === "hi" ? "Save card" : "Save card"}</button>
+  </form>`);
+  wrap.appendChild(addForm);
+
+  // AI fill button — generates 3 flashcards for selected subject
+  addForm.querySelector("#aiFillBtn").onclick = () => {
+    const sub = addForm.querySelector("#fcSubj").value;
+    go("chat");
+    setTimeout(() => sendMessage(state.lang === "hi"
+      ? `${sub} ke liye 5 flashcards banao — har card ka front (term/sawal) aur back (formula/short answer) clearly mention karo. Format: "CARD 1\\nFront: ...\\nBack: ..."`
+      : `Create 5 flashcards for ${sub} — for each card clearly mention front (term/question) and back (formula/short answer). Format: "CARD 1\\nFront: ...\\nBack: ..."`), 60);
+  };
+
+  addForm.onsubmit = (e) => {
+    e.preventDefault();
+    const subj = addForm.querySelector("#fcSubj").value;
+    const front = (addForm.querySelector("#fcFront").value || "").trim();
+    const back = (addForm.querySelector("#fcBack").value || "").trim();
+    if (!front || !back) return;
+    state.flashcards.unshift({ id: Date.now(), subject: subj, front, back, known: false, reviewed: 0, lastReview: null });
+    saveLS(LS.flashcards, state.flashcards);
+    render();
+  };
+
+  // Study mode — show one card at a time
+  if (state.flashcards.length === 0) {
+    wrap.appendChild(el(`<div class="rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 p-6 text-center text-xs text-slate-500">
+      ${state.lang === "hi" ? "Abhi koi flashcard nahi. Pehla card banao 👆" : "No flashcards yet. Create your first one above 👆"}
+    </div>`));
+    return wrap;
+  }
+
+  // Filter: show unknown cards first
+  const unknown = state.flashcards.filter(c => !c.known);
+  const queue = unknown.length ? unknown : state.flashcards;
+  const current = queue[0];
+
+  const studyCard = el(`<div class="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
+    <div class="mb-2 flex items-center justify-between">
+      <span class="rounded-full bg-slate-100 dark:bg-slate-800 px-2.5 py-1 text-[11px]">${current.subject || "General"}</span>
+      <span class="text-[11px] text-slate-400">${state.lang === "hi" ? "Tap karo flip karne ke liye" : "Tap to flip"}</span>
+    </div>
+    <div id="flipCard" class="cursor-pointer rounded-2xl bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 p-8 min-h-[180px] flex items-center justify-center text-center">
+      <div>
+        <p class="text-[10px] font-semibold uppercase text-slate-400 mb-2">${state.lang === "hi" ? "Sawal" : "Front"}</p>
+        <p class="text-lg font-bold leading-snug">${sanitize(current.front)}</p>
+      </div>
+    </div>
+    <div class="mt-3 flex gap-2">
+      <button id="fcKnown" class="flex-1 rounded-xl bg-emerald-500 py-2.5 text-xs font-semibold text-white">✓ ${state.lang === "hi" ? "Yaad hai" : "I knew it"}</button>
+      <button id="fcUnknown" class="flex-1 rounded-xl bg-rose-500 py-2.5 text-xs font-semibold text-white">✗ ${state.lang === "hi" ? "Phir dekhna" : "Need review"}</button>
+      <button id="fcDelete" class="rounded-xl border border-slate-300 dark:border-slate-700 px-3 py-2.5 text-xs font-semibold">🗑</button>
+    </div>
+  </div>`);
+
+  let flipped = false;
+  const flipEl = studyCard.querySelector("#flipCard");
+  flipEl.onclick = () => {
+    flipped = !flipped;
+    if (flipped) {
+      flipEl.innerHTML = `<div><p class="text-[10px] font-semibold uppercase text-slate-400 mb-2">${state.lang === "hi" ? "Jawab" : "Back"}</p><p class="text-base leading-relaxed">${sanitize(current.back)}</p></div>`;
+    } else {
+      flipEl.innerHTML = `<div><p class="text-[10px] font-semibold uppercase text-slate-400 mb-2">${state.lang === "hi" ? "Sawal" : "Front"}</p><p class="text-lg font-bold leading-snug">${sanitize(current.front)}</p></div>`;
+    }
+  };
+  studyCard.querySelector("#fcKnown").onclick = () => {
+    current.known = true; current.reviewed = (current.reviewed || 0) + 1; current.lastReview = new Date().toISOString();
+    saveLS(LS.flashcards, state.flashcards); render();
+  };
+  studyCard.querySelector("#fcUnknown").onclick = () => {
+    current.known = false; current.reviewed = (current.reviewed || 0) + 1; current.lastReview = new Date().toISOString();
+    saveLS(LS.flashcards, state.flashcards); render();
+  };
+  studyCard.querySelector("#fcDelete").onclick = () => {
+    if (confirm(state.lang === "hi" ? "Card delete karein?" : "Delete this card?")) {
+      state.flashcards = state.flashcards.filter(c => c.id !== current.id);
+      saveLS(LS.flashcards, state.flashcards); render();
+    }
+  };
+  wrap.appendChild(studyCard);
+
+  // Progress stats
+  const known = state.flashcards.filter(c => c.known).length;
+  wrap.appendChild(el(`<div class="rounded-2xl bg-gradient-to-br from-teal-500 to-indigo-600 p-4 text-white text-center">
+    <p class="text-xs opacity-80">${state.lang === "hi" ? "Cards mastered" : "Cards mastered"}</p>
+    <p class="text-3xl font-bold">${known} / ${state.flashcards.length}</p>
+    <div class="mt-2 h-2 rounded-full bg-white/20 overflow-hidden">
+      <div class="h-full bg-white" style="width: ${state.flashcards.length ? Math.round(known * 100 / state.flashcards.length) : 0}%"></div>
+    </div>
+  </div>`));
+
+  return wrap;
+}
+
+// ===================================================================
+//  3. MCQ MOCK TEST (AI-generated, self-scored)
+// ===================================================================
+let _quiz = { questions: [], current: 0, answers: [], loading: false };
+
+function QuizView() {
+  const wrap = el(`<div class="space-y-4"></div>`);
+  wrap.appendChild(el(`<div><h2 class="px-1 text-lg font-bold">❓ ${state.lang === "hi" ? "Mock Test (MCQ)" : "Mock Test (MCQ)"}</h2>
+    <p class="px-1 text-xs text-slate-500 dark:text-slate-400">${state.lang === "hi" ? "AI se 5 MCQ generate karwao, self-score karo, weak spots dhoondo." : "Generate 5 MCQs from AI, self-score, find weak spots."}</p></div>`));
+
+  // Setup form
+  const setup = el(`<div class="space-y-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
+    <div><label class="mb-1 block text-xs font-semibold">${state.lang === "hi" ? "Subject" : "Subject"}</label>
+      <select id="qSubj" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2">
+        ${SUBJECTS.map(s => `<option value="${s.name}">${s.icon} ${s.name}</option>`).join("")}
+      </select></div>
+    <div><label class="mb-1 block text-xs font-semibold">${state.lang === "hi" ? "Topic (optional)" : "Topic (optional)"}</label>
+      <input id="qTopic" placeholder="${state.lang === "hi" ? "e.g. Differentiation" : "e.g. Differentiation"}" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2"></div>
+    <div><label class="mb-1 block text-xs font-semibold">${state.lang === "hi" ? "Number of questions" : "Number of questions"}</label>
+      <select id="qCount" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2">
+        <option value="5">5</option><option value="10">10</option><option value="15">15</option>
+      </select></div>
+    <button id="genQuiz" class="w-full rounded-xl bg-gradient-to-r from-rose-500 to-red-600 py-2.5 font-semibold text-white">📝 ${state.lang === "hi" ? "Quiz generate karo" : "Generate quiz"}</button>
+  </div>`);
+  wrap.appendChild(setup);
+
+  // Recent quiz results
+  if (state.quizResults.length) {
+    const last = state.quizResults[0];
+    wrap.appendChild(el(`<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
+      <p class="text-xs font-semibold text-slate-500 mb-1">📊 ${state.lang === "hi" ? "Last quiz result" : "Last quiz result"}</p>
+      <p class="text-sm"><strong>${last.score}/${last.total}</strong> • ${last.subject} ${last.topic ? "· " + last.topic : ""} • ${new Date(last.date).toLocaleDateString()}</p>
+    </div>`));
+  }
+
+  setup.querySelector("#genQuiz").onclick = async () => {
+    const subj = setup.querySelector("#qSubj").value;
+    const topic = (setup.querySelector("#qTopic").value || "").trim();
+    const count = parseInt(setup.querySelector("#qCount").value) || 5;
+    const btn = setup.querySelector("#genQuiz"); btn.disabled = true; btn.textContent = "⏳ Generating...";
+    _quiz.loading = true; _quiz.questions = []; _quiz.current = 0; _quiz.answers = [];
+    const prompt = state.lang === "hi"
+      ? `Mujhe ${subj}${topic ? " (" + topic + ")" : ""} se ${count} MCQ (multiple choice questions) do. Har question ke 4 options (A, B, C, D) ho aur end me sahi answer bhi batao. Strict format use karo:\n\nQ1. question text\nA) option1\nB) option2\nC) option3\nD) option4\nAnswer: B\n\nQ2. ...\n\nBas isi format me, koi extra explanation nahi.`
+      : `Give me ${count} MCQ (multiple choice questions) from ${subj}${topic ? " (" + topic + ")" : ""}. Each question must have 4 options (A, B, C, D) and the correct answer at the end. Use this strict format:\n\nQ1. question text\nA) option1\nB) option2\nC) option3\nD) option4\nAnswer: B\n\nQ2. ...\n\nOnly this format, no extra explanation.`;
+    try {
+      const r = await api("chat", { lang: state.lang, message: prompt, history: [], memory: [] });
+      const text = (r && r.reply) || "";
+      _quiz.questions = parseQuiz(text);
+      _quiz.meta = { subject: subj, topic, total: _quiz.questions.length, date: new Date().toISOString() };
+      render();
+    } catch (e) {
+      alert(state.lang === "hi" ? "Quiz generate nahi hua. Network check karo." : "Quiz generation failed. Check network.");
+    } finally {
+      _quiz.loading = false;
+      btn.disabled = false; btn.textContent = state.lang === "hi" ? "📝 Quiz generate karo" : "📝 Generate quiz";
+    }
+  };
+
+  // If quiz is active, render questions
+  if (_quiz.questions.length) {
+    return renderQuizActive(wrap);
+  }
+
+  if (_quiz.loading) {
+    wrap.appendChild(el(`<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 text-center">
+      <div class="text-3xl mb-2">⏳</div>
+      <p class="text-sm">${state.lang === "hi" ? "AI quiz bana raha hai..." : "AI is preparing your quiz..."}</p>
+    </div>`));
+  }
+
+  return wrap;
+}
+
+function parseQuiz(text) {
+  // Parse strict-format MCQ text into structured questions
+  const qs = [];
+  const blocks = text.split(/\n(?=Q\d+\.)/i).filter(b => b.trim());
+  blocks.forEach(b => {
+    const qMatch = b.match(/^Q\d+\.\s*(.+)/i);
+    if (!qMatch) return;
+    const question = qMatch[1].trim();
+    const opts = {};
+    const optMatches = [...b.matchAll(/([A-D])\)\s*(.+)/g)];
+    optMatches.forEach(m => { opts[m[1]] = m[2].trim(); });
+    const ansMatch = b.match(/Answer\s*:\s*([A-D])/i);
+    if (!question || Object.keys(opts).length < 4 || !ansMatch) return;
+    qs.push({ question, options: opts, answer: ansMatch[1].toUpperCase() });
+  });
+  return qs;
+}
+
+function renderQuizActive(wrap) {
+  const q = _quiz.questions[_quiz.current];
+  const total = _quiz.questions.length;
+  const answered = _quiz.answers.filter(a => a).length;
+  const isLast = _quiz.current === total - 1;
+
+  wrap.innerHTML = "";
+  wrap.appendChild(el(`<div class="flex items-center justify-between">
+    <h2 class="text-lg font-bold">❓ ${state.lang === "hi" ? "Mock Test" : "Mock Test"}</h2>
+    <span class="rounded-full bg-slate-100 dark:bg-slate-800 px-3 py-1 text-xs font-semibold">${_quiz.current + 1} / ${total}</span>
+  </div>`));
+
+  // Progress bar
+  wrap.appendChild(el(`<div class="h-2 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
+    <div class="h-full bg-gradient-to-r from-teal-500 to-indigo-600 transition-all" style="width: ${Math.round(answered * 100 / total)}%"></div>
+  </div>`));
+
+  // Question card
+  const userAns = _quiz.answers[_quiz.current];
+  const card = el(`<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
+    <p class="mb-3 text-sm font-semibold leading-relaxed">${_quiz.current + 1}. ${sanitize(q.question)}</p>
+    <div class="space-y-2"></div>
+  </div>`);
+  const optsBox = card.querySelector("div.space-y-2");
+  ["A", "B", "C", "D"].forEach(letter => {
+    const opt = q.options[letter];
+    if (!opt) return;
+    const selected = userAns === letter;
+    const b = el(`<button data-letter="${letter}" class="flex w-full items-center gap-3 rounded-xl border ${selected ? "border-teal-500 bg-teal-50 dark:bg-teal-900/30" : "border-slate-200 dark:border-slate-700"} p-3 text-left text-sm">
+      <span class="grid h-7 w-7 shrink-0 place-items-center rounded-full ${selected ? "bg-teal-500 text-white" : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"} font-bold text-xs">${letter}</span>
+      <span>${sanitize(opt)}</span>
+    </button>`);
+    b.onclick = () => { _quiz.answers[_quiz.current] = letter; render(); };
+    optsBox.appendChild(b);
+  });
+  wrap.appendChild(card);
+
+  // Nav buttons
+  const nav = el(`<div class="flex gap-2">
+    <button id="qPrev" class="flex-1 rounded-xl border border-slate-300 dark:border-slate-700 py-2.5 text-sm font-semibold ${_quiz.current === 0 ? "opacity-40" : ""}">← ${state.lang === "hi" ? "Pichla" : "Previous"}</button>
+    ${isLast
+      ? `<button id="qSubmit" class="flex-1 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 py-2.5 text-sm font-semibold text-white">✓ ${state.lang === "hi" ? "Submit quiz" : "Submit quiz"}</button>`
+      : `<button id="qNext" class="flex-1 rounded-xl bg-gradient-to-r from-teal-500 to-indigo-600 py-2.5 text-sm font-semibold text-white">${state.lang === "hi" ? "Agla" : "Next"} →</button>`}
+  </div>`);
+  if (_quiz.current > 0) nav.querySelector("#qPrev").onclick = () => { _quiz.current--; render(); };
+  if (isLast) {
+    nav.querySelector("#qSubmit").onclick = () => {
+      const unanswered = _quiz.questions.length - _quiz.answers.filter(a => a).length;
+      if (unanswered > 0 && !confirm(state.lang === "hi" ? `${unanswered} question bache hain. Submit karein?` : `${unanswered} questions unanswered. Submit anyway?`)) return;
+      submitQuiz();
+    };
+  } else {
+    nav.querySelector("#qNext").onclick = () => { _quiz.current++; render(); };
+  }
+  wrap.appendChild(nav);
+  return wrap;
+}
+
+function submitQuiz() {
+  let score = 0;
+  _quiz.questions.forEach((q, i) => { if (_quiz.answers[i] === q.answer) score++; });
+  const result = {
+    date: _quiz.meta.date,
+    subject: _quiz.meta.subject,
+    topic: _quiz.meta.topic,
+    total: _quiz.questions.length,
+    score,
+    answers: _quiz.answers.slice(),
+    questions: _quiz.questions.map(q => ({ q: q.question, options: q.options, answer: q.answer })),
+  };
+  state.quizResults.unshift(result);
+  if (state.quizResults.length > 50) state.quizResults = state.quizResults.slice(0, 50);
+  saveLS(LS.quizResults, state.quizResults);
+  // Show result view
+  state.view = "analytics";
+  _quiz.questions = []; _quiz.current = 0; _quiz.answers = [];
+  render();
+}
+
+// ===================================================================
+//  4. DOUBT BOOKMARKS VIEW
+// ===================================================================
+function BookmarksView() {
+  const wrap = el(`<div class="space-y-4"></div>`);
+  wrap.appendChild(el(`<div class="flex items-center justify-between">
+    <h2 class="px-1 text-lg font-bold">⭐ ${state.lang === "hi" ? "Doubt Bookmarks" : "Doubt Bookmarks"}</h2>
+    ${state.bookmarks.length ? `<button id="clearBm" class="text-[11px] text-rose-500 hover:underline">${state.lang === "hi" ? "Clear all" : "Clear all"}</button>` : ""}
+  </div>
+  <p class="px-1 text-xs text-slate-500 dark:text-slate-400">${state.lang === "hi" ? "Exam se pehle yahan se sabhi important doubts revise karo." : "Revise all important doubts here before exam."}</p>`));
+
+  if (state.bookmarks.length === 0) {
+    wrap.appendChild(el(`<div class="rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 p-6 text-center text-xs text-slate-500">
+      ${state.lang === "hi" ? "Abhi koi bookmark nahi. Chat me AI ke jawab par ⭐ Save button dabaao." : "No bookmarks yet. In chat, tap ⭐ Save on any AI reply."}
+    </div>`));
+    return wrap;
+  }
+
+  const list = el(`<div class="space-y-2"></div>`);
+  state.bookmarks.forEach((b, i) => {
+    const card = el(`<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3">
+      <div class="flex items-start justify-between gap-2">
+        <p class="text-xs leading-relaxed flex-1">${sanitize(b.text).slice(0, 280)}${b.text.length > 280 ? "..." : ""}</p>
+        <button data-i="${i}" class="delBm shrink-0 rounded-md bg-rose-100 dark:bg-rose-900/40 px-2 py-1 text-[10px] text-rose-600 dark:text-rose-300">✕</button>
+      </div>
+      <div class="mt-1.5 flex items-center justify-between">
+        <span class="text-[10px] text-slate-400">${b.date ? new Date(b.date).toLocaleDateString() : ""}</span>
+        <button data-i="${i}" class="askBm rounded-md bg-slate-100 dark:bg-slate-800 px-2 py-1 text-[10px] text-teal-600 dark:text-teal-300">💬 ${state.lang === "hi" ? "Aur pucho" : "Ask more"}</button>
+      </div>
+    </div>`);
+    list.appendChild(card);
+  });
+  list.querySelectorAll(".delBm").forEach(b => b.onclick = () => {
+    const i = parseInt(b.dataset.i);
+    state.bookmarks.splice(i, 1); saveLS(LS.bookmarks, state.bookmarks); render();
+  });
+  list.querySelectorAll(".askBm").forEach(b => b.onclick = () => {
+    const i = parseInt(b.dataset.i);
+    const text = state.bookmarks[i].text;
+    go("chat");
+    setTimeout(() => sendMessage(state.lang === "hi"
+      ? `Is topic par aur detail samjhao aur 3 practice questions do: "${text.slice(0, 200)}"`
+      : `Explain this in more detail and give 3 practice questions: "${text.slice(0, 200)}"`), 60);
+  });
+  wrap.appendChild(list);
+
+  const clrBtn = wrap.querySelector("#clearBm");
+  if (clrBtn) clrBtn.onclick = () => {
+    if (confirm(state.lang === "hi" ? "Saare bookmarks clear karein?" : "Clear all bookmarks?")) {
+      state.bookmarks = []; saveLS(LS.bookmarks, state.bookmarks); render();
+    }
+  };
+  return wrap;
+}
+
+// ===================================================================
+//  5. ANALYTICS + SYLLABUS TRACKER
+// ===================================================================
+function AnalyticsView() {
+  const wrap = el(`<div class="space-y-4"></div>`);
+  wrap.appendChild(el(`<div><h2 class="px-1 text-lg font-bold">📊 ${state.lang === "hi" ? "Performance Analytics" : "Performance Analytics"}</h2>
+    <p class="px-1 text-xs text-slate-500 dark:text-slate-400">${state.lang === "hi" ? "Apni progress dekho — kahan strong, kahan weak." : "Track your progress — where you're strong, where weak."}</p></div>`));
+
+  // Quiz score trend
+  if (state.quizResults.length) {
+    const recent = state.quizResults.slice(0, 10).reverse();
+    const avgPct = Math.round(recent.reduce((a, r) => a + (r.score * 100 / r.total), 0) / recent.length);
+    const best = Math.max(...recent.map(r => r.score * 100 / r.total));
+    const worst = Math.min(...recent.map(r => r.score * 100 / r.total));
+    wrap.appendChild(el(`<div class="rounded-2xl bg-gradient-to-br from-teal-500 to-indigo-600 p-5 text-white">
+      <p class="text-xs opacity-80">${state.lang === "hi" ? "Quiz performance (last 10)" : "Quiz performance (last 10)"}</p>
+      <div class="mt-2 grid grid-cols-3 gap-3 text-center">
+        <div><p class="text-2xl font-bold">${avgPct}%</p><p class="text-[10px] opacity-80">${state.lang === "hi" ? "Average" : "Average"}</p></div>
+        <div><p class="text-2xl font-bold">${Math.round(best)}%</p><p class="text-[10px] opacity-80">${state.lang === "hi" ? "Best" : "Best"}</p></div>
+        <div><p class="text-2xl font-bold">${Math.round(worst)}%</p><p class="text-[10px] opacity-80">${state.lang === "hi" ? "Lowest" : "Lowest"}</p></div>
+      </div>
+    </div>`));
+
+    // Bar chart of recent scores
+    const chartCard = el(`<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
+      <p class="mb-2 text-sm font-bold">📈 ${state.lang === "hi" ? "Recent quiz scores" : "Recent quiz scores"}</p>
+      <div class="flex items-end justify-between gap-1 h-32"></div>
+    </div>`);
+    const bars = chartCard.querySelector("div.flex");
+    const maxPct = 100;
+    recent.forEach(r => {
+      const pct = Math.round(r.score * 100 / r.total);
+      bars.appendChild(el(`<div class="flex-1 flex flex-col items-center gap-1">
+        <span class="text-[9px] font-semibold">${pct}%</span>
+        <div class="w-full rounded-t-md bg-gradient-to-t from-teal-500 to-indigo-500" style="height: ${pct}%"></div>
+        <span class="text-[9px] text-slate-400">${new Date(r.date).toLocaleDateString(undefined, { day: "numeric", month: "numeric" })}</span>
+      </div>`));
+    });
+    wrap.appendChild(chartCard);
+
+    // Subject-wise breakdown
+    const bySubj = {};
+    state.quizResults.forEach(r => {
+      if (!bySubj[r.subject]) bySubj[r.subject] = { total: 0, score: 0 };
+      bySubj[r.subject].total += r.total;
+      bySubj[r.subject].score += r.score;
+    });
+    const subCard = el(`<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
+      <p class="mb-2 text-sm font-bold">🎯 ${state.lang === "hi" ? "Subject-wise accuracy" : "Subject-wise accuracy"}</p>
+      <div class="space-y-2"></div>
+    </div>`);
+    const subList = subCard.querySelector("div.space-y-2");
+    Object.entries(bySubj).forEach(([subj, d]) => {
+      const pct = Math.round(d.score * 100 / d.total);
+      const color = pct >= 75 ? "from-emerald-500 to-teal-600" : pct >= 50 ? "from-amber-500 to-orange-600" : "from-rose-500 to-red-600";
+      subList.appendChild(el(`<div>
+        <div class="flex justify-between text-[11px] mb-1"><span>${subj}</span><span class="font-semibold">${pct}%</span></div>
+        <div class="h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+          <div class="h-full bg-gradient-to-r ${color}" style="width: ${pct}%"></div>
+        </div>
+      </div>`));
+    });
+    wrap.appendChild(subCard);
+  } else {
+    wrap.appendChild(el(`<div class="rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 p-4 text-center text-xs text-slate-500">
+      ${state.lang === "hi" ? "Abhi koi quiz nahi diya. Mock Test tab se quiz generate karo." : "No quizzes yet. Generate one from Mock Test tab."}
+    </div>`));
+  }
+
+  // Pomodoro stats summary
+  const pomo = state.pomoStats || { sessions: [], todayMinutes: 0, todayDate: "" };
+  const totalPomoMin = pomo.sessions.reduce((a, s) => a + (s.minutes || 0), 0);
+  wrap.appendChild(el(`<div class="grid grid-cols-2 gap-3">
+    ${StatCard(state.lang === "hi" ? "Total focus minutes" : "Total focus minutes", totalPomoMin, "⏱")}
+    ${StatCard(state.lang === "hi" ? "Total focus sessions" : "Total focus sessions", pomo.sessions.length, "🎯")}
+  </div>`));
+
+  // ===== SYLLABUS PROGRESS TRACKER =====
+  wrap.appendChild(el(`<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
+    <h3 class="mb-2 text-sm font-bold">📚 ${state.lang === "hi" ? "Syllabus Progress Tracker" : "Syllabus Progress Tracker"}</h3>
+    <p class="text-[11px] text-slate-500 mb-3">${state.lang === "hi" ? "Har chapter ka status update karo — Not Started / Studying / Revised / Mastered." : "Update each chapter's status — Not Started / Studying / Revised / Mastered."}</p>
+    <div class="space-y-3"></div>
+  </div>`));
+  const tracker = wrap.querySelector("div.space-y-3");
+
+  const STATUS = [
+    { id: 0, label: state.lang === "hi" ? "Not Started" : "Not Started", color: "bg-slate-300 text-slate-700 dark:bg-slate-700 dark:text-slate-200" },
+    { id: 1, label: state.lang === "hi" ? "Studying" : "Studying", color: "bg-amber-400 text-amber-900" },
+    { id: 2, label: state.lang === "hi" ? "Revised" : "Revised", color: "bg-blue-400 text-blue-900" },
+    { id: 3, label: state.lang === "hi" ? "Mastered" : "Mastered", color: "bg-emerald-500 text-white" },
+  ];
+
+  SUBJECTS.forEach(s => {
+    if (!state.syllabus[s.id]) state.syllabus[s.id] = {};
+    const subData = state.syllabus[s.id];
+    const total = s.chapters.length;
+    const mastered = s.chapters.filter(c => subData[c] === 3).length;
+    const pct = Math.round(mastered * 100 / total);
+
+    const subCard = el(`<div class="rounded-xl border border-slate-200 dark:border-slate-700 p-3">
+      <div class="flex items-center justify-between mb-1">
+        <p class="text-xs font-semibold">${s.icon} ${s.name}</p>
+        <span class="text-[10px] font-bold ${pct >= 75 ? "text-emerald-500" : pct >= 40 ? "text-amber-500" : "text-rose-500"}">${mastered}/${total} (${pct}%)</span>
+      </div>
+      <div class="h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden mb-2">
+        <div class="h-full bg-gradient-to-r from-emerald-500 to-teal-600" style="width: ${pct}%"></div>
+      </div>
+      <div class="space-y-1 chapters-list"></div>
+    </div>`);
+    const chapList = subCard.querySelector(".chapters-list");
+    s.chapters.forEach(c => {
+      const sid = subData[c] || 0;
+      const row = el(`<div class="flex items-center gap-1 text-[11px]">
+        <span class="flex-1 truncate">${c}</span>
+        <select data-subj="${s.id}" data-chap="${c.replace(/"/g, "&quot;")}" class="rounded-md border border-slate-200 dark:border-slate-700 bg-transparent px-1 py-0.5 text-[10px]">
+          ${STATUS.map(st => `<option value="${st.id}" ${sid === st.id ? "selected" : ""}>${st.label}</option>`).join("")}
+        </select>
+      </div>`);
+      chapList.appendChild(row);
+    });
+    tracker.appendChild(subCard);
+  });
+
+  // Wire up chapter status changes
+  tracker.querySelectorAll("select").forEach(sel => {
+    sel.onchange = () => {
+      const subjId = sel.dataset.subj;
+      const chap = sel.dataset.chap;
+      const val = parseInt(sel.value);
+      if (!state.syllabus[subjId]) state.syllabus[subjId] = {};
+      state.syllabus[subjId][chap] = val;
+      saveLS(LS.syllabus, state.syllabus);
+      render();
+    };
+  });
+
+  // Overall progress
+  const totalChapters = SUBJECTS.reduce((a, s) => a + s.chapters.length, 0);
+  const totalMastered = SUBJECTS.reduce((a, s) => a + s.chapters.filter(c => (state.syllabus[s.id] || {})[c] === 3).length, 0);
+  const overallPct = Math.round(totalMastered * 100 / totalChapters);
+  wrap.appendChild(el(`<div class="rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 p-5 text-white text-center">
+    <p class="text-xs opacity-80">${state.lang === "hi" ? "Overall syllabus mastery" : "Overall syllabus mastery"}</p>
+    <p class="text-4xl font-bold">${overallPct}%</p>
+    <p class="text-xs opacity-80">${totalMastered} / ${totalChapters} ${state.lang === "hi" ? "chapters mastered" : "chapters mastered"}</p>
+  </div>`));
+
+  return wrap;
+}
 
 // ---------- BOOT ----------
 boot();
