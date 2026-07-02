@@ -61,9 +61,27 @@ button:active { transform: scale(.97); }
 /* File preview hover */
 .group:hover .remove-file { opacity: 1; }
 
+/* Pomodoro timer pulse */
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(13, 148, 136, .4); }
+  70% { box-shadow: 0 0 0 12px rgba(13, 148, 136, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(13, 148, 136, 0); }
+}
+.pomo-active #pomoDisplay {
+  animation: pulse-ring 2s infinite;
+}
+
+/* Flashcard flip */
+.fc-flipped { transform: rotateY(180deg); }
+
+/* Chart bars */
+.bar-up { animation: barGrow .4s ease both; }
+@keyframes barGrow { from{height:0} }
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .view-enter { animation: none; }
   .typing span { animation: none; opacity: .4; }
   .animate-bounce-slow { animation: none; }
+  .pomo-active #pomoDisplay { animation: none; }
 }
