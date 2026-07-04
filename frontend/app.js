@@ -60,7 +60,7 @@ const I18N = {
     offline: "You're offline. Some features may not work.",
     nameLabel: "Your name",
     camera: "Camera", attachFiles: "Attach Files", filesSelected: "file(s) selected",
-    removeFile: "Remove", uploadComplete: "All files uploaded ✓", askAI: "Ask Professor",
+    removeFile: "Remove", uploadComplete: "All files uploaded ✓",
     tricksTitle: "MEC & CA Tricks & Tips", tricksHint: "Quick formulas, shortcuts and motivation for your CA journey",
     trickFormula: "Formula", trickTip: "Pro Tip", trickExample: "Example",
     dailyMotivation: "Daily Motivation", tricksCount: "tricks", studyTips: "Study Tips",
@@ -141,7 +141,7 @@ const I18N = {
     offline: "Aap offline hain. Kuch features kaam nahi karenge.",
     nameLabel: "Aapka naam",
     camera: "Camera", attachFiles: "Files Attach karo", filesSelected: "file(s) chune gaye",
-    removeFile: "Hatao", uploadComplete: "Saare files upload ho gaye ✓", askAI: "Professor se pucho",
+    removeFile: "Hatao", uploadComplete: "Saare files upload ho gaye ✓",
     tricksTitle: "Maths Tricks & Tips", tricksHint: "Jaldi formulas, shortcuts aur motivation apni CA journey ke liye",
     trickFormula: "Formula", trickTip: "Pro Tip", trickExample: "Udaharan",
     dailyMotivation: "Aaj ki Prerna", tricksCount: "tricks", studyTips: "Padhai ke Tips",
@@ -776,7 +776,6 @@ function render() {
     main.querySelector("#errBack").onclick = () => go("home");
   }
   app.appendChild(main);
-  app.appendChild(AIAgentFAB());
   app.appendChild(BottomNav());
   if (state.view === "chat") { scrollChat(); runMermaid(); }
 }
@@ -801,19 +800,7 @@ function Header() {
   return h;
 }
 
-// ── Floating AI Agent button ───────────────────────────────────
-function AIAgentFAB() {
-  const fab = el(`<div id="aiFab" class="fixed bottom-20 right-4 z-30 flex flex-col items-end gap-2">
-    <button id="fabBtn" aria-label="${t().askAI}" class="grid h-14 w-14 place-items-center rounded-full bg-gradient-to-br from-teal-500 to-indigo-600 text-2xl text-white shadow-lg shadow-teal-500/30 hover:scale-110 active:scale-95 transition-all duration-200 animate-bounce-slow" title="${t().askAI}">🤖</button>
-    <span class="rounded-full bg-white dark:bg-slate-800 px-2.5 py-1 text-[10px] font-semibold shadow-md border border-slate-200 dark:border-slate-700">${t().askAI} 💬</span>
-  </div>`);
-  fab.querySelector("#fabBtn").addEventListener("click", () => {
-    if (state.view === "chat") { scrollChat(); return; }
-    go("chat");
-  });
-  return fab;
-}
-
+// ── Stat card helper ───────────────────────────────────────────
 function StatCard(label, value, icon) {
   return `<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 text-center">
     <div class="text-2xl">${icon}</div><div class="mt-1 text-xl font-extrabold">${value}</div>
