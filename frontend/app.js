@@ -1,18 +1,32 @@
 /* ===================================================================
    MEC CA Study Buddy — Frontend SPA (Apps Script edition)
-   24x7 AI Education Agent | Class Diary | Multi-file Upload | Exam Prep
+   ---------------------------------------------------------------
+   24x7 AI Education Agent for Indian Intermediate 1st-year MEC
+   students preparing for CA.
+   Features: AI Chat, Class Diary, Multi-file Upload, Exam Prep,
+   Maths Tricks, Pomodoro Timer, Flashcards, MCQ Mock Test,
+   Doubt Bookmarks, Performance Analytics, Syllabus Tracker.
+   ---------------------------------------------------------------
+   Version: 2.1.0 (cleaned-up release)
    =================================================================== */
 
+// ── Config ─────────────────────────────────────────────────────
 const DEFAULT_BACKEND_URL = "https://script.google.com/macros/s/AKfycbxLTvO6v7h-c_PBoDozByo4FOAJ7Gk7WqbsroObPXLnAkNvExbJ-Fc6rMCNHlSyxx-I/exec";
 const FETCH_TIMEOUT = 25000;
 const MAX_CHAT_HISTORY = 100;
 const MAX_RETRIES = 2;
+const POMO_WORK_SEC = 25 * 60;
+const POMO_BREAK_SEC = 5 * 60;
+const MAX_FILE_BYTES = 5 * 1024 * 1024;
+const MAX_BOOKMARKS = 200;
+const MAX_QUIZ_HISTORY = 50;
+const MAX_POMO_SESSIONS = 500;
 
-// ---------- i18n ----------
+// ── i18n (Hinglish + English) ──────────────────────────────────
 const I18N = {
   en: {
-    appName: "MEC Study Buddy", tagline: "Your 24x7 CA Professor — always with you",
-    nav: { home: "Home", subjects: "Subjects", today: "Today", exam: "Exams", chat: "Chat", tricks: "Tricks", tools: "Tools" },
+    appName: "MEC Study Buddy", tagline: "Your 24×7 CA Professor — always with you",
+    nav: { home: "Home", subjects: "Subjects", today: "Today", exam: "Exams", chat: "Chat", tricks: "Tricks" },
     greetMorning: "Good morning", greetAfternoon: "Good afternoon", greetEvening: "Good evening",
     welcome: "Ready to study, future CA? 🎓",
     quickAsk: "Ask the Professor", logToday: "Log today's class", myNotes: "My Notes", examPrep: "Exam Prep",
@@ -21,7 +35,7 @@ const I18N = {
     save: "Save", saved: "Saved ✓", recent: "Recent classes", noLogs: "No classes logged yet.",
     subjectsTitle: "Your MEC Subjects", openChat: "Ask about this",
     examTitle: "Exam & Test Preparation", examHint: "Get a study plan, important questions & revision tips.",
-    makePlan: "Make my plan", chatTitle: "24x7 AI Professor",
+    makePlan: "Make my plan", chatTitle: "24×7 AI Professor",
     chatPlaceholder: "Type your doubt… (Maths, Eco, Accounts)", clearMem: "Clear chat",
     streak: "Day streak", classesLogged: "Classes logged", topicsCovered: "Topics covered",
     uploadPhoto: "Upload notes / diagram photo", photoSaved: "Photo backed up ✓", uploading: "Uploading…",
@@ -57,43 +71,43 @@ const I18N = {
     tip5: "Economics graphs: draw them for 5 mins daily — you'll never forget",
     tip6: "Commerce terms: create a short story around each term to remember",
     tip7: "Accounting: keep the double-entry rule clear — every debit has an equal credit",
-    // MCQ Quiz
-    mcqTitle: "MCQ Practice Tests", mcqHint: "Test your knowledge with subject-wise MCQs. Get instant feedback.",
-    mcqStart: "Start Quiz", mcqScore: "Score", mcqCorrect: "Correct", mcqWrong: "Wrong",
-    mcqNext: "Next", mcqResult: "Quiz Complete!", mcqSelectSubj: "Select Subject",
-    mcqAccuracy: "Accuracy", mcqRetry: "Try Again", mcqTotal: "Total Questions",
-    mcqExplain: "Explanation", mcqGenByAI: "Generate AI Questions",
-    // Flashcards
-    fcTitle: "Flashcards", fcHint: "Master formulas & concepts with spaced repetition",
-    fcFront: "Front", fcBack: "Back", fcFlip: "Flip", fcEasy: "Easy (3 days)",
-    fcMedium: "Medium (1 day)", fcHard: "Hard (now)", fcBox: "Box", fcNewCard: "New Flashcard",
-    fcReview: "Review Cards", fcDone: "Done for now!", fcDue: "Due for review",
-    fcAddNew: "Add New Card", fcSubject: "Subject", fcFrontLabel: "Question / Formula",
-    fcBackLabel: "Answer / Explanation", fcAdd: "Add Card", fcEmpty: "No flashcards yet. Add your first!",
-    // Pomodoro Timer
-    pomTitle: "Focus Timer", pomHint: "Study with Pomodoro technique — 25 min focus, 5 min break",
-    pomWork: "Focus", pomBreak: "Break", pomStart: "Start", pomPause: "Pause",
-    pomReset: "Reset", pomSessions: "Sessions today", pomFocusTime: "Total focus time",
-    pomComplete: "Time's up! Take a break 🎉", pomBreakComplete: "Break over! Back to work 💪",
-    // Progress Dashboard
-    progTitle: "My Progress", progHint: "Track your study journey — stay motivated!",
-    progStreak: "Streak", progLogs: "Diary Entries", progTopics: "Topics",
-    progQuizScore: "Quiz Avg", progFocusHours: "Focus Hours", progThisWeek: "This Week",
-    progNoData: "Start studying to see your progress!",
-    // Doubt Library
-    doubtTitle: "Doubt Library", doubtHint: "Search previously asked doubts and AI answers",
-    doubtSearch: "Search doubts…", doubtEmpty: "No doubts found. Ask the Professor!",
-    doubtClear: "Clear search",
-    // Voice Notes
-    recordNote: "Record Voice Note", recording: "Recording… tap to stop",
-    stopRecording: "Stop", playback: "Playback", saveNote: "Save Note",
-    // Tools nav
-    tools: "Tools",
+    // v2.1 new strings (only add keys actually used)
+    more: "More", moreTitle: "📋 More Features",
+    focus: "Pomodoro Timer", focusHint: "25 min focus + 5 min break. Consistency = top marks.",
+    focusTime: "🎯 Focus Time", breakTime: "☕ Break Time",
+    start: "▶ Start", pause: "⏸ Pause", resetLbl: "↺ Reset", skip: "⏭ Skip",
+    pomoTrickTitle: "💡 Pomodoro Trick",
+    pomoTrickBody: "Focus on ONE topic for 25 minutes. Keep phone away. After each session, take a 5-min break — drink water, walk. After 4 sessions, take a 20-min long break. This way you can cover 8 topics in 4 hours.",
+    workDone: "🎯 25 min done! Take a 5-min break.", breakOver: "☕ Break over! Back to focus.",
+    todaySessions: "Today's sessions", todayMinutes: "Today's minutes", totalSessions: "Total sessions",
+    flashcards: "Flashcards", flashcardsHint: "Memorize formulas & definitions — flip to check.",
+    addCard: "Add new card", aiFill: "🤖 AI se bharo",
+    frontLabel: "Front (question / term)", backLabel: "Back (answer / formula)",
+    saveCard: "Save card", tapToFlip: "Tap to flip", front: "Front", back: "Back",
+    knewIt: "✓ I knew it", needReview: "✗ Need review",
+    noFlashcards: "No flashcards yet. Create your first one above 👆",
+    cardsMastered: "Cards mastered", deleteCard: "Delete this card?",
+    mockTest: "Mock Test (MCQ)", mockHint: "Generate 5 MCQs from AI, self-score, find weak spots.",
+    subjectLbl: "Subject", topicOptional: "Topic (optional)", numQuestions: "Number of questions",
+    genQuiz: "Generate quiz", generating: "⏳ Generating...", quizLoading: "AI is preparing your quiz...",
+    lastQuiz: "Last quiz result", prev: "Previous", nextLbl: "Next", submitQuiz: "Submit quiz",
+    unansweredConfirm: "questions unanswered. Submit anyway?", quizGenFail: "Quiz generation failed. Check network.",
+    bookmarks: "Doubt Bookmarks", bookmarksHint: "Revise all important doubts here before exam.",
+    noBookmarks: "No bookmarks yet. In chat, tap ⭐ Save on any AI reply.",
+    clearAll: "Clear all", clearAllConfirm: "Clear all bookmarks?", askMore: "Ask more",
+    analytics: "Performance Analytics", analyticsHint: "Track your progress — where you're strong, where weak.",
+    quizPerf: "Quiz performance (last 10)", avg: "Average", best: "Best", lowest: "Lowest",
+    recentScores: "Recent quiz scores", subjectAcc: "Subject-wise accuracy",
+    noQuizzes: "No quizzes yet. Generate one from Mock Test tab.",
+    totalFocusMin: "Total focus minutes", totalFocusSess: "Total focus sessions",
+    syllabusTracker: "Syllabus Progress Tracker",
+    syllabusHint: "Update each chapter's status — Not Started / Studying / Revised / Mastered.",
+    notStarted: "Not Started", studying: "Studying", revised: "Revised", mastered: "Mastered",
+    overallMastery: "Overall syllabus mastery", chaptersMastered: "chapters mastered",
   },
-
   hi: {
-    appName: "MEC Study Buddy", tagline: "Aapke 24x7 CA Professor — hamesha saath",
-    nav: { home: "Home", subjects: "Subjects", today: "Aaj", exam: "Exam", chat: "Chat", tricks: "Tricks", tools: "Tools" },
+    appName: "MEC Study Buddy", tagline: "Aapke 24×7 CA Professor — hamesha saath",
+    nav: { home: "Home", subjects: "Subjects", today: "Aaj", exam: "Exam", chat: "Chat", tricks: "Tricks" },
     greetMorning: "Good morning", greetAfternoon: "Good afternoon", greetEvening: "Good evening",
     welcome: "Padhne ke liye ready ho, future CA? 🎓",
     quickAsk: "Professor se pucho", logToday: "Aaj ki class likho", myNotes: "Mere Notes", examPrep: "Exam Prep",
@@ -102,7 +116,7 @@ const I18N = {
     save: "Save karo", saved: "Save ho gaya ✓", recent: "Recent classes", noLogs: "Abhi koi class log nahi hui.",
     subjectsTitle: "Aapke MEC Subjects", openChat: "Iske baare me pucho",
     examTitle: "Exam & Test ki Taiyari", examHint: "Study plan, important questions aur revision tips lo.",
-    makePlan: "Mera plan banao", chatTitle: "24x7 AI Professor",
+    makePlan: "Mera plan banao", chatTitle: "24×7 AI Professor",
     chatPlaceholder: "Apna doubt likho… (Maths, Eco, Accounts)", clearMem: "Chat clear karo",
     streak: "Din ka streak", classesLogged: "Classes logged", topicsCovered: "Topics cover hue",
     uploadPhoto: "Notes / diagram photo upload karo", photoSaved: "Photo backup ho gaya ✓", uploading: "Upload ho raha…",
@@ -129,7 +143,7 @@ const I18N = {
     camera: "Camera", attachFiles: "Files Attach karo", filesSelected: "file(s) chune gaye",
     removeFile: "Hatao", uploadComplete: "Saare files upload ho gaye ✓", askAI: "Professor se pucho",
     tricksTitle: "Maths Tricks & Tips", tricksHint: "Jaldi formulas, shortcuts aur motivation apni CA journey ke liye",
-    trickFormula: "Formula", trickTip: "Pro Tip", trickExample: "Udaharn",
+    trickFormula: "Formula", trickTip: "Pro Tip", trickExample: "Udaharan",
     dailyMotivation: "Aaj ki Prerna", tricksCount: "tricks", studyTips: "Padhai ke Tips",
     tip1: "Roz 5 problems karo — consistency intensity se zyada kaam karti hai",
     tip2: "Formulas 3 baar likh ke yaad karo — muscle memory kaam karegi!",
@@ -138,42 +152,42 @@ const I18N = {
     tip5: "Economics graphs: roz 5 mins draw karo — hamesha yaad rahega",
     tip6: "Commerce terms: har term ke around chhoti story banao, yaad rahega",
     tip7: "Accounting: double entry rule clear rakho — har debit ka ek credit hota hai",
-    // MCQ Quiz
-    mcqTitle: "MCQ Practice Test", mcqHint: "Subject-wise MCQs se apni knowledge test karo. Instant feedback milega.",
-    mcqStart: "Quiz Start karo", mcqScore: "Score", mcqCorrect: "Sahi", mcqWrong: "Galat",
-    mcqNext: "Agla", mcqResult: "Quiz Complete!", mcqSelectSubj: "Subject chuno",
-    mcqAccuracy: "Accuracy", mcqRetry: "Phir se try karo", mcqTotal: "Total Questions",
-    mcqExplain: "Explanation", mcqGenByAI: "AI se questions banao",
-    // Flashcards
-    fcTitle: "Flashcards", fcHint: "Spaced repetition se formulas aur concepts yaad karo",
-    fcFront: "Aage", fcBack: "Peeche", fcFlip: "Palat do", fcEasy: "Easy (3 din)",
-    fcMedium: "Medium (1 din)", fcHard: "Hard (abhi)", fcBox: "Box", fcNewCard: "Naya Flashcard",
-    fcReview: "Review karo", fcDone: "Abhi ke liye ho gaya!", fcDue: "Review due hai",
-    fcAddNew: "Naya Card Add karo", fcSubject: "Subject", fcFrontLabel: "Sawaal / Formula",
-    fcBackLabel: "Jawaab / Explanation", fcAdd: "Card Add karo", fcEmpty: "Abhi koi flashcard nahi. Pehla add karo!",
-    // Pomodoro Timer
-    pomTitle: "Focus Timer", pomHint: "Pomodoro technique se padho — 25 min focus, 5 min break",
-    pomWork: "Focus", pomBreak: "Break", pomStart: "Shuru", pomPause: "Ruko",
-    pomReset: "Reset", pomSessions: "Aaj ke sessions", pomFocusTime: "Total focus time",
-    pomComplete: "Time ho gaya! Break lo 🎉", pomBreakComplete: "Break khatam! Padhai karo 💪",
-    // Progress Dashboard
-    progTitle: "Meri Progress", progHint: "Apni study journey track karo — motivated raho!",
-    progStreak: "Streak", progLogs: "Diary Entries", progTopics: "Topics",
-    progQuizScore: "Quiz Avg", progFocusHours: "Focus Hours", progThisWeek: "Is hafte",
-    progNoData: "Progress dekhne ke liye padhai shuru karo!",
-    // Doubt Library
-    doubtTitle: "Doubt Library", doubtHint: "Pehle puchhe gaye doubts aur AI answers search karo",
-    doubtSearch: "Doubts search karo…", doubtEmpty: "Koi doubt nahi mila. Professor se pucho!",
-    doubtClear: "Search clear karo",
-    // Voice Notes
-    recordNote: "Voice Note Record karo", recording: "Record ho raha… tap karo rukne ke liye",
-    stopRecording: "Ruko", playback: "Sunno", saveNote: "Note Save karo",
-    // Tools nav
-    tools: "Tools",
+    more: "More", moreTitle: "📋 More Features",
+    focus: "Pomodoro Timer", focusHint: "25 minute focus, 5 minute break. Consistency = top marks.",
+    focusTime: "🎯 Focus Time", breakTime: "☕ Break Time",
+    start: "▶ Start", pause: "⏸ Pause", resetLbl: "↺ Reset", skip: "⏭ Skip",
+    pomoTrickTitle: "💡 Pomodoro Trick",
+    pomoTrickBody: "25 minute me sirf EK topic par dhyaan do. Phone ko door rakho. Har session ke baad 5 minute break lo — paani pio, walk karo. 4 sessions ke baad 20 minute ka long break lo. Aise 4 ghante me 8 topics cover ho jayenge.",
+    workDone: "🎯 25 minute ho gaye! 5 minute break lo.", breakOver: "☕ Break khatam! Wapas focus karo.",
+    todaySessions: "Aaj ke sessions", todayMinutes: "Aaj ke minutes", totalSessions: "Total sessions",
+    flashcards: "Flashcards", flashcardsHint: "Formulas & definitions yaad karo — flip karke check karo.",
+    addCard: "Naya card banao", aiFill: "🤖 AI se bharo",
+    frontLabel: "Front (sawal / term)", backLabel: "Back (jawab / formula)",
+    saveCard: "Save card", tapToFlip: "Tap karo flip karne ke liye", front: "Sawal", back: "Jawab",
+    knewIt: "✓ Yaad hai", needReview: "✗ Phir dekhna",
+    noFlashcards: "Abhi koi flashcard nahi. Pehla card banao 👆",
+    cardsMastered: "Cards mastered", deleteCard: "Card delete karein?",
+    mockTest: "Mock Test (MCQ)", mockHint: "AI se 5 MCQ generate karwao, self-score karo, weak spots dhoondo.",
+    subjectLbl: "Subject", topicOptional: "Topic (optional)", numQuestions: "Number of questions",
+    genQuiz: "Quiz generate karo", generating: "⏳ Generating...", quizLoading: "AI quiz bana raha hai...",
+    lastQuiz: "Last quiz result", prev: "Pichla", nextLbl: "Agla", submitQuiz: "Submit quiz",
+    unansweredConfirm: "question bache hain. Submit karein?", quizGenFail: "Quiz generate nahi hua. Network check karo.",
+    bookmarks: "Doubt Bookmarks", bookmarksHint: "Exam se pehle yahan se sabhi important doubts revise karo.",
+    noBookmarks: "Abhi koi bookmark nahi. Chat me AI ke jawab par ⭐ Save button dabaao.",
+    clearAll: "Clear all", clearAllConfirm: "Saare bookmarks clear karein?", askMore: "Aur pucho",
+    analytics: "Performance Analytics", analyticsHint: "Apni progress dekho — kahan strong, kahan weak.",
+    quizPerf: "Quiz performance (last 10)", avg: "Average", best: "Best", lowest: "Lowest",
+    recentScores: "Recent quiz scores", subjectAcc: "Subject-wise accuracy",
+    noQuizzes: "Abhi koi quiz nahi diya. Mock Test tab se quiz generate karo.",
+    totalFocusMin: "Total focus minutes", totalFocusSess: "Total focus sessions",
+    syllabusTracker: "Syllabus Progress Tracker",
+    syllabusHint: "Har chapter ka status update karo — Not Started / Studying / Revised / Mastered.",
+    notStarted: "Not Started", studying: "Studying", revised: "Revised", mastered: "Mastered",
+    overallMastery: "Overall syllabus mastery", chaptersMastered: "chapters mastered",
   }
 };
 
-// ---------- MATHS TRICKS DATA (Hinglish, simple, accurate) ----------
+// ── Maths Tricks Data ──────────────────────────────────────────
 const MATH_TRICKS = [
   { id: "ia", subject: "Maths Paper-IA", color: "from-orange-500 to-amber-600", icon: "📐",
     tricks: [
@@ -282,7 +296,7 @@ const MATH_TRICKS = [
     ] },
 ];
 
-// ---------- MOTIVATIONAL QUOTES (Hinglish / English) ----------
+// ── Motivational Quotes (Hinglish + English) ───────────────────
 const MOTIVATIONS = [
   { en: "Success is the sum of small efforts repeated day in and day out.", hi: "Safalta chhoti chhoti mehnat ka collection hai jo har roz karte ho." },
   { en: "The expert in anything was once a beginner. Keep going!", hi: "Har expert kabhi beginner tha. Chalo mat ruko!" },
@@ -296,40 +310,7 @@ const MOTIVATIONS = [
   { en: "You don't have to be great to start, but you have to start to be great.", hi: "Great hone ke liye start karna zaroori hai, start karne ke liye great hona nahi." },
 ];
 
-// ---------- MCQ QUESTION BANK (5 per subject) ----------
-const MCQ_BANK = [
-  { subject: "Maths Paper-IA", q: "What is the domain of f(x) = 1/(x-3)?", opts: ["All real numbers", "x ≠ 3", "x > 3", "x < 3"], ans: 1, exp: "Denominator cannot be zero, so x-3 ≠ 0 → x ≠ 3" },
-  { subject: "Maths Paper-IA", q: "det[2 3; 4 5] = ?", opts: ["-2", "2", "10-12= -2", "22"], ans: 0, exp: "det = (2×5) - (3×4) = 10-12 = -2" },
-  { subject: "Maths Paper-IA", q: "sin²θ + cos²θ = ?", opts: ["0", "1", "-1", "sinθ"], ans: 1, exp: "This is the fundamental trig identity — always equals 1" },
-  { subject: "Maths Paper-IA", q: "Which is NOT a scalar quantity?", opts: ["Mass", "Speed", "Velocity", "Temperature"], ans: 2, exp: "Velocity has both magnitude and direction — it's a vector" },
-  { subject: "Maths Paper-IA", q: "What is the order of a 2×3 matrix?", opts: ["2", "3", "2×3", "3×2"], ans: 2, exp: "Order is rows × columns = 2×3" },
-  { subject: "Maths Paper-IB", q: "Slope of line through (1,2) and (3,6) is:", opts: ["1", "2", "4", "1/2"], ans: 1, exp: "m = (6-2)/(3-1) = 4/2 = 2" },
-  { subject: "Maths Paper-IB", q: "d/dx(x⁵) = ?", opts: ["5x⁴", "x⁴", "5x⁵", "4x⁵"], ans: 0, exp: "Power rule: d/dx(xⁿ) = n·xⁿ⁻¹ → 5x⁴" },
-  { subject: "Maths Paper-IB", q: "Distance between (1,2) and (4,6) is:", opts: ["5", "4", "7", "25"], ans: 0, exp: "d = √[(4-1)²+(6-2)²] = √(9+16)=√25=5" },
-  { subject: "Maths Paper-IB", q: "lim(x→0) sin x / x = ?", opts: ["0", "1", "∞", "undefined"], ans: 1, exp: "Standard limit: lim(x→0) sin x / x = 1" },
-  { subject: "Maths Paper-IB", q: "Which is a scalar quantity?", opts: ["Force", "Velocity", "Speed", "Acceleration"], ans: 2, exp: "Speed has only magnitude, no direction" },
-  { subject: "Economics", q: "GDP = ?", opts: ["C+I+G+(X-M)", "C+I+G", "C+I", "C+G+X"], ans: 0, exp: "GDP = Consumption + Investment + Govt Spending + Net Exports" },
-  { subject: "Economics", q: "When Ed > 1, demand is:", opts: ["Inelastic", "Elastic", "Unit elastic", "Perfectly inelastic"], ans: 1, exp: "Ed > 1 means demand changes more than price → elastic" },
-  { subject: "Economics", q: "CRR = 10% → Money Multiplier = ?", opts: ["10", "5", "20", "1"], ans: 0, exp: "Multiplier = 1/CRR = 1/0.10 = 10" },
-  { subject: "Economics", q: "Who gave the 'Law of Demand'?", opts: ["Marshall", "Keynes", "Adam Smith", "Ricardo"], ans: 0, exp: "Alfred Marshall propounded the Law of Demand" },
-  { subject: "Economics", q: "Inflation target of RBI is:", opts: ["2%", "4%", "6%", "8%"], ans: 1, exp: "RBI inflation target is 4% with ±2% tolerance band" },
-  { subject: "Commerce", q: "Sole Proprietorship has:", opts: ["Limited liability", "Unlimited liability", "Separate legal entity", "Perpetual succession"], ans: 1, exp: "Sole proprietor has unlimited personal liability" },
-  { subject: "Commerce", q: "Which is NOT a type of trade?", opts: ["Wholesale", "Retail", "Export", "Production"], ans: 3, exp: "Production is not a type of trade; trade involves buying/selling" },
-  { subject: "Commerce", q: "MSME: Micro enterprise investment limit:", opts: ["≤ ₹1 cr", "≤ ₹10 cr", "≤ ₹50 cr", "≤ ₹5 cr"], ans: 0, exp: "Micro: Investment ≤ ₹1 crore" },
-  { subject: "Commerce", q: "E-commerce B2C example:", opts: ["Amazon", "Alibaba", "OLX", "eBay"], ans: 0, exp: "Amazon sells to consumers → B2C" },
-  { subject: "Commerce", q: "Joint Stock Company features:", opts: ["Unlimited liability", "No separate entity", "Separate legal entity", "Only 5 members"], ans: 2, exp: "Company has separate legal entity distinct from its members" },
-  { subject: "Accountancy", q: "Accounting Equation: Assets = ?", opts: ["Liabilities + Capital", "Liabilities - Capital", "Capital - Liabilities", "Expenses + Income"], ans: 0, exp: "Assets = Liabilities + Capital (fundamental equation)" },
-  { subject: "Accountancy", q: "Paid salary ₹5000. Which account rule?", opts: ["Real", "Personal", "Nominal", "None"], ans: 2, exp: "Salary is an expense → Nominal account: Debit expenses" },
-  { subject: "Accountancy", q: "Depreciation SLM: Cost ₹1L, Scrap ₹10K, Life 10 yrs → Annual Dep = ?", opts: ["₹10,000", "₹9,000", "₹11,000", "₹5,000"], ans: 1, exp: "(1,00,000 - 10,000)/10 = ₹9,000 per year" },
-  { subject: "Accountancy", q: "BRS: Cheque issued but not presented →", opts: ["Add to Cash Book", "Subtract from Cash Book", "Add to Pass Book", "No adjustment"], ans: 0, exp: "Add to Cash Book balance to reach Pass Book balance" },
-  { subject: "Accountancy", q: "Bills of Exchange: Days of grace = ?", opts: ["1", "2", "3", "7"], ans: 2, exp: "3 days of grace are added to the bill term" },
-];
-
-// ---------- FLASHCARD HELPERS ----------
-const FC_BOXES = [1, 2, 3];
-const FC_INTERVALS = [0, 1, 3, 7];
-
-// ---------- STATE ----------
+// ── Subject Catalog ────────────────────────────────────────────
 const SUBJECTS = [
   { id: "maths1a", name: "Maths Paper-IA", icon: "📐", color: "from-orange-500 to-amber-600",
     tag: "Algebra · Vector Algebra · Trigonometry",
@@ -361,50 +342,95 @@ const SUBJECTS = [
                "Computerised Accounting"] },
 ];
 
-// ---------- STATE ----------
-const LS = { cfg: "mec_cfg", logs: "mec_logs", chat: "mec_chat", streak: "mec_streak", lastDay: "mec_lastday",
-  flashcards: "mec_fc", quizScores: "mec_quiz", pomodoros: "mec_pomo", focusTotal: "mec_focus", voiceNotes: "mec_voice" };
+// ── State & Storage ────────────────────────────────────────────
+const LS = {
+  cfg: "mec_cfg", logs: "mec_logs", chat: "mec_chat",
+  streak: "mec_streak", lastDay: "mec_lastday",
+  flashcards: "mec_flashcards_v2",
+  bookmarks: "mec_bookmarks_v2",
+  quizResults: "mec_quiz_results_v2",
+  syllabus: "mec_syllabus_v2",
+  pomoStats: "mec_pomo_stats_v2",
+};
+
 let cfg = JSON.parse(localStorage.getItem(LS.cfg) || "null");
 let session = { pinHash: sessionStorage.getItem("mec_pin") || null, unlocked: false };
 let state = {
-  lang: (cfg && cfg.lang) || "hi", view: "home", online: navigator.onLine,
+  lang: (cfg && cfg.lang) || "hi",
+  view: "home",
+  online: navigator.onLine,
   logs: JSON.parse(localStorage.getItem(LS.logs) || "[]"),
   chat: JSON.parse(localStorage.getItem(LS.chat) || "[]"),
-  pendingFiles: [],
   flashcards: JSON.parse(localStorage.getItem(LS.flashcards) || "[]"),
-  quizScores: JSON.parse(localStorage.getItem(LS.quizScores) || "[]"),
-  pomodoros: parseInt(localStorage.getItem(LS.pomodoros) || "0"),
-  focusTotal: parseInt(localStorage.getItem(LS.focusTotal) || "0"),
-  voiceNotes: JSON.parse(localStorage.getItem(LS.voiceNotes) || "[]"),
+  bookmarks: JSON.parse(localStorage.getItem(LS.bookmarks) || "[]"),
+  quizResults: JSON.parse(localStorage.getItem(LS.quizResults) || "[]"),
+  syllabus: JSON.parse(localStorage.getItem(LS.syllabus) || "{}"),
+  pomoStats: JSON.parse(localStorage.getItem(LS.pomoStats) || '{"sessions":[],"todayMinutes":0,"todayDate":""}'),
 };
-const t = () => I18N[state.lang];
+
+const t = () => I18N[state.lang] || I18N.en;
 const saveLS = (k, v) => localStorage.setItem(k, JSON.stringify(v));
 
-// ---------- helpers ----------
-const el = (html) => { const d = document.createElement("div"); d.innerHTML = html.trim(); return d.firstElementChild; };
+// Translation helper: pick Hinglish or English string inline
+const tr = (hi, en) => (state.lang === "hi" ? hi : en);
+
+// ── Generic helpers ────────────────────────────────────────────
+const el = (html) => {
+  const d = document.createElement("div");
+  d.innerHTML = html.trim();
+  return d.firstElementChild;
+};
+
 async function sha256(str) {
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
   return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
 }
-function greet() { const h = new Date().getHours(); return h < 12 ? t().greetMorning : h < 17 ? t().greetAfternoon : t().greetEvening; }
-function mdToHtml(s) {
-  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-    .replace(/^### (.*)$/gm, "<h3>$1</h3>").replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-    .replace(/`(.+?)`/g, "<code>$1</code>").replace(/^\s*[-*] (.*)$/gm, "<li>$1</li>")
-    .replace(/(<li>.*<\/li>)/s, "<ul>$1</ul>").replace(/\n{2,}/g, "</p><p>").replace(/\n/g, "<br>")
-    .replace(/^(.*)$/s, "<p>$1</p>");
+
+function greet() {
+  const h = new Date().getHours();
+  return h < 12 ? t().greetMorning : h < 17 ? t().greetAfternoon : t().greetEvening;
 }
+
 function getStudentName() {
-  return cfg && cfg.studentName ? cfg.studentName : "Student";
+  return (cfg && cfg.studentName) ? cfg.studentName : "Yeshaswini";
 }
+
+// Strip angle brackets to prevent HTML injection from user/AI text
 function sanitize(str) {
   return String(str || "").replace(/[<>]/g, "").trim();
 }
+
+function escapeHtml(str) {
+  return String(str || "")
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+
 function formatDate(d) {
   return d ? new Date(d).toLocaleDateString(undefined, { day: "numeric", month: "short" }) : "";
 }
 
-// ---------- fetch with timeout + retry ----------
+// Minimal markdown → HTML (paragraphs, bold, code, lists, headings)
+function mdToHtml(s) {
+  return s
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/^### (.*)$/gm, "<h3>$1</h3>")
+    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+    .replace(/`(.+?)`/g, "<code>$1</code>")
+    .replace(/^\s*[-*] (.*)$/gm, "<li>$1</li>")
+    .replace(/(<li>.*<\/li>)/s, "<ul>$1</ul>")
+    .replace(/\n{2,}/g, "</p><p>")
+    .replace(/\n/g, "<br>")
+    .replace(/^(.*)$/s, "<p>$1</p>");
+}
+
+// Daily-stable motivation index — same quote shown all day
+function dailyIndex(arr) {
+  const seed = new Date().toDateString().split("").reduce((a, c) => a + c.charCodeAt(0), 0);
+  return Math.floor(Math.abs(seed) % arr.length);
+}
+
+// ── Network: fetch with timeout + retry ────────────────────────
 async function fetchWithTimeout(url, options, retries = MAX_RETRIES) {
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
@@ -422,30 +448,39 @@ async function fetchWithTimeout(url, options, retries = MAX_RETRIES) {
   }
 }
 
-// ---------- Apps Script API ----------
 async function api(action, payload = {}) {
+  if (!cfg || !cfg.url) throw new Error("no backend configured");
   const body = JSON.stringify(Object.assign({ action, pinHash: session.pinHash }, payload));
   const res = await fetchWithTimeout(cfg.url, {
-    method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
-    body, redirect: "follow",
+    method: "POST",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body,
+    redirect: "follow",
   });
   return res.json();
 }
+
 async function apiStatus(url) {
   const res = await fetchWithTimeout(url + (url.includes("?") ? "&" : "?") + "action=status");
   return res.json();
 }
 
-// ---------- Offline detection ----------
+// ── Offline detection ──────────────────────────────────────────
 window.addEventListener("online", () => { state.online = true; if (session.unlocked) render(); });
 window.addEventListener("offline", () => { state.online = false; if (session.unlocked) render(); });
+
+// Global error boundary — keeps app alive on a single render bug
+window.addEventListener("error", (e) => {
+  console.error("Global error:", e.error || e.message);
+});
+window.addEventListener("unhandledrejection", (e) => {
+  console.error("Unhandled rejection:", e.reason);
+});
 
 // ===================================================================
 //  BOOT
 // ===================================================================
 async function boot() {
-  const app = document.getElementById("app");
-  app.innerHTML = `<div class="flex min-h-dvh items-center justify-center"><div class="text-center"><div class="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-teal-500 to-indigo-600 text-3xl text-white shadow-lg animate-pulse">🎓</div><p class="mt-4 text-sm text-slate-500">Loading MEC Study Buddy...</p></div></div>`;
   const baked = DEFAULT_BACKEND_URL && !DEFAULT_BACKEND_URL.startsWith("PASTE_");
   if (!cfg || !cfg.url) {
     if (baked) {
@@ -454,10 +489,12 @@ async function boot() {
         cfg = { url: DEFAULT_BACKEND_URL, lang: (st && st.lang) || "hi" };
         state.lang = cfg.lang;
         if (st && st.pinSet) { saveLS(LS.cfg, cfg); return renderLock(); }
-        wiz = { step: 2, url: DEFAULT_BACKEND_URL, status: st, driveId: "", photosId: "", groqKey: "",
-                lang: "hi", pin: "", pin2: "", studentName: "" };
+        wiz = newWizard();
+        wiz.step = 2; wiz.url = DEFAULT_BACKEND_URL; wiz.status = st;
         return renderSetup();
-      } catch (e) { return renderSetup(); }
+      } catch (e) {
+        return renderSetup();
+      }
     }
     return renderSetup();
   }
@@ -466,7 +503,11 @@ async function boot() {
     const r = await api("verify");
     if (r && r.ok) { session.unlocked = true; await loadServerLogs(); render(); }
     else { sessionStorage.removeItem("mec_pin"); session.pinHash = null; renderLock(t().wrongPin); }
-  } catch (e) { render(); }
+  } catch (e) {
+    // Network failed — still render cached state if possible
+    session.unlocked = true;
+    render();
+  }
 }
 
 async function loadServerLogs() {
@@ -476,14 +517,17 @@ async function loadServerLogs() {
       state.logs = r.logs.filter(x => x.topic || x.subject);
       saveLS(LS.logs, state.logs);
     }
-  } catch (e) {}
+  } catch (e) { /* silent — use cached */ }
 }
 
 // ===================================================================
 //  SETUP WIZARD
 // ===================================================================
-let wiz = { step: 1, url: "", status: null, driveId: "", photosId: "", groqKey: "",
-            lang: "hi", pin: "", pin2: "", studentName: "" };
+function newWizard() {
+  return { step: 1, url: "", status: null, driveId: "", photosId: "",
+           groqKey: "", lang: "hi", pin: "", pin2: "", studentName: "" };
+}
+let wiz = newWizard();
 
 function shell(inner) {
   const app = document.getElementById("app");
@@ -504,13 +548,15 @@ function shell(inner) {
 function field(label, id, ph, type = "text", val = "", hint = "") {
   const safeVal = String(val).replace(/"/g, "&quot;");
   return `<label class="mb-1 mt-3 block text-xs font-semibold">${label}</label>
-    <input id="${id}" type="${type}" value="${safeVal}" placeholder="${ph}"
+    <input id="${id}" type="${type}" value="${safeVal}" placeholder="${ph}" autocomplete="off"
       class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2.5 outline-none focus:border-teal-500">
     ${hint ? `<p class="mt-1 text-[11px] text-slate-400">${hint}</p>` : ""}`;
 }
 
 function renderSetup(msg = "") {
   const T = t();
+
+  // Step 1 — connect backend
   if (wiz.step === 1) {
     const inner = el(`<div>
       <p class="text-[11px] font-semibold uppercase tracking-wide text-teal-600">${T.step} 1 / 3</p>
@@ -524,18 +570,23 @@ function renderSetup(msg = "") {
       const url = inner.querySelector("#wUrl").value.trim();
       if (!url) return;
       wiz.url = url;
-      const btn = inner.querySelector("#testBtn"); btn.textContent = T.testing; btn.disabled = true;
+      const btn = inner.querySelector("#testBtn");
+      btn.textContent = T.testing; btn.disabled = true;
       try {
         const st = await apiStatus(url);
         if (!st || !st.ok) throw new Error("bad");
         wiz.status = st;
         if (st.pinSet) { wiz.step = "existing"; renderSetup(); }
         else { wiz.step = 2; renderSetup(T.connected); }
-      } catch (e) { renderSetup(T.connectFail); btn.disabled = false; btn.textContent = T.testBtn; }
+      } catch (e) {
+        renderSetup(T.connectFail);
+        btn.disabled = false; btn.textContent = T.testBtn;
+      }
     };
     return shell(inner);
   }
 
+  // Step 2 — backup + AI key + language
   if (wiz.step === 2) {
     const inner = el(`<div>
       <p class="text-[11px] font-semibold uppercase tracking-wide text-teal-600">${T.step} 2 / 3</p>
@@ -567,6 +618,7 @@ function renderSetup(msg = "") {
     return shell(inner);
   }
 
+  // Step 3 — set PIN
   if (wiz.step === 3) {
     const inner = el(`<div>
       <p class="text-[11px] font-semibold uppercase tracking-wide text-teal-600">${T.step} 3 / 3</p>
@@ -583,64 +635,91 @@ function renderSetup(msg = "") {
     inner.querySelectorAll('input[type=password]').forEach(i => { i.inputMode = "numeric"; });
     inner.querySelector("#back").onclick = () => { wiz.step = 2; renderSetup(); };
     inner.querySelector("#fin").onclick = async () => {
-      const p1 = inner.querySelector("#wPin").value.trim(), p2 = inner.querySelector("#wPin2").value.trim();
+      const p1 = inner.querySelector("#wPin").value.trim();
+      const p2 = inner.querySelector("#wPin2").value.trim();
       if (!/^\d{4,6}$/.test(p1)) return renderSetup3msg(T.pinLen);
       if (p1 !== p2) return renderSetup3msg(T.pinMismatch);
-      const btn = inner.querySelector("#fin"); btn.textContent = T.saving; btn.disabled = true;
+      const btn = inner.querySelector("#fin");
+      btn.textContent = T.saving; btn.disabled = true;
       const pinHash = await sha256(p1);
       session.pinHash = pinHash;
       cfg = { url: wiz.url, lang: wiz.lang, studentName: wiz.studentName || "Yeshaswini" };
       try {
-        const r = await fetchWithTimeout(cfg.url, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({ action: "setup", pinHash, driveId: wiz.driveId, photosId: wiz.photosId,
-            groqKey: wiz.groqKey, lang: wiz.lang, studentName: wiz.studentName }) }).then(x => x.json());
-        if (!r || !r.ok) throw new Error(r && r.error || "setup failed");
+        const r = await fetchWithTimeout(cfg.url, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            action: "setup", pinHash,
+            driveId: wiz.driveId, photosId: wiz.photosId,
+            groqKey: wiz.groqKey, lang: wiz.lang, studentName: wiz.studentName,
+          }),
+        }).then(x => x.json());
+        if (!r || !r.ok) throw new Error((r && r.error) || "setup failed");
         finishUnlock();
-      } catch (e) { renderSetup3msg(String(e.message || e)); btn.disabled = false; btn.textContent = T.finishBtn; }
+      } catch (e) {
+        renderSetup3msg(String(e.message || e));
+        btn.disabled = false; btn.textContent = T.finishBtn;
+      }
     };
     return shell(inner);
   }
 
+  // Existing backend → ask PIN
   if (wiz.step === "existing") {
-    return renderLock(T.existingFound, true);
+    return renderLock(T.existingFound);
   }
 }
-function renderSetup3msg(m) { const e = document.getElementById("msg"); if (e) e.textContent = m; }
+
+function renderSetup3msg(m) {
+  const e = document.getElementById("msg");
+  if (e) e.textContent = m;
+}
 
 // ===================================================================
 //  PIN LOCK
 // ===================================================================
-function renderLock(msg = "", fromWizard = false) {
+function renderLock(msg = "") {
   const T = t();
   const inner = el(`<div class="text-center">
     <div class="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-slate-100 dark:bg-slate-800 text-2xl">🔒</div>
     <h2 class="mt-3 text-lg font-bold">${T.lockTitle}</h2>
     <p class="mt-1 text-xs text-slate-500">${msg || ""}</p>
-    <input id="pinInp" type="password" inputmode="numeric" maxlength="6" placeholder="••••"
+    <input id="pinInp" type="password" inputmode="numeric" maxlength="6" placeholder="••••" autocomplete="off"
       class="mx-auto mt-4 block w-40 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-3 text-center text-2xl tracking-[0.4em] outline-none focus:border-teal-500">
     <p id="lmsg" class="mt-2 text-xs text-rose-500"></p>
     <button id="unlock" class="mt-3 w-full rounded-xl bg-gradient-to-r from-teal-500 to-indigo-600 py-2.5 font-semibold text-white">${T.unlock}</button>
     <button id="reset" class="mt-3 text-[11px] text-slate-400 hover:underline">${T.reset}</button>
   </div>`);
+
   const tryUnlock = async () => {
     const pin = inner.querySelector("#pinInp").value.trim();
     if (!/^\d{4,6}$/.test(pin)) { inner.querySelector("#lmsg").textContent = T.pinLen; return; }
-    const btn = inner.querySelector("#unlock"); btn.disabled = true; btn.textContent = "…";
+    const btn = inner.querySelector("#unlock");
+    btn.disabled = true; btn.textContent = "…";
     const pinHash = await sha256(pin);
     session.pinHash = pinHash;
     if (!cfg) cfg = { url: wiz.url, lang: wiz.lang || "hi" };
     try {
       const r = await api("verify");
       if (r && r.ok) { finishUnlock(); }
-      else { session.pinHash = null; inner.querySelector("#lmsg").textContent = T.wrongPin; btn.disabled = false; btn.textContent = T.unlock; }
-    } catch (e) { inner.querySelector("#lmsg").textContent = T.networkErr; btn.disabled = false; btn.textContent = T.unlock; }
+      else {
+        session.pinHash = null;
+        inner.querySelector("#lmsg").textContent = T.wrongPin;
+        btn.disabled = false; btn.textContent = T.unlock;
+      }
+    } catch (e) {
+      inner.querySelector("#lmsg").textContent = T.networkErr;
+      btn.disabled = false; btn.textContent = T.unlock;
+    }
   };
+
   inner.querySelector("#unlock").onclick = tryUnlock;
   inner.querySelector("#pinInp").addEventListener("keydown", e => { if (e.key === "Enter") tryUnlock(); });
   inner.querySelector("#reset").onclick = () => {
     if (confirm("Reset this device's connection?")) {
       localStorage.removeItem(LS.cfg); sessionStorage.removeItem("mec_pin");
-      cfg = null; session = { pinHash: null, unlocked: false }; wiz = { step: 1, url: "", lang: "hi", studentName: "" }; renderSetup();
+      cfg = null; session = { pinHash: null, unlocked: false };
+      wiz = newWizard(); renderSetup();
     }
   };
   shell(inner);
@@ -660,12 +739,14 @@ async function finishUnlock() {
 //  MAIN APP RENDER
 // ===================================================================
 function updateStreak() {
-  const today = new Date().toDateString(); const last = localStorage.getItem(LS.lastDay);
+  const today = new Date().toDateString();
+  const last = localStorage.getItem(LS.lastDay);
   let streak = parseInt(localStorage.getItem(LS.streak) || "0", 10);
   if (last !== today) {
-    const y = new Date(Date.now() - 864e5).toDateString();
-    streak = (last === y) ? Math.min(streak + 1, 365) : 1;
-    localStorage.setItem(LS.streak, streak); localStorage.setItem(LS.lastDay, today);
+    const yesterday = new Date(Date.now() - 864e5).toDateString();
+    streak = (last === yesterday) ? Math.min(streak + 1, 365) : 1;
+    localStorage.setItem(LS.streak, streak);
+    localStorage.setItem(LS.lastDay, today);
   }
   return streak || 1;
 }
@@ -678,8 +759,22 @@ function render() {
   if (!state.online) {
     main.appendChild(el(`<div class="mb-3 rounded-xl bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 p-3 text-center text-xs text-amber-700 dark:text-amber-300">📡 ${t().offline}</div>`));
   }
-  const views = { home: HomeView, subjects: SubjectsView, today: TodayView, exam: ExamView, chat: ChatView, tricks: TricksView, mcq: MCQView, flashcards: FlashcardsView, pomodoro: PomodoroView, progress: ProgressView, doubts: DoubtsView, tools: ToolsView };
-  main.appendChild((views[state.view] || HomeView)());
+  const views = {
+    home: HomeView, subjects: SubjectsView, today: TodayView, exam: ExamView,
+    chat: ChatView, tricks: TricksView,
+    focus: FocusView, flashcards: FlashcardsView, quiz: QuizView,
+    analytics: AnalyticsView, bookmarks: BookmarksView,
+  };
+  try {
+    main.appendChild((views[state.view] || HomeView)());
+  } catch (err) {
+    console.error("Render error in view", state.view, err);
+    main.appendChild(el(`<div class="rounded-xl border border-rose-200 dark:border-rose-800 bg-rose-50 dark:bg-rose-950 p-4 text-xs text-rose-700 dark:text-rose-300">
+      ⚠️ ${tr("View load nahi hua. Network check karo aur dobara try karo.", "View failed to load. Check network and try again.")}<br>
+      <button id="errBack" class="mt-2 rounded-lg bg-rose-500 px-3 py-1 text-white">Home</button>
+    </div>`));
+    main.querySelector("#errBack").onclick = () => go("home");
+  }
   app.appendChild(main);
   app.appendChild(AIAgentFAB());
   app.appendChild(BottomNav());
@@ -693,28 +788,26 @@ function Header() {
         <div class="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-teal-500 to-indigo-600 text-white text-lg shadow">🎓</div>
         <div class="min-w-0 flex-1"><h1 class="truncate text-base font-bold leading-tight">${t().appName}</h1>
           <p class="truncate text-[11px] text-slate-500 dark:text-slate-400">${t().tagline}</p></div>
+        <button id="moreBtn" class="shrink-0 rounded-full border border-slate-300 dark:border-slate-700 px-3 py-1.5 text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-800" title="${t().more}">⚡ ${t().more}</button>
         <button id="langBtn" class="shrink-0 rounded-full border border-slate-300 dark:border-slate-700 px-3 py-1.5 text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-800">
           ${state.lang === "hi" ? "🇮🇳 Hinglish" : "🇬🇧 English"}</button>
       </div></header>`);
   h.querySelector("#langBtn").onclick = () => {
-    state.lang = state.lang === "hi" ? "en" : "hi"; cfg.lang = state.lang; saveLS(LS.cfg, cfg); render();
+    state.lang = state.lang === "hi" ? "en" : "hi";
+    if (cfg) { cfg.lang = state.lang; saveLS(LS.cfg, cfg); }
+    render();
   };
+  h.querySelector("#moreBtn").onclick = () => openMoreSheet();
   return h;
 }
 
-// ===================================================================
-//  24x7 FLOATING AI AGENT
-// ===================================================================
+// ── Floating AI Agent button ───────────────────────────────────
 function AIAgentFAB() {
   const fab = el(`<div id="aiFab" class="fixed bottom-20 right-4 z-30 flex flex-col items-end gap-2">
-    <button id="fabBtn" class="grid h-14 w-14 place-items-center rounded-full bg-gradient-to-br from-teal-500 to-indigo-600 text-2xl text-white shadow-lg shadow-teal-500/30 hover:scale-110 active:scale-95 transition-all duration-200 animate-bounce-slow"
-      title="${t().askAI}">
-      🤖
-    </button>
+    <button id="fabBtn" aria-label="${t().askAI}" class="grid h-14 w-14 place-items-center rounded-full bg-gradient-to-br from-teal-500 to-indigo-600 text-2xl text-white shadow-lg shadow-teal-500/30 hover:scale-110 active:scale-95 transition-all duration-200 animate-bounce-slow" title="${t().askAI}">🤖</button>
     <span class="rounded-full bg-white dark:bg-slate-800 px-2.5 py-1 text-[10px] font-semibold shadow-md border border-slate-200 dark:border-slate-700">${t().askAI} 💬</span>
   </div>`);
-  const btn = fab.querySelector("#fabBtn");
-  btn.addEventListener("click", () => {
+  fab.querySelector("#fabBtn").addEventListener("click", () => {
     if (state.view === "chat") { scrollChat(); return; }
     go("chat");
   });
@@ -728,482 +821,106 @@ function StatCard(label, value, icon) {
 }
 
 // ===================================================================
-//  MCQ QUIZ VIEW
+//  HOME VIEW
 // ===================================================================
-function MCQView() {
-  const T = t();
-  const wrap = el(`<div class="space-y-4"><div><h2 class="px-1 text-lg font-bold">📝 ${T.mcqTitle}</h2>
-    <p class="px-1 text-xs text-slate-500 dark:text-slate-400">${T.mcqHint}</p></div></div>`);
-
-  const saved = state.quizScores || [];
-  const avg = saved.length ? Math.round(saved.reduce((a,b)=>a+b,0)/saved.length) : 0;
-
-  wrap.appendChild(el(`<div class="grid grid-cols-3 gap-2">${StatCard(T.mcqTotal, saved.length, "📋")}${StatCard(T.mcqAccuracy, avg + "%", "🎯")}${StatCard(T.classesLogged, saved.filter(s=>s>=80).length, "🏆")}</div>`));
-
-  const subjGrid = el(`<div class="grid grid-cols-2 gap-2"></div>`);
-  SUBJECTS.forEach(s => {
-    const prev = saved.filter(sc => sc.subject === s.name).length;
-    const card = el(`<button class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 text-center hover:shadow-md transition">
-      <span class="text-2xl">${s.icon}</span><p class="mt-1 text-xs font-bold">${s.name}</p>
-      <p class="text-[10px] text-slate-400">${prev} tests done</p></button>`);
-    card.onclick = () => startMCQ(s.name);
-    subjGrid.appendChild(card);
-  });
-  wrap.appendChild(subjGrid);
-
-  // AI Question Generator
-  const aiBtn = el(`<button class="w-full rounded-xl bg-gradient-to-r from-purple-500 to-pink-600 py-2.5 text-sm font-semibold text-white">🤖 ${T.mcqGenByAI}</button>`);
-  aiBtn.onclick = () => { go("chat"); setTimeout(() => sendMessage(state.lang === "hi"
-    ? "Mujhe MEC subjects ke 10 MCQ questions do with answers and explanation"
-    : "Give me 10 MCQ questions on MEC subjects with answers and explanation"), 60); };
-  wrap.appendChild(aiBtn);
-
-  return wrap;
-}
-
-function startMCQ(subject) {
-  const T = t();
-  const questions = MCQ_BANK.filter(q => q.subject === subject);
-  if (!questions.length) { alert("No questions for this subject yet!"); return; }
-  let idx = 0, correct = 0, wrong = 0, answered = false;
-  const wrap = el(`<div class="space-y-4"></div>`);
-  const card = el(`<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 space-y-3"></div>`);
-
-  function renderQuestion() {
-    card.innerHTML = "";
-    if (idx >= questions.length) return showResult();
-    const q = questions[idx];
-    card.appendChild(el(`<div class="flex items-center justify-between"><span class="text-[11px] font-semibold text-teal-600">${subject}</span><span class="text-[11px] text-slate-400">${idx+1}/${questions.length}</span></div>`));
-    card.appendChild(el(`<p class="text-sm font-bold">${q.q}</p>`));
-    const optsDiv = el(`<div class="space-y-1.5"></div>`);
-    q.opts.forEach((o, i) => {
-      const btn = el(`<button class="opt-btn w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2.5 text-left text-xs hover:bg-slate-100 dark:hover:bg-slate-700 transition">${String.fromCharCode(65+i)}. ${o}</button>`);
-      btn.onclick = () => {
-        if (answered) return;
-        answered = true;
-        document.querySelectorAll(".opt-btn").forEach(b => b.style.pointerEvents = "none");
-        if (i === q.ans) { correct++; btn.classList.replace("border-slate-200", "border-emerald-500"); btn.classList.add("bg-emerald-50","dark:bg-emerald-900/30"); }
-        else { wrong++; btn.classList.replace("border-slate-200", "border-rose-500"); btn.classList.add("bg-rose-50","dark:bg-rose-900/30");
-          const correctBtn = document.querySelectorAll(".opt-btn")[q.ans];
-          if (correctBtn) { correctBtn.classList.replace("border-slate-200", "border-emerald-500"); correctBtn.classList.add("bg-emerald-50","dark:bg-emerald-900/30"); } }
-        const expDiv = el(`<div class="rounded-xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 p-2.5"><p class="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400">💡 ${T.mcqExplain}</p><p class="text-[11px] mt-0.5 text-slate-600 dark:text-slate-300">${q.exp}</p></div>`);
-        card.appendChild(expDiv);
-        nextBtn.classList.remove("hidden");
-      };
-      optsDiv.appendChild(btn);
-    });
-    card.appendChild(optsDiv);
-    const nextBtn = el(`<button class="next-btn hidden w-full rounded-xl bg-gradient-to-r from-teal-500 to-indigo-600 py-2.5 text-sm font-semibold text-white">${idx < questions.length-1 ? T.mcqNext : T.mcqResult}</button>`);
-    nextBtn.onclick = () => { idx++; answered = false; renderQuestion(); };
-    card.appendChild(nextBtn);
-  }
-
-  function showResult() {
-    const pct = Math.round(correct/questions.length*100);
-    const grade = pct >= 80 ? "🏆" : pct >= 50 ? "👍" : "💪";
-    card.innerHTML = `<div class="text-center py-4 space-y-3"><div class="text-5xl">${grade}</div>
-      <h3 class="text-lg font-bold">${T.mcqResult}</h3>
-      <div class="grid grid-cols-3 gap-2">${StatCard(T.mcqCorrect, correct, "✅")}${StatCard(T.mcqWrong, wrong, "❌")}${StatCard(T.mcqAccuracy, pct+"%", "🎯")}</div>
-      <button class="retry-btn w-full rounded-xl bg-gradient-to-r from-teal-500 to-indigo-600 py-2.5 text-sm font-semibold text-white">${T.mcqRetry}</button>
-      <button class="back-btn w-full rounded-xl border border-slate-300 dark:border-slate-700 py-2.5 text-sm font-semibold">← ${T.back}</button></div>`;
-    card.querySelector(".retry-btn").onclick = () => { state.view = "mcq"; startMCQ(subject); };
-    card.querySelector(".back-btn").onclick = () => go("mcq");
-    const scores = state.quizScores || [];
-    scores.push({ subject, score: pct, date: new Date().toISOString() });
-    state.quizScores = scores;
-    saveLS(LS.quizScores, scores);
-  }
-
-  renderQuestion();
-  const app = document.getElementById("app");
-  const main = app.querySelector("main") || app;
-  const backBtn = el(`<button class="mb-2 text-xs text-slate-500 hover:underline" onclick="go('mcq')">← ${T.mcqTitle}</button>`);
-  main.innerHTML = ""; main.appendChild(backBtn); main.appendChild(card);
-  window.scrollTo({ top: 0 });
-}
-
-// ===================================================================
-//  FLASHCARDS VIEW
-// ===================================================================
-function FlashcardsView() {
-  const T = t();
-  const wrap = el(`<div class="space-y-4"><div><h2 class="px-1 text-lg font-bold">🃏 ${T.fcTitle}</h2>
-    <p class="px-1 text-xs text-slate-500 dark:text-slate-400">${T.fcHint}</p></div></div>`);
-
-  const cards = state.flashcards || [];
-  const due = cards.filter(c => new Date(c.nextReview) <= new Date());
-  const total = cards.length;
-
-  // Stats
-  wrap.appendChild(el(`<div class="grid grid-cols-3 gap-2">${StatCard(T.fcDue, due.length, "📖")}${StatCard(T.fcBox+" 1", cards.filter(c=>c.box===1).length, "🟢")}${StatCard(T.mcqTotal, total, "🃏")}</div>`));
-
-  // Review section
-  const reviewSec = el(`<div class="space-y-2"></div>`);
-  if (due.length) {
-    let dueIdx = 0;
-    const reviewCard = el(`<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 text-center space-y-3 min-h-[200px] flex flex-col items-center justify-center"></div>`);
-
-    function showCard() {
-      if (dueIdx >= due.length) { reviewCard.innerHTML = `<div class="py-6 text-center"><div class="text-4xl">🎉</div><p class="mt-2 text-sm font-bold">${T.fcDone}</p></div>`; return; }
-      const c = due[dueIdx];
-      reviewCard.innerHTML = `<p class="text-[11px] font-semibold text-teal-600">${c.subject} · ${T.fcBox} ${c.box}</p>
-        <p class="text-sm font-bold mt-1" id="fcFront">${c.front}</p>
-        <div id="fcBack" class="hidden mt-1"><div class="rounded-xl bg-slate-100 dark:bg-slate-800 p-3"><p class="text-xs">${c.back}</p></div></div>
-        <button id="fcFlipBtn" class="rounded-full bg-gradient-to-r from-teal-500 to-indigo-600 px-6 py-2 text-xs font-semibold text-white">${T.fcFlip}</button>
-        <div id="fcRating" class="hidden flex gap-2 mt-2">
-          <button data-days="7" class="flex-1 rounded-xl bg-emerald-500 py-2 text-xs font-semibold text-white">${T.fcEasy}</button>
-          <button data-days="1" class="flex-1 rounded-xl bg-amber-500 py-2 text-xs font-semibold text-white">${T.fcMedium}</button>
-          <button data-days="0" class="flex-1 rounded-xl bg-rose-500 py-2 text-xs font-semibold text-white">${T.fcHard}</button>
-        </div>`;
-      reviewCard.querySelector("#fcFlipBtn").onclick = () => {
-        document.getElementById("fcBack").classList.remove("hidden");
-        document.getElementById("fcFlipBtn").classList.add("hidden");
-        document.getElementById("fcRating").classList.remove("hidden");
-      };
-      reviewCard.querySelectorAll("#fcRating button").forEach(b => {
-        b.onclick = () => {
-          const days = parseInt(b.dataset.days);
-          const c2 = state.flashcards.find(x => x.id === c.id);
-          if (c2) {
-            c2.box = days === 0 ? 1 : Math.min(c2.box + 1, 3);
-            c2.nextReview = new Date(Date.now() + (days || FC_INTERVALS[c2.box] || 1) * 86400000).toISOString();
-            c2.timesReviewed = (c2.timesReviewed || 0) + 1;
-          }
-          saveLS(LS.flashcards, state.flashcards);
-          dueIdx++;
-          showCard();
-        };
-      });
-    }
-    showCard();
-    reviewSec.appendChild(reviewCard);
-  } else {
-    reviewSec.appendChild(el(`<div class="rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 p-6 text-center"><div class="text-4xl">✅</div><p class="mt-2 text-sm font-bold">${T.fcDone}</p><p class="text-xs text-slate-400">${total ? "Come back later!" : T.fcEmpty}</p></div>`));
-  }
-  wrap.appendChild(reviewSec);
-
-  // Add new card form
-  const addSec = el(`<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 space-y-3">
-    <h3 class="text-sm font-bold">➕ ${T.fcAddNew}</h3>
-    <select id="fcSubj" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2">${SUBJECTS.map(s => `<option value="${s.name}">${s.icon} ${s.name}</option>`).join("")}</select>
-    <input id="fcFrontInp" placeholder="${T.fcFrontLabel}" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2">
-    <textarea id="fcBackInp" rows="2" placeholder="${T.fcBackLabel}" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2"></textarea>
-    <button id="fcAddBtn" class="w-full rounded-xl bg-gradient-to-r from-teal-500 to-indigo-600 py-2.5 text-sm font-semibold text-white">${T.fcAdd}</button></div>`);
-  addSec.querySelector("#fcAddBtn").onclick = () => {
-    const subj = addSec.querySelector("#fcSubj").value;
-    const front = addSec.querySelector("#fcFrontInp").value.trim();
-    const back = addSec.querySelector("#fcBackInp").value.trim();
-    if (!front || !back) return;
-    state.flashcards.push({ id: Date.now(), subject: subj, front, back, box: 1, nextReview: new Date().toISOString(), timesReviewed: 0 });
-    saveLS(LS.flashcards, state.flashcards);
-    addSec.querySelector("#fcFrontInp").value = ""; addSec.querySelector("#fcBackInp").value = "";
-    go("flashcards");
-  };
-  wrap.appendChild(addSec);
-
-  // All cards list
-  if (total) {
-    const list = el(`<div class="space-y-1"><h3 class="px-1 text-xs font-semibold text-slate-400">${T.mcqTotal}: ${total}</h3></div>`);
-    cards.forEach(c => {
-      list.appendChild(el(`<div class="flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-2.5">
-        <span class="shrink-0 text-lg">${(SUBJECTS.find(s=>s.name===c.subject)||{}).icon||"📘"}</span>
-        <div class="min-w-0 flex-1"><p class="truncate text-xs font-semibold">${c.front}</p><p class="text-[10px] text-slate-400">${T.fcBox} ${c.box} · ${new Date(c.nextReview) <= new Date() ? "🔴 Due" : "✅ Reviewed"}</p></div>
-        <button class="del-fc text-[10px] text-rose-400 hover:text-rose-600" data-id="${c.id}">✕</button></div>`));
-    });
-    list.querySelectorAll(".del-fc").forEach(b => b.onclick = () => {
-      state.flashcards = state.flashcards.filter(x => x.id !== parseInt(b.dataset.id));
-      saveLS(LS.flashcards, state.flashcards); go("flashcards");
-    });
-    wrap.appendChild(list);
-  }
-
-  return wrap;
-}
-
-// ===================================================================
-//  POMODORO TIMER VIEW
-// ===================================================================
-let _pomoInterval = null;
-const POMO_WORK = 25 * 60;
-const POMO_BREAK = 5 * 60;
-
-function PomodoroView() {
-  const T = t();
-  let timeLeft = POMO_WORK, isWork = true, running = false;
-
-  const wrap = el(`<div class="space-y-4"><div><h2 class="px-1 text-lg font-bold">⏱ ${T.pomTitle}</h2>
-    <p class="px-1 text-xs text-slate-500 dark:text-slate-400">${T.pomHint}</p></div></div>`);
-
-  // Stats
-  wrap.appendChild(el(`<div class="grid grid-cols-2 gap-2">${StatCard(T.pomSessions, state.pomodoros, "🍅")}${StatCard(T.progFocusHours, Math.floor(state.focusTotal/60)+"h "+state.focusTotal%60+"m", "🔥")}</div>`));
-
-  const timerCard = el(`<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 text-center space-y-4">
-    <p id="pomoPhase" class="text-xs font-semibold text-teal-600 uppercase tracking-wide">${T.pomWork}</p>
-    <div id="pomoDisplay" class="text-6xl font-extrabold tabular-nums">25:00</div>
-    <div class="flex justify-center gap-3">
-      <button id="pomoStart" class="rounded-full bg-gradient-to-r from-teal-500 to-indigo-600 px-8 py-2.5 text-sm font-semibold text-white">${T.pomStart}</button>
-      <button id="pomoReset" class="rounded-full border border-slate-300 dark:border-slate-700 px-6 py-2.5 text-sm font-semibold">${T.pomReset}</button>
-    </div></div>`);
-
-  function updateDisplay() {
-    const m = String(Math.floor(timeLeft/60)).padStart(2, "0");
-    const s = String(timeLeft%60).padStart(2, "0");
-    const d = timerCard.querySelector("#pomoDisplay");
-    if (d) d.textContent = `${m}:${s}`;
-    const ph = timerCard.querySelector("#pomoPhase");
-    if (ph) ph.textContent = isWork ? T.pomWork : T.pomBreak;
-  }
-
-  timerCard.querySelector("#pomoStart").onclick = () => {
-    if (running) {
-      running = false;
-      clearInterval(_pomoInterval);
-      timerCard.querySelector("#pomoStart").textContent = T.pomStart;
-      document.title = "MEC Study Buddy";
-      return;
-    }
-    running = true;
-    timerCard.querySelector("#pomoStart").textContent = T.pomPause;
-    _pomoInterval = setInterval(() => {
-      timeLeft--;
-      updateDisplay();
-      document.title = `${Math.floor(timeLeft/60)}:${String(timeLeft%60).padStart(2,"0")} - Study Buddy`;
-      if (timeLeft <= 0) {
-        clearInterval(_pomoInterval); running = false;
-        if (isWork) {
-          state.pomodoros++; localStorage.setItem(LS.pomodoros, state.pomodoros);
-          state.focusTotal += POMO_WORK/60; localStorage.setItem(LS.focusTotal, state.focusTotal);
-          alert(T.pomComplete);
-          isWork = false; timeLeft = POMO_BREAK;
-        } else {
-          alert(T.pomBreakComplete);
-          isWork = true; timeLeft = POMO_WORK;
-        }
-        updateDisplay();
-        timerCard.querySelector("#pomoStart").textContent = T.pomStart;
-        document.title = "MEC Study Buddy";
-      }
-    }, 1000);
-  };
-
-  timerCard.querySelector("#pomoReset").onclick = () => {
-    clearInterval(_pomoInterval); running = false;
-    isWork = true; timeLeft = POMO_WORK;
-    updateDisplay();
-    timerCard.querySelector("#pomoStart").textContent = T.pomStart;
-    document.title = "MEC Study Buddy";
-  };
-
-  wrap.appendChild(timerCard);
-  return wrap;
-}
-
-// ===================================================================
-//  PROGRESS DASHBOARD VIEW
-// ===================================================================
-function ProgressView() {
-  const T = t();
-  const wrap = el(`<div class="space-y-4"><div><h2 class="px-1 text-lg font-bold">📊 ${T.progTitle}</h2>
-    <p class="px-1 text-xs text-slate-500 dark:text-slate-400">${T.progHint}</p></div></div>`);
-
-  const streak = updateStreak();
-  const topics = new Set(state.logs.map(l => l.subject + "|" + l.topic)).size;
-  const savedScores = state.quizScores || [];
-  const avg = savedScores.length ? Math.round(savedScores.reduce((a,b)=>a.score+b.score,0)/savedScores.length) : 0;
-
-  // Stats row
-  wrap.appendChild(el(`<div class="grid grid-cols-2 gap-2 sm:grid-cols-4">${StatCard(T.progStreak, streak+" 🔥", "📅")}${StatCard(T.progLogs, state.logs.length, "📚")}${StatCard(T.progTopics, topics, "✅")}${StatCard(T.progQuizScore, avg+"%", "🎯")}</div>`));
-
-  // Focus time
-  const focusH = Math.floor(state.focusTotal/60);
-  const focusM = state.focusTotal%60;
-  wrap.appendChild(el(`<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
-    <h3 class="text-xs font-semibold text-slate-500 mb-2">🔥 ${T.progFocusHours}</h3>
-    <p class="text-2xl font-extrabold">${focusH}h ${focusM}m</p>
-    <p class="text-[11px] text-slate-400">${T.pomSessions}: ${state.pomodoros}</p></div>`));
-
-  // Weekly activity (simple bar chart)
-  const days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-  const weekData = days.map((_, i) => {
-    const d = new Date(); d.setDate(d.getDate() - (6-i));
-    return state.logs.filter(l => l.date && new Date(l.date).toDateString() === d.toDateString()).length;
-  });
-  const maxVal = Math.max(...weekData, 1);
-  const chart = el(`<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
-    <h3 class="mb-3 text-xs font-semibold text-slate-500">📊 ${T.progThisWeek}</h3>
-    <div class="flex items-end gap-1.5" style="height:80px">${weekData.map((v, i) => `<div class="flex flex-1 flex-col items-center justify-end gap-1"><div class="w-full rounded-t-md bg-gradient-to-t from-teal-500 to-indigo-600 transition-all" style="height:${Math.max(2, (v/maxVal)*70)}px;opacity:${0.4+(v/maxVal)*0.6}"></div><span class="text-[8px] text-slate-400">${days[i].slice(0,2)}</span></div>`).join("")}</div></div>`);
-  wrap.appendChild(chart);
-
-  if (!state.logs.length && !savedScores.length && !state.pomodoros) {
-    wrap.appendChild(el(`<div class="rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 p-8 text-center"><div class="text-4xl">📈</div><p class="mt-2 text-sm text-slate-500">${T.progNoData}</p></div>`));
-  }
-
-  return wrap;
-}
-
-// ===================================================================
-//  DOUBT LIBRARY VIEW
-// ===================================================================
-function DoubtsView() {
-  const T = t();
-  const wrap = el(`<div class="space-y-4"><div><h2 class="px-1 text-lg font-bold">💡 ${T.doubtTitle}</h2>
-    <p class="px-1 text-xs text-slate-500 dark:text-slate-400">${T.doubtHint}</p></div></div>`);
-
-  const chat = state.chat || [];
-  const pairs = [];
-  for (let i = 0; i < chat.length-1; i += 2) {
-    if (chat[i].role === "user" && chat[i+1].role === "assistant") {
-      pairs.push({ q: chat[i].content, a: chat[i+1].content, i });
-    }
-  }
-
-  const searchBox = el(`<div class="flex gap-2"><input id="doubtSearch" placeholder="${T.doubtSearch}" class="flex-1 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2">
-    <button id="doubtClear" class="shrink-0 rounded-xl border border-slate-300 dark:border-slate-700 px-3 py-2 text-xs">✕</button></div>`);
-  wrap.appendChild(searchBox);
-
-  const list = el(`<div id="doubtList" class="space-y-2"></div>`);
-  function renderDoubts(filter = "") {
-    list.innerHTML = "";
-    const filtered = filter ? pairs.filter(p => p.q.toLowerCase().includes(filter.toLowerCase()) || p.a.toLowerCase().includes(filter.toLowerCase())) : pairs;
-    if (!filtered.length) {
-      list.appendChild(el(`<div class="rounded-xl border border-dashed border-slate-300 dark:border-slate-700 p-6 text-center"><div class="text-3xl">🔍</div><p class="mt-1 text-xs text-slate-500">${T.doubtEmpty}</p></div>`));
-      return;
-    }
-    filtered.slice(-20).reverse().forEach(p => {
-      const card = el(`<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 space-y-1.5">
-        <div class="flex items-start gap-2"><span class="shrink-0 mt-0.5 text-xs">💬</span><p class="text-xs font-semibold">${sanitize(p.q.slice(0,200))}</p></div>
-        <div class="flex items-start gap-2 pl-5"><span class="shrink-0 mt-0.5 text-xs">🤖</span><div class="msg-body text-[11px] text-slate-600 dark:text-slate-300">${renderAssistant(p.a.slice(0,300))}</div></div>
-      </div>`);
-      list.appendChild(card);
-    });
-  }
-  renderDoubts();
-  wrap.appendChild(list);
-
-  searchBox.querySelector("#doubtSearch").oninput = (e) => renderDoubts(e.target.value);
-  searchBox.querySelector("#doubtClear").onclick = () => {
-    searchBox.querySelector("#doubtSearch").value = "";
-    renderDoubts();
-  };
-
-  return wrap;
-}
-
-// ===================================================================
-//  TOOLS HUB VIEW
-// ===================================================================
-function ToolsView() {
-  const T = t();
-  const wrap = el(`<div class="space-y-4"><div><h2 class="px-1 text-lg font-bold">🧰 ${T.tools}</h2>
-    <p class="px-1 text-xs text-slate-500 dark:text-slate-400">All study tools at your fingertips</p></div></div>`);
-
-  const toolCards = [
-    { id: "mcq", icon: "📝", label: T.mcqTitle, desc: T.mcqHint, color: "from-orange-500 to-amber-600" },
-    { id: "flashcards", icon: "🃏", label: T.fcTitle, desc: T.fcHint, color: "from-teal-500 to-emerald-600" },
-    { id: "pomodoro", icon: "⏱", label: T.pomTitle, desc: T.pomHint, color: "from-rose-500 to-red-600" },
-    { id: "progress", icon: "📊", label: T.progTitle, desc: T.progHint, color: "from-indigo-500 to-violet-600" },
-    { id: "doubts", icon: "💡", label: T.doubtTitle, desc: T.doubtHint, color: "from-purple-500 to-pink-600" },
-    { id: "chat", icon: "🤖", label: T.chatTitle, desc: "24x7 AI Professor — ask anything!", color: "from-cyan-500 to-blue-600" },
-  ];
-
-  const grid = el(`<div class="grid grid-cols-1 gap-3 sm:grid-cols-2"></div>`);
-  toolCards.forEach(t => {
-    const card = el(`<div class="cursor-pointer rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden hover:shadow-md transition">
-      <div class="bg-gradient-to-r ${t.color} p-3.5 text-white"><span class="text-2xl">${t.icon}</span><h3 class="mt-1 text-sm font-bold">${t.label}</h3></div>
-      <div class="p-3"><p class="text-[11px] text-slate-500 dark:text-slate-400">${t.desc}</p></div></div>`);
-    card.onclick = () => { if (t.id === "chat") { go("chat"); return; } go(t.id); };
-    grid.appendChild(card);
-  });
-  wrap.appendChild(grid);
-
-  return wrap;
-}
-
 function HomeView() {
   const streak = updateStreak();
   const topics = new Set(state.logs.map(l => l.subject + "|" + l.topic)).size;
   const name = getStudentName();
+  const mot = MOTIVATIONS[dailyIndex(MOTIVATIONS)];
+
   const wrap = el(`<div class="space-y-5"></div>`);
+
+  // Greeting card
   wrap.appendChild(el(`<section class="rounded-3xl bg-gradient-to-br from-teal-500 via-cyan-600 to-indigo-600 p-5 text-white shadow-lg">
-      <p class="text-sm opacity-90">${greet()}, ${sanitize(name)} 👋</p>
+      <p class="text-sm opacity-90">${greet()}, ${escapeHtml(name)} 👋</p>
       <h2 class="mt-1 text-xl font-bold">${t().welcome}</h2>
       <button id="goChat" class="mt-4 inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-2 text-sm font-semibold backdrop-blur hover:bg-white/30">💬 ${t().quickAsk}</button>
     </section>`));
+
+  // Stats
   wrap.appendChild(el(`<div class="grid grid-cols-3 gap-3">
-      ${StatCard(t().streak, streak, "🔥")}${StatCard(t().classesLogged, state.logs.length, "📚")}${StatCard(t().topicsCovered, topics, "✅")}</div>`));
-  const motIdx = Math.floor(Math.abs(new Date().toDateString().split("").reduce((a,c)=>a+c.charCodeAt(0),0)) % MOTIVATIONS.length);
-  const mot = MOTIVATIONS[motIdx];
+      ${StatCard(t().streak, streak, "🔥")}
+      ${StatCard(t().classesLogged, state.logs.length, "📚")}
+      ${StatCard(t().topicsCovered, topics, "✅")}
+    </div>`));
+
+  // Quick action grid
   const acts = [
     { v: "today", icon: "📝", label: t().logToday, c: "from-orange-400 to-amber-500" },
     { v: "subjects", icon: "📖", label: t().myNotes, c: "from-teal-400 to-emerald-500" },
     { v: "tricks", icon: "🧠", label: t().nav.tricks, c: "from-purple-400 to-pink-500" },
     { v: "exam", icon: "🎯", label: t().examPrep, c: "from-rose-400 to-red-500" },
-    { v: "chat", icon: "🤖", label: t().nav.chat, c: "from-indigo-400 to-violet-500" }];
+    { v: "chat", icon: "🤖", label: t().nav.chat, c: "from-indigo-400 to-violet-500" },
+  ];
   const grid = el(`<div class="grid grid-cols-2 gap-3 sm:grid-cols-5"></div>`);
-  acts.forEach(a => { const b = el(`<button class="flex flex-col items-center gap-2 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 hover:shadow-md transition">
+  acts.forEach(a => {
+    const b = el(`<button class="flex flex-col items-center gap-2 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 hover:shadow-md transition">
         <span class="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br ${a.c} text-2xl text-white">${a.icon}</span>
-        <span class="text-xs font-semibold text-center">${a.label}</span></button>`); b.onclick = () => go(a.v); grid.appendChild(b); });
+        <span class="text-xs font-semibold text-center">${a.label}</span></button>`);
+    b.onclick = () => go(a.v);
+    grid.appendChild(b);
+  });
   wrap.appendChild(grid);
-  const motQuote = el(`<section class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
+
+  // Daily motivation
+  wrap.appendChild(el(`<section class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
     <div class="flex items-start gap-3"><span class="text-2xl">💪</span>
       <div><p class="text-[11px] font-semibold text-teal-600 dark:text-teal-400">${t().dailyMotivation}</p>
-        <p class="mt-1 text-sm leading-relaxed">"${state.lang === "hi" ? mot.hi : mot.en}"</p></div></div></section>`);
-  wrap.appendChild(motQuote);
+        <p class="mt-1 text-sm leading-relaxed">"${state.lang === "hi" ? mot.hi : mot.en}"</p></div></div></section>`));
 
-  // Study Tools section
-  const toolItems = [
-    { v: "mcq", icon: "📝", label: t().mcqTitle, c: "from-orange-400 to-amber-500" },
-    { v: "flashcards", icon: "🃏", label: t().fcTitle, c: "from-teal-400 to-emerald-500" },
-    { v: "pomodoro", icon: "⏱", label: t().pomTitle, c: "from-rose-400 to-red-500" },
-    { v: "progress", icon: "📊", label: t().progTitle, c: "from-indigo-400 to-violet-500" },
-    { v: "doubts", icon: "💡", label: t().doubtTitle, c: "from-purple-400 to-pink-500" },
-  ];
-  const toolsSec = el(`<section><h3 class="mb-2 px-1 text-sm font-bold">🧰 ${t().tools}</h3><div class="grid grid-cols-3 gap-2 sm:grid-cols-5"></div></section>`);
-  const tGrid = toolsSec.querySelector("div");
-  toolItems.forEach(a => { const b = el(`<button class="flex flex-col items-center gap-1 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-2.5 hover:shadow-sm transition">
-      <span class="grid h-8 w-8 place-items-center rounded-xl bg-gradient-to-br ${a.c} text-sm text-white">${a.icon}</span>
-      <span class="text-[9px] font-semibold text-center leading-tight">${a.label}</span></button>`); b.onclick = () => go(a.v); tGrid.appendChild(b); });
-  wrap.appendChild(toolsSec);
-
+  // Recent classes
   const recent = el(`<section><h3 class="mb-2 px-1 text-sm font-bold">${t().recent}</h3></section>`);
-  recent.appendChild(LogList(state.logs.slice(0, 3))); wrap.appendChild(recent);
+  recent.appendChild(LogList(state.logs.slice(0, 3)));
+  wrap.appendChild(recent);
+
   wrap.querySelector("#goChat").onclick = () => go("chat");
   return wrap;
 }
 
+// ===================================================================
+//  SUBJECTS VIEW
+// ===================================================================
 function SubjectsView() {
   const wrap = el(`<div class="space-y-4"><h2 class="px-1 text-lg font-bold">${t().subjectsTitle}</h2></div>`);
   const grid = el(`<div class="grid grid-cols-1 gap-3 sm:grid-cols-2"></div>`);
+
   SUBJECTS.forEach(s => {
     const card = el(`<div class="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
         <div class="flex items-center gap-3 bg-gradient-to-r ${s.color} p-4 text-white"><span class="text-3xl">${s.icon}</span>
           <div><h3 class="font-bold">${s.name}</h3><p class="text-xs opacity-90">${s.tag} · ${s.chapters.length} chapters</p></div></div>
         <div class="p-4"><div class="flex flex-wrap gap-1.5">
-            ${s.chapters.slice(0, 6).map(c => `<span class="rounded-full bg-slate-100 dark:bg-slate-800 px-2.5 py-1 text-[11px]">${c}</span>`).join("")}
+            ${s.chapters.slice(0, 6).map(c => `<span class="rounded-full bg-slate-100 dark:bg-slate-800 px-2.5 py-1 text-[11px]">${escapeHtml(c)}</span>`).join("")}
             ${s.chapters.length > 6 ? `<span class="rounded-full bg-slate-100 dark:bg-slate-800 px-2.5 py-1 text-[11px]">+${s.chapters.length - 6} more</span>` : ""}</div>
           <div class="mt-3 flex gap-2">
             <button class="askSub flex-1 rounded-xl bg-slate-900 dark:bg-white dark:text-slate-900 py-2 text-xs font-semibold text-white">${t().openChat}</button>
             <button class="tricksSub flex-1 rounded-xl border border-slate-300 dark:border-slate-700 py-2 text-xs font-semibold">🧠 ${t().nav.tricks}</button>
           </div></div></div>`);
-    card.querySelector(".askSub").onclick = () => { go("chat"); setTimeout(() => sendMessage(state.lang === "hi"
-        ? `${s.name} ka ek important chapter samjhao aur 3 exam questions do.`
-        : `Explain an important chapter of ${s.name} and give 3 exam questions.`), 60); };
-    const trBtn = card.querySelector(".tricksSub");
-    if (trBtn) trBtn.onclick = () => go("tricks");
+    card.querySelector(".askSub").onclick = () => {
+      go("chat");
+      setTimeout(() => sendMessage(tr(
+        `${s.name} ka ek important chapter samjhao aur 3 exam questions do.`,
+        `Explain an important chapter of ${s.name} and give 3 exam questions.`
+      )), 60);
+    };
+    card.querySelector(".tricksSub").onclick = () => go("tricks");
     grid.appendChild(card);
   });
-  wrap.appendChild(grid); return wrap;
+
+  wrap.appendChild(grid);
+  return wrap;
 }
 
 // ===================================================================
-//  TODAY VIEW — with multi-file upload (camera OR files)
+//  TODAY VIEW — class diary + multi-file upload
 // ===================================================================
 let _fileList = [];
 
 function TodayView() {
-  _fileList = state.pendingFiles || [];
+  _fileList = [];
   const wrap = el(`<div class="space-y-4"><div><h2 class="px-1 text-lg font-bold">📝 ${t().todayTitle}</h2>
       <p class="px-1 text-xs text-slate-500 dark:text-slate-400">${t().todayHint}</p></div></div>`);
+
   const opts = SUBJECTS.map(s => `<option value="${s.name}">${s.icon} ${s.name}</option>`).join("");
   const form = el(`<form id="logForm" class="space-y-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
       <div><label class="mb-1 block text-xs font-semibold">${t().subject}</label>
@@ -1212,69 +929,28 @@ function TodayView() {
         <input name="topic" required class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2" placeholder="e.g. Demand Analysis"></div>
       <div><label class="mb-1 block text-xs font-semibold">${t().note}</label>
         <textarea name="note" rows="3" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2"></textarea></div>
-
-      <!-- File attach area -->
       <div class="rounded-xl border border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 p-3">
         <p class="mb-2 text-center text-xs font-semibold text-slate-500 dark:text-slate-400">📎 ${t().uploadPhoto}</p>
         <div class="flex gap-2">
           <button type="button" id="cameraBtn" class="flex-1 rounded-lg bg-gradient-to-r from-teal-500 to-cyan-600 py-2 text-xs font-semibold text-white">📷 ${t().camera}</button>
           <button type="button" id="filesBtn" class="flex-1 rounded-lg bg-gradient-to-r from-indigo-500 to-violet-600 py-2 text-xs font-semibold text-white">📁 ${t().attachFiles}</button>
         </div>
-        <!-- Hidden inputs -->
         <input id="cameraInp" type="file" accept="image/*" capture="environment" class="hidden">
         <input id="filesInp" type="file" accept="image/*,application/pdf,.doc,.docx,.ppt,.pptx,.txt" multiple class="hidden">
-        <!-- Preview gallery -->
         <div id="filePreview" class="mt-2 flex flex-wrap gap-2"></div>
         <p id="fileMsg" class="mt-1 text-center text-[11px] text-slate-400"></p>
       </div>
-
       <button class="w-full rounded-xl bg-gradient-to-r from-teal-500 to-indigo-600 py-2.5 font-semibold text-white">${t().save}</button>
     </form>`);
 
-  // Camera button
-  const camBtn = form.querySelector("#cameraBtn");
+  // Wire up file pickers
   const camInp = form.querySelector("#cameraInp");
-  camBtn.onclick = () => camInp.click();
-  camInp.onchange = (e) => {
-    for (const f of e.target.files) addFile(f);
-    camInp.value = "";
-    renderFilePreview(form);
-  };
-
-  // Files button (multiple)
-  const filesBtn = form.querySelector("#filesBtn");
   const filesInp = form.querySelector("#filesInp");
-  filesBtn.onclick = () => filesInp.click();
-  filesInp.onchange = (e) => {
-    for (const f of e.target.files) addFile(f);
-    filesInp.value = "";
-    renderFilePreview(form);
-  };
+  form.querySelector("#cameraBtn").onclick = () => camInp.click();
+  form.querySelector("#filesBtn").onclick = () => filesInp.click();
+  camInp.onchange = (e) => { ingestFiles(e.target.files); camInp.value = ""; renderFilePreview(form); };
+  filesInp.onchange = (e) => { ingestFiles(e.target.files); filesInp.value = ""; renderFilePreview(form); };
 
-  // File preview helpers
-  function addFile(f) {
-    if (f.size > 5 * 1024 * 1024) { alert(`File too large: ${f.name} (max 5 MB)`); return; }
-    _fileList.push(f);
-    state.pendingFiles = _fileList;
-  }
-
-  function renderFilePreview(ctx) {
-    const container = ctx.querySelector("#filePreview");
-    const msg = ctx.querySelector("#fileMsg");
-    container.innerHTML = "";
-    if (!_fileList.length) { msg.textContent = ""; return; }
-    msg.textContent = `${_fileList.length} ${t().filesSelected}`;
-    _fileList.forEach((f, i) => {
-      const card = el(`<div class="group relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
-        <div class="flex h-full w-full items-center justify-center text-lg font-bold text-slate-400">${f.type.startsWith("image/") ? "🖼" : "📄"}</div>
-        <button type="button" data-idx="${i}" class="remove-file absolute -right-1 -top-1 grid h-5 w-5 place-items-center rounded-full bg-rose-500 text-[10px] text-white shadow opacity-0 group-hover:opacity-100 transition">✕</button>
-      </div>`);
-      card.querySelector(".remove-file").onclick = () => { _fileList.splice(i, 1); renderFilePreview(ctx); };
-      container.appendChild(card);
-    });
-  }
-
-  // Submit
   form.onsubmit = async (e) => {
     e.preventDefault();
     const fd = new FormData(form);
@@ -1283,39 +959,76 @@ function TodayView() {
     const btn = form.querySelector('button[type="submit"]');
     btn.disabled = true; btn.textContent = t().saving;
 
-    // Upload files first
-    const uploaded = [];
-    for (const f of _fileList) {
-      const fr = new FileReader();
-      const result = await new Promise((resolve) => {
-        fr.onload = () => resolve(fr.result);
-        fr.readAsDataURL(f);
-      });
+    // Upload files first (each in parallel for speed)
+    const uploaded = await Promise.all(_fileList.map(async (f) => {
+      const dataUrl = await readFileAsDataURL(f);
       try {
-        const r = await api("upload", { filename: f.name, mime: f.type, data: result });
-        if (r && r.ok && r.link) uploaded.push(r.link);
-      } catch (er) { console.error("Upload failed:", er); }
-    }
+        const r = await api("upload", { filename: f.name, mime: f.type, data: dataUrl });
+        return (r && r.ok && r.link) ? r.link : null;
+      } catch (e) { return null; }
+    }));
+    const validLinks = uploaded.filter(Boolean);
 
     const entry = {
-      subject: fd.get("subject"), topic,
+      subject: fd.get("subject"),
+      topic,
       note: sanitize(fd.get("note") || ""),
       date: new Date().toISOString(),
-      files: uploaded,
+      files: validLinks,
     };
-    state.logs.unshift(entry); saveLS(LS.logs, state.logs);
-    try { await api("log", { entry }); } catch (e2) {}
-    _fileList = []; state.pendingFiles = [];
+    state.logs.unshift(entry);
+    saveLS(LS.logs, state.logs);
+    try { await api("log", { entry }); } catch (e) { /* silent — saved locally */ }
+
+    _fileList = [];
     btn.textContent = t().saved;
     setTimeout(() => go("today"), 700);
   };
 
   wrap.appendChild(form);
 
-  // Recent classes
   const list = el(`<section><h3 class="mb-2 px-1 text-sm font-bold">${t().recent}</h3></section>`);
-  list.appendChild(LogList(state.logs)); wrap.appendChild(list);
+  list.appendChild(LogList(state.logs));
+  wrap.appendChild(list);
   return wrap;
+}
+
+function ingestFiles(fileList) {
+  for (const f of fileList) {
+    if (f.size > MAX_FILE_BYTES) {
+      alert(`File too large: ${f.name} (max 5 MB)`);
+      continue;
+    }
+    _fileList.push(f);
+  }
+}
+
+function readFileAsDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const fr = new FileReader();
+    fr.onload = () => resolve(fr.result);
+    fr.onerror = () => reject(fr.error);
+    fr.readAsDataURL(file);
+  });
+}
+
+function renderFilePreview(ctx) {
+  const container = ctx.querySelector("#filePreview");
+  const msg = ctx.querySelector("#fileMsg");
+  container.innerHTML = "";
+  if (!_fileList.length) { msg.textContent = ""; return; }
+  msg.textContent = `${_fileList.length} ${t().filesSelected}`;
+  _fileList.forEach((f, i) => {
+    const card = el(`<div class="group relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
+      <div class="flex h-full w-full items-center justify-center text-lg font-bold text-slate-400">${f.type.startsWith("image/") ? "🖼" : "📄"}</div>
+      <button type="button" data-idx="${i}" class="remove-file absolute -right-1 -top-1 grid h-5 w-5 place-items-center rounded-full bg-rose-500 text-[10px] text-white shadow opacity-0 group-hover:opacity-100 transition">✕</button>
+    </div>`);
+    card.querySelector(".remove-file").onclick = () => {
+      _fileList.splice(i, 1);
+      renderFilePreview(ctx);
+    };
+    container.appendChild(card);
+  });
 }
 
 function LogList(logs) {
@@ -1328,33 +1041,42 @@ function LogList(logs) {
     box.appendChild(el(`<div class="flex items-start gap-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3">
         <span class="text-xl">${sub ? sub.icon : "📘"}</span>
         <div class="min-w-0 flex-1"><div class="flex items-center justify-between gap-2">
-            <p class="truncate font-semibold">${sanitize(l.topic || "")}</p><span class="shrink-0 text-[11px] text-slate-400">${d}</span></div>
-          <p class="text-[11px] text-slate-500">${l.subject || ""}</p>
-          ${l.note ? `<p class="mt-1 text-xs text-slate-600 dark:text-slate-300">${sanitize(l.note)}</p>` : ""}
-          ${files.length ? `<div class="mt-1 flex flex-wrap gap-1">${files.map(url => `<a href="${url}" target="_blank" class="inline-flex items-center gap-0.5 rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[10px] text-teal-600 dark:text-teal-400 hover:underline">📎 file</a>`).join("")}</div>` : ""}
+            <p class="truncate font-semibold">${escapeHtml(l.topic || "")}</p><span class="shrink-0 text-[11px] text-slate-400">${d}</span></div>
+          <p class="text-[11px] text-slate-500">${escapeHtml(l.subject || "")}</p>
+          ${l.note ? `<p class="mt-1 text-xs text-slate-600 dark:text-slate-300">${escapeHtml(l.note)}</p>` : ""}
+          ${files.length ? `<div class="mt-1 flex flex-wrap gap-1">${files.map(url => `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-0.5 rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[10px] text-teal-600 dark:text-teal-400 hover:underline">📎 file</a>`).join("")}</div>` : ""}
         </div></div>`));
   });
   return box;
 }
 
+// ===================================================================
+//  EXAM VIEW
+// ===================================================================
 function ExamView() {
   const wrap = el(`<div class="space-y-4"><div><h2 class="px-1 text-lg font-bold">${t().examTitle}</h2>
       <p class="px-1 text-xs text-slate-500 dark:text-slate-400">${t().examHint}</p></div></div>`);
+
   const opts = SUBJECTS.map(s => `<label class="flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3">
       <input type="checkbox" value="${s.name}" class="examSub h-4 w-4 accent-teal-600"><span>${s.icon} ${s.name}</span></label>`).join("");
+
   const card = el(`<div class="space-y-3"><div class="grid grid-cols-1 gap-2 sm:grid-cols-2">${opts}</div>
       <div class="flex items-center gap-2"><input id="examDays" type="number" min="1" max="365" value="7" class="w-20 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2 text-center"><span class="text-xs text-slate-500">days left</span></div>
       <button id="planBtn" class="w-full rounded-xl bg-gradient-to-r from-rose-500 to-red-600 py-2.5 font-semibold text-white">🎯 ${t().makePlan}</button></div>`);
+
   card.querySelector("#planBtn").onclick = () => {
     const subs = [...card.querySelectorAll(".examSub:checked")].map(c => c.value);
     const days = Math.min(Math.max(parseInt(card.querySelector("#examDays").value) || 7, 1), 365);
     const list = subs.length ? subs.join(", ") : "all MEC subjects";
-    go("chat"); setTimeout(() => sendMessage(state.lang === "hi"
-      ? `Mere exam me ${days} din bache hain. ${list} ke liye day-wise study plan banao with important questions aur revision tips.`
-      : `My exam is in ${days} days. Make a day-wise study plan for ${list} with important questions and revision tips.`), 60);
+    go("chat");
+    setTimeout(() => sendMessage(tr(
+      `Mere exam me ${days} din bache hain. ${list} ke liye day-wise study plan banao with important questions aur revision tips.`,
+      `My exam is in ${days} days. Make a day-wise study plan for ${list} with important questions and revision tips.`
+    )), 60);
   };
   wrap.appendChild(card);
 
+  // Model paper generator
   const papers = el(`<div class="space-y-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
       <div><h3 class="text-sm font-bold">📄 ${t().papersTitle}</h3>
         <p class="text-xs text-slate-500 dark:text-slate-400">${t().papersHint}</p></div>
@@ -1366,40 +1088,38 @@ function ExamView() {
       </div></div>`);
   papers.querySelector("#genPaper").onclick = () => {
     const sub = papers.querySelector("#paperSub").value;
-    go("chat"); setTimeout(() => sendMessage(state.lang === "hi"
-      ? `${sub} ka ek full MODEL QUESTION PAPER banao TSBIE Intermediate 1st year exam pattern ke hisaab se — sections, marks aur important questions ke saath.`
-      : `Create a full MODEL QUESTION PAPER for ${sub} as per the TSBIE Intermediate 1st year exam pattern — with sections, marks and important questions.`), 60);
+    go("chat");
+    setTimeout(() => sendMessage(tr(
+      `${sub} ka ek full MODEL QUESTION PAPER banao TSBIE Intermediate 1st year exam pattern ke hisaab se — sections, marks aur important questions ke saath.`,
+      `Create a full MODEL QUESTION PAPER for ${sub} as per the TSBIE Intermediate 1st year exam pattern — with sections, marks and important questions.`
+    )), 60);
   };
   papers.querySelector("#findPrev").onclick = () => {
     const sub = papers.querySelector("#paperSub").value;
     const q = encodeURIComponent(`TS Inter 1st year ${sub} previous question papers TSBIE`);
-    window.open(`https://www.google.com/search?q=${q}`, "_blank");
+    window.open(`https://www.google.com/search?q=${q}`, "_blank", "noopener");
   };
   wrap.appendChild(papers);
   return wrap;
 }
 
 // ===================================================================
-//  TRICKS VIEW — Maths Tricks, Study Tips & Daily Motivation
+//  TRICKS VIEW — formula vault + study tips
 // ===================================================================
 function TricksView() {
-  const todayKey = new Date().toDateString();
-  const motIdx = Math.floor(Math.abs(todayKey.split("").reduce((a,c)=>a+c.charCodeAt(0),0)) % MOTIVATIONS.length);
-  const mot = MOTIVATIONS[motIdx];
+  const mot = MOTIVATIONS[dailyIndex(MOTIVATIONS)];
   const T = t();
   const wrap = el(`<div class="space-y-4"></div>`);
 
-  // Header
   wrap.appendChild(el(`<div><h2 class="px-1 text-lg font-bold">🧠 ${T.tricksTitle}</h2>
     <p class="px-1 text-xs text-slate-500 dark:text-slate-400">${T.tricksHint}</p></div>`));
 
-  // Daily Motivation
   wrap.appendChild(el(`<section class="rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 p-4 text-white shadow-lg">
     <p class="text-[10px] font-semibold uppercase tracking-wide opacity-80">💪 ${T.dailyMotivation}</p>
     <p class="mt-2 text-sm leading-relaxed font-medium">"${state.lang === "hi" ? mot.hi : mot.en}"</p>
   </section>`));
 
-  // Study Tips section
+  // Study tips
   const tips = [T.tip1, T.tip2, T.tip3, T.tip4, T.tip5, T.tip6];
   const tipsCard = el(`<section class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
     <h3 class="mb-2 flex items-center gap-2 text-sm font-bold">📘 ${T.studyTips}</h3>
@@ -1407,16 +1127,16 @@ function TricksView() {
   const tipsBox = tipsCard.querySelector("div");
   tips.forEach((tip, i) => {
     tipsBox.appendChild(el(`<div class="flex items-start gap-2 rounded-xl bg-slate-50 dark:bg-slate-800/50 p-2.5">
-      <span class="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-gradient-to-br from-teal-500 to-indigo-600 text-[11px] text-white font-bold">${i+1}</span>
+      <span class="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-gradient-to-br from-teal-500 to-indigo-600 text-[11px] text-white font-bold">${i + 1}</span>
       <p class="text-xs leading-relaxed">${tip}</p></div>`));
   });
   wrap.appendChild(tipsCard);
 
-  // Tricks by subject — accordion style
+  // Tricks accordion
   const tricksWrap = el(`<section class="space-y-2"></section>`);
-  MATH_TRICKS.forEach((subj, si) => {
+  MATH_TRICKS.forEach((subj) => {
     const subCard = el(`<div class="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-      <button data-si="${si}" class="subj-trigger flex w-full items-center gap-3 bg-gradient-to-r ${subj.color} p-3.5 text-white">
+      <button class="subj-trigger flex w-full items-center gap-3 bg-gradient-to-r ${subj.color} p-3.5 text-white">
         <span class="text-2xl">${subj.icon}</span>
         <div class="flex-1 text-left"><p class="font-bold text-sm">${subj.subject}</p>
           <p class="text-[11px] opacity-80">${subj.tricks.length} ${T.tricksCount}</p></div>
@@ -1426,18 +1146,17 @@ function TricksView() {
     const body = subCard.querySelector(".tricks-body");
     const arrow = subCard.querySelector(".arrow");
 
-    subj.tricks.forEach((tr, ti) => {
-      const trCard = el(`<div class="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/30 p-3 space-y-1.5">
-        <p class="text-xs font-bold text-teal-600 dark:text-teal-400">${tr.title}</p>
+    subj.tricks.forEach((trItem) => {
+      body.appendChild(el(`<div class="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/30 p-3 space-y-1.5">
+        <p class="text-xs font-bold text-teal-600 dark:text-teal-400">${trItem.title}</p>
         <div class="rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2">
-          <code class="text-[12px] font-mono leading-relaxed">${tr.formula}</code>
+          <code class="text-[12px] font-mono leading-relaxed whitespace-pre-wrap">${escapeHtml(trItem.formula)}</code>
         </div>
         <div class="flex items-start gap-1.5"><span class="shrink-0 text-[10px] font-bold text-amber-500">💡</span>
-          <p class="text-[11px] text-slate-600 dark:text-slate-300">${tr.tip}</p></div>
-        ${tr.example ? `<div class="flex items-start gap-1.5"><span class="shrink-0 text-[10px] font-bold text-emerald-500">📝</span>
-          <p class="text-[11px] text-slate-500 dark:text-slate-400">${tr.example}</p></div>` : ""}
-      </div>`);
-      body.appendChild(trCard);
+          <p class="text-[11px] text-slate-600 dark:text-slate-300">${trItem.tip}</p></div>
+        ${trItem.example ? `<div class="flex items-start gap-1.5"><span class="shrink-0 text-[10px] font-bold text-emerald-500">📝</span>
+          <p class="text-[11px] text-slate-500 dark:text-slate-400">${trItem.example}</p></div>` : ""}
+      </div>`));
     });
 
     subCard.querySelector(".subj-trigger").onclick = () => {
@@ -1449,57 +1168,84 @@ function TricksView() {
   });
   wrap.appendChild(tricksWrap);
 
-  // Quick ask button
   wrap.appendChild(el(`<button id="tricksAskBtn" class="w-full rounded-xl bg-gradient-to-r from-teal-500 to-indigo-600 py-3 font-semibold text-white text-sm">🤖 ${T.quickAsk}</button>`));
-  wrap.querySelector("#tricksAskBtn").onclick = () => { go("chat"); setTimeout(() => sendMessage(state.lang === "hi"
-    ? "Mujhe Maths me help chahiye — koi bhi chapter se ek important concept + trick + example do"
-    : "I need help with Maths — give me an important concept + trick + example from any chapter"), 60); };
+  wrap.querySelector("#tricksAskBtn").onclick = () => {
+    go("chat");
+    setTimeout(() => sendMessage(tr(
+      "Mujhe Maths me help chahiye — koi bhi chapter se ek important concept + trick + example do",
+      "I need help with Maths — give me an important concept + trick + example from any chapter"
+    )), 60);
+  };
 
   return wrap;
 }
 
-// ---------- CHAT ----------
+// ===================================================================
+//  CHAT VIEW
+// ===================================================================
 function ChatView() {
   const wrap = el(`<div class="flex h-[calc(100dvh-9.5rem)] flex-col"></div>`);
+
   const head = el(`<div class="mb-2 flex items-center justify-between px-1"><h2 class="text-lg font-bold">🤖 ${t().chatTitle}</h2>
       <button id="clearMem" class="text-[11px] text-rose-500 hover:underline">${t().clearMem}</button></div>`);
-  head.querySelector("#clearMem").onclick = () => { if (confirm("Clear chat?")) { state.chat = []; saveLS(LS.chat, state.chat); render(); } };
+  head.querySelector("#clearMem").onclick = () => {
+    if (confirm("Clear chat?")) { state.chat = []; saveLS(LS.chat, state.chat); render(); }
+  };
   wrap.appendChild(head);
+
   const scroll = el(`<div id="chatScroll" class="no-sb flex-1 space-y-3 overflow-y-auto rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3"></div>`);
-  if (!state.chat.length) scroll.appendChild(el(`<div class="grid h-full place-items-center text-center text-slate-400">
-      <div><div class="text-4xl">🎓</div><p class="mt-2 text-xs">${state.lang === "hi" ? "Apna pehla doubt pucho! Main 24x7 available hoon!" : "Ask your first doubt! I'm 24x7 available!"}</p></div></div>`));
-  else state.chat.forEach(m => scroll.appendChild(Bubble(m.role, m.content)));
+  if (!state.chat.length) {
+    scroll.appendChild(el(`<div class="grid h-full place-items-center text-center text-slate-400">
+      <div><div class="text-4xl">🎓</div><p class="mt-2 text-xs">${tr("Apna pehla doubt pucho! Main 24×7 available hoon!", "Ask your first doubt! I'm 24×7 available!")}</p></div></div>`));
+  } else {
+    state.chat.forEach(m => scroll.appendChild(Bubble(m.role, m.content)));
+  }
   wrap.appendChild(scroll);
+
   const bar = el(`<form id="chatForm" class="safe-bottom mt-2 flex items-end gap-1.5">
-      <button type="button" id="micBtn" title="${t().micTip}" class="grid h-11 w-9 shrink-0 place-items-center rounded-2xl border border-slate-300 dark:border-slate-700 text-lg">🎤</button>
+      <button type="button" id="micBtn" title="${t().micTip}" aria-label="${t().micTip}" class="grid h-11 w-9 shrink-0 place-items-center rounded-2xl border border-slate-300 dark:border-slate-700 text-lg">🎤</button>
       <textarea id="chatInput" rows="1" placeholder="${t().chatPlaceholder}" class="max-h-28 flex-1 resize-none rounded-2xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3.5 py-2.5"></textarea>
-      <button type="button" id="diagBtn" title="${t().diagramTip}" class="grid h-11 w-9 shrink-0 place-items-center rounded-2xl border border-slate-300 dark:border-slate-700 text-lg">📊</button>
-      <button type="submit" class="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-teal-500 to-indigo-600 text-white">➤</button></form>`);
+      <button type="button" id="diagBtn" title="${t().diagramTip}" aria-label="${t().diagramTip}" class="grid h-11 w-9 shrink-0 place-items-center rounded-2xl border border-slate-300 dark:border-slate-700 text-lg">📊</button>
+      <button type="submit" aria-label="Send" class="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-teal-500 to-indigo-600 text-white">➤</button></form>`);
+
   const inp = bar.querySelector("#chatInput");
-  inp.addEventListener("input", () => { inp.style.height = "auto"; inp.style.height = Math.min(inp.scrollHeight, 112) + "px"; });
-  inp.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); bar.requestSubmit(); } });
-  bar.onsubmit = e => { e.preventDefault(); const v = inp.value.trim(); if (!v) return; inp.value = ""; inp.style.height = "auto"; inp.blur(); sendMessage(v); };
+  inp.addEventListener("input", () => {
+    inp.style.height = "auto";
+    inp.style.height = Math.min(inp.scrollHeight, 112) + "px";
+  });
+  inp.addEventListener("keydown", e => {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); bar.requestSubmit(); }
+  });
+  bar.onsubmit = e => {
+    e.preventDefault();
+    const v = inp.value.trim();
+    if (!v) return;
+    inp.value = ""; inp.style.height = "auto";
+    sendMessage(v);
+  };
   bar.querySelector("#micBtn").onclick = () => startVoice(inp, bar.querySelector("#micBtn"));
   bar.querySelector("#diagBtn").onclick = () => {
-    const v = inp.value.trim(); if (!v) { inp.focus(); return; }
+    const v = inp.value.trim();
+    if (!v) { inp.focus(); return; }
     inp.value = ""; inp.style.height = "auto";
-    sendMessage((state.lang === "hi" ? "Is topic ka ek labelled Mermaid diagram banao: " : "Make a labelled Mermaid diagram for: ") + v);
+    sendMessage(tr("Is topic ka ek labelled Mermaid diagram banao: ", "Make a labelled Mermaid diagram for: ") + v);
   };
+
   wrap.appendChild(bar);
-
-  // Send pending message from other views
-  if (_pendingSend) { const ps = _pendingSend; _pendingSend = null; setTimeout(() => sendMessage(ps), 100); }
-
   return wrap;
 }
 
 function startVoice(inp, btn) {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { alert(state.lang === "hi" ? "Is browser me voice support nahi hai." : "Voice not supported in this browser."); return; }
+  if (!SR) {
+    alert(tr("Is browser me voice support nahi hai.", "Voice not supported in this browser."));
+    return;
+  }
   if (window.__rec) { window.__rec.stop(); return; }
   const rec = new SR();
   rec.lang = state.lang === "hi" ? "hi-IN" : "en-IN";
-  rec.interimResults = true; rec.continuous = false;
+  rec.interimResults = true;
+  rec.continuous = false;
   window.__rec = rec;
   btn.classList.add("animate-pulse", "text-rose-500");
   rec.onresult = (e) => {
@@ -1509,86 +1255,813 @@ function startVoice(inp, btn) {
     inp.dispatchEvent(new Event("input"));
   };
   rec.onerror = () => {};
-  rec.onend = () => { btn.classList.remove("animate-pulse", "text-rose-500"); window.__rec = null; };
+  rec.onend = () => {
+    btn.classList.remove("animate-pulse", "text-rose-500");
+    window.__rec = null;
+  };
   rec.start();
 }
 
 function renderAssistant(content) {
+  // Extract fenced mermaid code blocks before md processing, then re-inject as <div class="mermaid">
   const blocks = [];
-  let s = content.replace(/```mermaid\s*([\s\S]*?)```/g, (m, code) => {
-    const i = blocks.length; blocks.push(code.trim()); return `\u0000M${i}\u0000`;
+  const s = content.replace(/```mermaid\s*([\s\S]*?)```/g, (m, code) => {
+    const i = blocks.length;
+    blocks.push(code.trim());
+    return `\u0000M${i}\u0000`;
   });
   let html = mdToHtml(s);
   html = html.replace(/\u0000M(\d+)\u0000/g, (m, i) =>
-    `<div class="mermaid my-2 rounded-xl bg-white p-2 overflow-x-auto text-center">${blocks[i].replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div>`);
+    `<div class="mermaid my-2 rounded-xl bg-white p-2 overflow-x-auto text-center">${blocks[i].replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>`);
   return html;
 }
+
 function runMermaid() {
   const nodes = document.querySelectorAll('.mermaid:not([data-processed])');
   if (!nodes.length) return;
   if (window.mermaid && window.mermaid.run) {
-    try { nodes.forEach(n => n.setAttribute('data-processed', 'true')); window.mermaid.run({ nodes }); } catch (e) { console.error("Mermaid render error:", e); }
-  } else { setTimeout(runMermaid, 300); }
+    try {
+      nodes.forEach(n => n.setAttribute('data-processed', 'true'));
+      window.mermaid.run({ nodes });
+    } catch (e) { /* silent — diagram fails shouldn't crash chat */ }
+  } else {
+    setTimeout(runMermaid, 300);
+  }
 }
 
 function Bubble(role, content) {
   const me = role === "user";
+  const bookmarkBtn = !me
+    ? `<button class="bmBtn mt-1.5 rounded-md bg-slate-200/60 dark:bg-slate-700/60 px-2 py-0.5 text-[10px] text-slate-600 dark:text-slate-300 hover:bg-amber-200 dark:hover:bg-amber-900/40" title="Save to Doubt Bookmarks">⭐ Save</button>`
+    : "";
   return el(`<div class="flex ${me ? "justify-end" : "justify-start"}"><div class="max-w-[88%] rounded-2xl px-3.5 py-2.5 ${me
       ? "bg-gradient-to-br from-teal-500 to-indigo-600 text-white rounded-br-sm" : "bg-slate-100 dark:bg-slate-800 rounded-bl-sm"}">
-      <div class="msg-body text-[13px] leading-relaxed">${me ? sanitize(content) : renderAssistant(content)}</div></div></div>`);
+      <div class="msg-body text-[13px] leading-relaxed">${me ? escapeHtml(content) : renderAssistant(content)}</div>${bookmarkBtn}</div></div>`);
 }
-function scrollChat() { const s = document.getElementById("chatScroll"); if (s) s.scrollTop = s.scrollHeight; }
 
-let _pendingSend = null;
+// Delegated click handler for bookmark buttons
+document.addEventListener("click", function (e) {
+  const btn = e.target.closest(".bmBtn");
+  if (!btn) return;
+  const bubble = btn.closest(".flex");
+  const body = bubble && bubble.querySelector(".msg-body");
+  if (!body) return;
+  const text = (body.innerText || body.textContent || "").trim();
+  if (!text) return;
+  const key = text.slice(0, 80);
+  const exists = state.bookmarks.some(b => (b.text || "").slice(0, 80) === key);
+  if (exists) { btn.textContent = "✓ Saved"; return; }
+  state.bookmarks.unshift({ text, date: new Date().toISOString(), subject: "" });
+  if (state.bookmarks.length > MAX_BOOKMARKS) state.bookmarks = state.bookmarks.slice(0, MAX_BOOKMARKS);
+  saveLS(LS.bookmarks, state.bookmarks);
+  btn.textContent = "✓ Saved";
+  btn.classList.add("bg-amber-200", "dark:bg-amber-900/40");
+});
+
+function scrollChat() {
+  const s = document.getElementById("chatScroll");
+  if (s) s.scrollTop = s.scrollHeight;
+}
 
 async function sendMessage(text) {
+  if (state.view !== "chat") go("chat");
   state.chat.push({ role: "user", content: text });
   if (state.chat.length > MAX_CHAT_HISTORY) state.chat = state.chat.slice(-MAX_CHAT_HISTORY);
   saveLS(LS.chat, state.chat);
-  if (state.view !== "chat") { _pendingSend = text; go("chat"); return; }
+
   const scroll = document.getElementById("chatScroll");
   if (scroll && scroll.querySelector(".place-items-center")) scroll.innerHTML = "";
-  scroll && scroll.appendChild(Bubble("user", text));
+  if (scroll) scroll.appendChild(Bubble("user", text));
+
   const typing = el(`<div class="flex justify-start"><div class="typing rounded-2xl bg-slate-100 dark:bg-slate-800 px-4 py-3"><span></span><span></span><span></span></div></div>`);
-  scroll && scroll.appendChild(typing); scrollChat();
+  if (scroll) scroll.appendChild(typing);
+  scrollChat();
+
   let reply;
   try {
-    const r = await api("chat", { lang: state.lang, message: text, history: state.chat.slice(-10), memory: state.logs.slice(0, 20) });
+    const r = await api("chat", {
+      lang: state.lang,
+      message: text,
+      history: state.chat.slice(-10),
+      memory: state.logs.slice(0, 20),
+    });
     reply = (r && r.reply) || ("⚠️ " + ((r && r.error) || "no reply"));
   } catch (e) {
-    reply = state.lang === "hi" ? "⚠️ " + t().networkErr : "⚠️ " + t().networkErr;
+    reply = "⚠️ " + t().networkErr;
   }
+
   if (typing.parentNode) typing.remove();
   state.chat.push({ role: "assistant", content: reply });
   if (state.chat.length > MAX_CHAT_HISTORY) state.chat = state.chat.slice(-MAX_CHAT_HISTORY);
   saveLS(LS.chat, state.chat);
-  scroll && scroll.appendChild(Bubble("assistant", reply)); scrollChat(); runMermaid();
+  if (scroll) scroll.appendChild(Bubble("assistant", reply));
+  scrollChat();
+  runMermaid();
 }
 
-// ---------- BOTTOM NAV ----------
+// ===================================================================
+//  BOTTOM NAV
+// ===================================================================
 function BottomNav() {
   const items = [
-    { v: "home", icon: "🏠", label: t().nav.home }, { v: "subjects", icon: "📚", label: t().nav.subjects },
-    { v: "today", icon: "📝", label: t().nav.today }, { v: "exam", icon: "🎯", label: t().nav.exam },
-    { v: "tools", icon: "🧰", label: t().tools }, { v: "chat", icon: "💬", label: t().nav.chat }];
+    { v: "home", icon: "🏠", label: t().nav.home },
+    { v: "subjects", icon: "📚", label: t().nav.subjects },
+    { v: "tricks", icon: "🧠", label: t().nav.tricks },
+    { v: "today", icon: "📝", label: t().nav.today },
+    { v: "exam", icon: "🎯", label: t().nav.exam },
+    { v: "chat", icon: "💬", label: t().nav.chat },
+  ];
   const nav = el(`<nav class="safe-bottom fixed inset-x-0 bottom-0 z-20 border-t border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur">
       <div class="mx-auto flex w-full max-w-3xl items-stretch justify-around px-1 pt-1.5"></div></nav>`);
   const row = nav.firstElementChild;
-  items.forEach(it => { const active = state.view === it.v;
+  items.forEach(it => {
+    const active = state.view === it.v;
     const b = el(`<button class="flex flex-1 flex-col items-center gap-0.5 rounded-xl py-1.5 ${active ? "nav-active" : "text-slate-500 dark:text-slate-400"}">
         <span class="text-base ${active ? "scale-110" : ""} transition">${it.icon}</span><span class="text-[9px] font-semibold leading-tight text-center">${it.label}</span></button>`);
-    b.onclick = () => go(it.v); row.appendChild(b); });
+    b.onclick = () => go(it.v);
+    row.appendChild(b);
+  });
   return nav;
 }
-function go(v) { state.view = v; render(); window.scrollTo({ top: 0 }); }
 
-// ---------- GLOBAL ERROR BOUNDARY ----------
-window.addEventListener("error", (e) => {
-  console.error("Global error:", e.error || e.message);
-});
-window.addEventListener("unhandledrejection", (e) => {
-  console.error("Unhandled rejection:", e.reason);
-});
+function go(v) {
+  state.view = v;
+  render();
+  window.scrollTo({ top: 0 });
+}
 
-// ---------- BOOT ----------
+// ===================================================================
+//  ⚡ MORE SHEET (header button)
+// ===================================================================
+function openMoreSheet() {
+  const items = [
+    { v: "focus", icon: "🍅", label: t().focus, desc: tr("25 min focus + 5 min break", "25 min focus + 5 min break") },
+    { v: "flashcards", icon: "🃏", label: t().flashcards, desc: tr("Formulas & definitions yaad karo", "Memorize formulas & definitions") },
+    { v: "quiz", icon: "❓", label: t().mockTest, desc: tr("Self-scoring quiz banao", "Self-scored AI quiz") },
+    { v: "bookmarks", icon: "⭐", label: t().bookmarks, desc: tr("Saved AI explanations", "Saved AI explanations") },
+    { v: "analytics", icon: "📊", label: t().analytics, desc: tr("Progress + syllabus tracker", "Progress + syllabus tracker") },
+  ];
+  const overlay = el(`<div id="moreSheet" class="fixed inset-0 z-40 flex items-end justify-center bg-black/40">
+    <div class="w-full max-w-md rounded-t-3xl bg-white dark:bg-slate-900 p-5 pb-8 shadow-2xl view-enter">
+      <div class="mb-3 flex items-center justify-between">
+        <h3 class="text-lg font-bold">${t().moreTitle}</h3>
+        <button id="closeMore" aria-label="Close" class="grid h-8 w-8 place-items-center rounded-full bg-slate-100 dark:bg-slate-800 text-lg">✕</button>
+      </div>
+      <div class="space-y-2"></div>
+    </div>
+  </div>`);
+  const list = overlay.querySelector("div.space-y-2");
+  items.forEach(it => {
+    const row = el(`<button class="flex w-full items-center gap-3 rounded-2xl border border-slate-200 dark:border-slate-800 p-3 text-left hover:bg-slate-50 dark:hover:bg-slate-800">
+      <span class="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-teal-500 to-indigo-600 text-xl text-white">${it.icon}</span>
+      <div class="flex-1"><p class="text-sm font-semibold">${it.label}</p><p class="text-[11px] text-slate-500">${it.desc}</p></div>
+      <span class="text-slate-400">›</span>
+    </button>`);
+    row.onclick = () => { overlay.remove(); go(it.v); };
+    list.appendChild(row);
+  });
+  overlay.querySelector("#closeMore").onclick = () => overlay.remove();
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+}
+
+// ===================================================================
+//  1. POMODORO FOCUS TIMER
+// ===================================================================
+let _pomo = { running: false, mode: "work", remaining: POMO_WORK_SEC, timer: null };
+
+function fmtTime(sec) {
+  const safeSec = Math.max(0, sec | 0);
+  const m = Math.floor(safeSec / 60).toString().padStart(2, "0");
+  const s = (safeSec % 60).toString().padStart(2, "0");
+  return `${m}:${s}`;
+}
+
+function FocusView() {
+  const wrap = el(`<div class="space-y-4"></div>`);
+  wrap.appendChild(el(`<div><h2 class="px-1 text-lg font-bold">🍅 ${t().focus}</h2>
+    <p class="px-1 text-xs text-slate-500 dark:text-slate-400">${t().focusHint}</p></div>`));
+
+  const card = el(`<div class="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 text-center">
+    <p id="pomoMode" class="text-xs font-semibold uppercase tracking-wide ${_pomo.mode === "work" ? "text-rose-500" : "text-emerald-500"}">${_pomo.mode === "work" ? t().focusTime : t().breakTime}</p>
+    <div id="pomoTime" class="my-4 font-mono text-6xl font-bold tracking-tight">${fmtTime(_pomo.remaining)}</div>
+    <div class="flex justify-center gap-2">
+      <button id="pomoStart" class="rounded-xl bg-gradient-to-r from-teal-500 to-indigo-600 px-6 py-2.5 font-semibold text-white">${_pomo.running ? t().pause : t().start}</button>
+      <button id="pomoReset" class="rounded-xl border border-slate-300 dark:border-slate-700 px-5 py-2.5 font-semibold">${t().resetLbl}</button>
+      <button id="pomoSkip" class="rounded-xl border border-slate-300 dark:border-slate-700 px-5 py-2.5 font-semibold">${t().skip}</button>
+    </div>
+  </div>`);
+  wrap.appendChild(card);
+
+  // Stats — ensure pomoStats object is well-formed
+  const stats = state.pomoStats || { sessions: [], todayMinutes: 0, todayDate: "" };
+  if (!Array.isArray(stats.sessions)) stats.sessions = [];
+  const today = new Date().toDateString();
+  if (stats.todayDate !== today) { stats.todayDate = today; stats.todayMinutes = 0; }
+
+  const todaySessions = stats.sessions.filter(s => new Date(s.date).toDateString() === today).length;
+  const totalSessions = stats.sessions.length;
+  const totalMinutes = stats.sessions.reduce((a, s) => a + (s.minutes || 0), 0);
+
+  wrap.appendChild(el(`<div class="grid grid-cols-3 gap-3">
+    ${StatCard(t().todaySessions, todaySessions, "🎯")}
+    ${StatCard(t().todayMinutes, stats.todayMinutes, "⏱")}
+    ${StatCard(t().totalSessions, totalSessions, "🏆")}
+  </div>`));
+
+  wrap.appendChild(el(`<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 text-xs text-slate-600 dark:text-slate-300">
+    <p class="font-semibold text-slate-800 dark:text-slate-100 mb-1">${t().pomoTrickTitle}</p>
+    ${t().pomoTrickBody}
+  </div>`));
+
+  // Wire up
+  const startBtn = card.querySelector("#pomoStart");
+  const resetBtn = card.querySelector("#pomoReset");
+  const skipBtn = card.querySelector("#pomoSkip");
+  const timeEl = card.querySelector("#pomoTime");
+  const modeEl = card.querySelector("#pomoMode");
+
+  function updateUI() {
+    timeEl.textContent = fmtTime(_pomo.remaining);
+    modeEl.textContent = _pomo.mode === "work" ? t().focusTime : t().breakTime;
+    modeEl.className = `text-xs font-semibold uppercase tracking-wide ${_pomo.mode === "work" ? "text-rose-500" : "text-emerald-500"}`;
+    startBtn.textContent = _pomo.running ? t().pause : t().start;
+  }
+
+  function completeSession() {
+    if (_pomo.mode === "work") {
+      stats.sessions.push({ date: new Date().toISOString(), minutes: 25, mode: "work" });
+      stats.todayMinutes = (stats.todayMinutes || 0) + 25;
+      if (stats.sessions.length > MAX_POMO_SESSIONS) stats.sessions = stats.sessions.slice(-MAX_POMO_SESSIONS);
+      state.pomoStats = stats;
+      saveLS(LS.pomoStats, stats);
+      _pomo.mode = "break";
+      _pomo.remaining = POMO_BREAK_SEC;
+      try { navigator.vibrate && navigator.vibrate(200); } catch (e) {}
+      alert(t().workDone);
+    } else {
+      _pomo.mode = "work";
+      _pomo.remaining = POMO_WORK_SEC;
+      try { navigator.vibrate && navigator.vibrate([100, 50, 100]); } catch (e) {}
+      alert(t().breakOver);
+    }
+  }
+
+  function tick() {
+    if (!_pomo.running) return;
+    _pomo.remaining--;
+    if (_pomo.remaining <= 0) {
+      completeSession();
+    }
+    updateUI();
+  }
+
+  startBtn.onclick = () => {
+    if (_pomo.running) {
+      _pomo.running = false;
+      clearInterval(_pomo.timer);
+    } else {
+      _pomo.running = true;
+      _pomo.timer = setInterval(tick, 1000);
+    }
+    updateUI();
+  };
+  resetBtn.onclick = () => {
+    _pomo.running = false;
+    clearInterval(_pomo.timer);
+    _pomo.mode = "work";
+    _pomo.remaining = POMO_WORK_SEC;
+    updateUI();
+  };
+  skipBtn.onclick = () => {
+    _pomo.remaining = 0;
+    completeSession();
+    updateUI();
+  };
+
+  return wrap;
+}
+
+// ===================================================================
+//  2. FLASHCARDS
+// ===================================================================
+function FlashcardsView() {
+  const wrap = el(`<div class="space-y-4"></div>`);
+  wrap.appendChild(el(`<div><h2 class="px-1 text-lg font-bold">🃏 ${t().flashcards}</h2>
+    <p class="px-1 text-xs text-slate-500 dark:text-slate-400">${t().flashcardsHint}</p></div>`));
+
+  // Add new card form
+  const addForm = el(`<form class="space-y-2 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
+    <div class="flex items-center justify-between">
+      <h3 class="text-sm font-bold">➕ ${t().addCard}</h3>
+      <button type="button" id="aiFillBtn" class="rounded-lg bg-slate-100 dark:bg-slate-800 px-2 py-1 text-[10px] font-semibold">${t().aiFill}</button>
+    </div>
+    <select id="fcSubj" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2 text-xs">
+      ${SUBJECTS.map(s => `<option value="${s.name}">${s.icon} ${s.name}</option>`).join("")}
+    </select>
+    <textarea id="fcFront" rows="2" placeholder="${t().frontLabel}" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2 text-xs"></textarea>
+    <textarea id="fcBack" rows="3" placeholder="${t().backLabel}" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2 text-xs"></textarea>
+    <button type="submit" class="w-full rounded-xl bg-gradient-to-r from-teal-500 to-indigo-600 py-2 text-xs font-semibold text-white">${t().saveCard}</button>
+  </form>`);
+  wrap.appendChild(addForm);
+
+  // AI auto-fill — send to chat with strict format
+  addForm.querySelector("#aiFillBtn").onclick = () => {
+    const sub = addForm.querySelector("#fcSubj").value;
+    go("chat");
+    setTimeout(() => sendMessage(tr(
+      `${sub} ke liye 5 flashcards banao — har card ka front (term/sawal) aur back (formula/short answer) clearly mention karo. Format: "CARD 1\\nFront: ...\\nBack: ..."`,
+      `Create 5 flashcards for ${sub} — for each card clearly mention front (term/question) and back (formula/short answer). Format: "CARD 1\\nFront: ...\\nBack: ..."`
+    )), 60);
+  };
+
+  addForm.onsubmit = (e) => {
+    e.preventDefault();
+    const subj = addForm.querySelector("#fcSubj").value;
+    const front = (addForm.querySelector("#fcFront").value || "").trim();
+    const back = (addForm.querySelector("#fcBack").value || "").trim();
+    if (!front || !back) return;
+    state.flashcards.unshift({
+      id: Date.now(),
+      subject: subj,
+      front,
+      back,
+      known: false,
+      reviewed: 0,
+      lastReview: null,
+    });
+    saveLS(LS.flashcards, state.flashcards);
+    render();
+  };
+
+  // Empty state
+  if (state.flashcards.length === 0) {
+    wrap.appendChild(el(`<div class="rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 p-6 text-center text-xs text-slate-500">
+      ${t().noFlashcards}
+    </div>`));
+    return wrap;
+  }
+
+  // Study card — unknown cards first (spaced repetition principle)
+  const unknown = state.flashcards.filter(c => !c.known);
+  const queue = unknown.length ? unknown : state.flashcards;
+  const current = queue[0];
+
+  const studyCard = el(`<div class="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
+    <div class="mb-2 flex items-center justify-between">
+      <span class="rounded-full bg-slate-100 dark:bg-slate-800 px-2.5 py-1 text-[11px]">${escapeHtml(current.subject || "General")}</span>
+      <span class="text-[11px] text-slate-400">${t().tapToFlip}</span>
+    </div>
+    <div id="flipCard" class="cursor-pointer rounded-2xl bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 p-8 min-h-[180px] flex items-center justify-center text-center">
+      <div>
+        <p class="text-[10px] font-semibold uppercase text-slate-400 mb-2">${t().front}</p>
+        <p class="text-lg font-bold leading-snug">${escapeHtml(current.front)}</p>
+      </div>
+    </div>
+    <div class="mt-3 flex gap-2">
+      <button id="fcKnown" class="flex-1 rounded-xl bg-emerald-500 py-2.5 text-xs font-semibold text-white">${t().knewIt}</button>
+      <button id="fcUnknown" class="flex-1 rounded-xl bg-rose-500 py-2.5 text-xs font-semibold text-white">${t().needReview}</button>
+      <button id="fcDelete" class="rounded-xl border border-slate-300 dark:border-slate-700 px-3 py-2.5 text-xs font-semibold">🗑</button>
+    </div>
+  </div>`);
+
+  let flipped = false;
+  const flipEl = studyCard.querySelector("#flipCard");
+  flipEl.onclick = () => {
+    flipped = !flipped;
+    flipEl.innerHTML = flipped
+      ? `<div><p class="text-[10px] font-semibold uppercase text-slate-400 mb-2">${t().back}</p><p class="text-base leading-relaxed">${escapeHtml(current.back)}</p></div>`
+      : `<div><p class="text-[10px] font-semibold uppercase text-slate-400 mb-2">${t().front}</p><p class="text-lg font-bold leading-snug">${escapeHtml(current.front)}</p></div>`;
+  };
+  studyCard.querySelector("#fcKnown").onclick = () => {
+    current.known = true;
+    current.reviewed = (current.reviewed || 0) + 1;
+    current.lastReview = new Date().toISOString();
+    saveLS(LS.flashcards, state.flashcards);
+    render();
+  };
+  studyCard.querySelector("#fcUnknown").onclick = () => {
+    current.known = false;
+    current.reviewed = (current.reviewed || 0) + 1;
+    current.lastReview = new Date().toISOString();
+    saveLS(LS.flashcards, state.flashcards);
+    render();
+  };
+  studyCard.querySelector("#fcDelete").onclick = () => {
+    if (confirm(t().deleteCard)) {
+      state.flashcards = state.flashcards.filter(c => c.id !== current.id);
+      saveLS(LS.flashcards, state.flashcards);
+      render();
+    }
+  };
+  wrap.appendChild(studyCard);
+
+  // Mastery progress
+  const known = state.flashcards.filter(c => c.known).length;
+  const pct = state.flashcards.length ? Math.round(known * 100 / state.flashcards.length) : 0;
+  wrap.appendChild(el(`<div class="rounded-2xl bg-gradient-to-br from-teal-500 to-indigo-600 p-4 text-white text-center">
+    <p class="text-xs opacity-80">${t().cardsMastered}</p>
+    <p class="text-3xl font-bold">${known} / ${state.flashcards.length}</p>
+    <div class="mt-2 h-2 rounded-full bg-white/20 overflow-hidden">
+      <div class="h-full bg-white" style="width: ${pct}%"></div>
+    </div>
+  </div>`));
+
+  return wrap;
+}
+
+// ===================================================================
+//  3. MCQ MOCK TEST (AI-generated, self-scored)
+// ===================================================================
+let _quiz = { questions: [], current: 0, answers: [], loading: false, meta: null };
+
+function QuizView() {
+  const wrap = el(`<div class="space-y-4"></div>`);
+
+  // If quiz is active, render the active test view
+  if (_quiz.questions.length) {
+    return renderQuizActive(wrap);
+  }
+
+  // Otherwise show setup form
+  wrap.appendChild(el(`<div><h2 class="px-1 text-lg font-bold">❓ ${t().mockTest}</h2>
+    <p class="px-1 text-xs text-slate-500 dark:text-slate-400">${t().mockHint}</p></div>`));
+
+  const setup = el(`<div class="space-y-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
+    <div><label class="mb-1 block text-xs font-semibold">${t().subjectLbl}</label>
+      <select id="qSubj" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2">
+        ${SUBJECTS.map(s => `<option value="${s.name}">${s.icon} ${s.name}</option>`).join("")}
+      </select></div>
+    <div><label class="mb-1 block text-xs font-semibold">${t().topicOptional}</label>
+      <input id="qTopic" placeholder="${tr("e.g. Differentiation", "e.g. Differentiation")}" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2"></div>
+    <div><label class="mb-1 block text-xs font-semibold">${t().numQuestions}</label>
+      <select id="qCount" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2">
+        <option value="5">5</option><option value="10">10</option><option value="15">15</option>
+      </select></div>
+    <button id="genQuiz" class="w-full rounded-xl bg-gradient-to-r from-rose-500 to-red-600 py-2.5 font-semibold text-white">📝 ${t().genQuiz}</button>
+  </div>`);
+  wrap.appendChild(setup);
+
+  if (state.quizResults.length) {
+    const last = state.quizResults[0];
+    wrap.appendChild(el(`<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
+      <p class="text-xs font-semibold text-slate-500 mb-1">📊 ${t().lastQuiz}</p>
+      <p class="text-sm"><strong>${last.score}/${last.total}</strong> • ${escapeHtml(last.subject)} ${last.topic ? "· " + escapeHtml(last.topic) : ""} • ${new Date(last.date).toLocaleDateString()}</p>
+    </div>`));
+  }
+
+  if (_quiz.loading) {
+    wrap.appendChild(el(`<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 text-center">
+      <div class="text-3xl mb-2">⏳</div>
+      <p class="text-sm">${t().quizLoading}</p>
+    </div>`));
+  }
+
+  setup.querySelector("#genQuiz").onclick = async () => {
+    const subj = setup.querySelector("#qSubj").value;
+    const topic = (setup.querySelector("#qTopic").value || "").trim();
+    const count = parseInt(setup.querySelector("#qCount").value) || 5;
+    const btn = setup.querySelector("#genQuiz");
+    btn.disabled = true; btn.textContent = t().generating;
+    _quiz.loading = true;
+    _quiz.questions = []; _quiz.current = 0; _quiz.answers = [];
+    render();
+
+    const prompt = tr(
+      `Mujhe ${subj}${topic ? " (" + topic + ")" : ""} se ${count} MCQ (multiple choice questions) do. Har question ke 4 options (A, B, C, D) ho aur end me sahi answer bhi batao. Strict format use karo:\n\nQ1. question text\nA) option1\nB) option2\nC) option3\nD) option4\nAnswer: B\n\nQ2. ...\n\nBas isi format me, koi extra explanation nahi.`,
+      `Give me ${count} MCQ (multiple choice questions) from ${subj}${topic ? " (" + topic + ")" : ""}. Each question must have 4 options (A, B, C, D) and the correct answer at the end. Use this strict format:\n\nQ1. question text\nA) option1\nB) option2\nC) option3\nD) option4\nAnswer: B\n\nQ2. ...\n\nOnly this format, no extra explanation.`
+    );
+    try {
+      const r = await api("chat", { lang: state.lang, message: prompt, history: [], memory: [] });
+      const text = (r && r.reply) || "";
+      _quiz.questions = parseQuiz(text);
+      _quiz.meta = { subject: subj, topic, total: _quiz.questions.length, date: new Date().toISOString() };
+      if (!_quiz.questions.length) {
+        alert(t().quizGenFail);
+      }
+    } catch (e) {
+      alert(t().quizGenFail);
+    } finally {
+      _quiz.loading = false;
+      btn.disabled = false; btn.textContent = "📝 " + t().genQuiz;
+      render();
+    }
+  };
+
+  return wrap;
+}
+
+function parseQuiz(text) {
+  const qs = [];
+  const blocks = text.split(/\n(?=Q\d+\.)/i).filter(b => b.trim());
+  blocks.forEach(b => {
+    const qMatch = b.match(/^Q\d+\.\s*(.+)/i);
+    if (!qMatch) return;
+    const question = qMatch[1].trim();
+    const opts = {};
+    const optMatches = [...b.matchAll(/([A-D])\)\s*(.+)/g)];
+    optMatches.forEach(m => { opts[m[1]] = m[2].trim(); });
+    const ansMatch = b.match(/Answer\s*:\s*([A-D])/i);
+    if (!question || Object.keys(opts).length < 4 || !ansMatch) return;
+    qs.push({ question, options: opts, answer: ansMatch[1].toUpperCase() });
+  });
+  return qs;
+}
+
+function renderQuizActive(wrap) {
+  const q = _quiz.questions[_quiz.current];
+  const total = _quiz.questions.length;
+  const answered = _quiz.answers.filter(Boolean).length;
+  const isLast = _quiz.current === total - 1;
+
+  wrap.appendChild(el(`<div class="flex items-center justify-between">
+    <h2 class="text-lg font-bold">❓ ${t().mockTest}</h2>
+    <span class="rounded-full bg-slate-100 dark:bg-slate-800 px-3 py-1 text-xs font-semibold">${_quiz.current + 1} / ${total}</span>
+  </div>`));
+
+  wrap.appendChild(el(`<div class="h-2 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
+    <div class="h-full bg-gradient-to-r from-teal-500 to-indigo-600 transition-all" style="width: ${Math.round(answered * 100 / total)}%"></div>
+  </div>`));
+
+  const userAns = _quiz.answers[_quiz.current];
+  const card = el(`<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
+    <p class="mb-3 text-sm font-semibold leading-relaxed">${_quiz.current + 1}. ${escapeHtml(q.question)}</p>
+    <div class="space-y-2"></div>
+  </div>`);
+  const optsBox = card.querySelector("div.space-y-2");
+  ["A", "B", "C", "D"].forEach(letter => {
+    const opt = q.options[letter];
+    if (!opt) return;
+    const selected = userAns === letter;
+    const b = el(`<button class="flex w-full items-center gap-3 rounded-xl border ${selected ? "border-teal-500 bg-teal-50 dark:bg-teal-900/30" : "border-slate-200 dark:border-slate-700"} p-3 text-left text-sm">
+      <span class="grid h-7 w-7 shrink-0 place-items-center rounded-full ${selected ? "bg-teal-500 text-white" : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"} font-bold text-xs">${letter}</span>
+      <span>${escapeHtml(opt)}</span>
+    </button>`);
+    b.onclick = () => { _quiz.answers[_quiz.current] = letter; render(); };
+    optsBox.appendChild(b);
+  });
+  wrap.appendChild(card);
+
+  // Navigation
+  const nav = el(`<div class="flex gap-2">
+    <button id="qPrev" class="flex-1 rounded-xl border border-slate-300 dark:border-slate-700 py-2.5 text-sm font-semibold ${_quiz.current === 0 ? "opacity-40 pointer-events-none" : ""}">← ${t().prev}</button>
+    ${isLast
+      ? `<button id="qSubmit" class="flex-1 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 py-2.5 text-sm font-semibold text-white">✓ ${t().submitQuiz}</button>`
+      : `<button id="qNext" class="flex-1 rounded-xl bg-gradient-to-r from-teal-500 to-indigo-600 py-2.5 text-sm font-semibold text-white">${t().nextLbl} →</button>`}
+  </div>`);
+  if (_quiz.current > 0) {
+    nav.querySelector("#qPrev").onclick = () => { _quiz.current--; render(); };
+  }
+  if (isLast) {
+    nav.querySelector("#qSubmit").onclick = () => {
+      const unanswered = _quiz.questions.length - _quiz.answers.filter(Boolean).length;
+      if (unanswered > 0 && !confirm(`${unanswered} ${t().unansweredConfirm}`)) return;
+      submitQuiz();
+    };
+  } else {
+    nav.querySelector("#qNext").onclick = () => { _quiz.current++; render(); };
+  }
+  wrap.appendChild(nav);
+  return wrap;
+}
+
+function submitQuiz() {
+  let score = 0;
+  _quiz.questions.forEach((q, i) => { if (_quiz.answers[i] === q.answer) score++; });
+  const result = {
+    date: _quiz.meta.date,
+    subject: _quiz.meta.subject,
+    topic: _quiz.meta.topic,
+    total: _quiz.questions.length,
+    score,
+    answers: _quiz.answers.slice(),
+    questions: _quiz.questions.map(q => ({ q: q.question, options: q.options, answer: q.answer })),
+  };
+  state.quizResults.unshift(result);
+  if (state.quizResults.length > MAX_QUIZ_HISTORY) state.quizResults = state.quizResults.slice(0, MAX_QUIZ_HISTORY);
+  saveLS(LS.quizResults, state.quizResults);
+  // Reset quiz state and show analytics with results
+  _quiz.questions = []; _quiz.current = 0; _quiz.answers = []; _quiz.meta = null;
+  state.view = "analytics";
+  render();
+}
+
+// ===================================================================
+//  4. DOUBT BOOKMARKS VIEW
+// ===================================================================
+function BookmarksView() {
+  const wrap = el(`<div class="space-y-4"></div>`);
+  wrap.appendChild(el(`<div class="flex items-center justify-between">
+    <h2 class="px-1 text-lg font-bold">⭐ ${t().bookmarks}</h2>
+    ${state.bookmarks.length ? `<button id="clearBm" class="text-[11px] text-rose-500 hover:underline">${t().clearAll}</button>` : ""}
+  </div>
+  <p class="px-1 text-xs text-slate-500 dark:text-slate-400">${t().bookmarksHint}</p>`));
+
+  if (state.bookmarks.length === 0) {
+    wrap.appendChild(el(`<div class="rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 p-6 text-center text-xs text-slate-500">
+      ${t().noBookmarks}
+    </div>`));
+    return wrap;
+  }
+
+  const list = el(`<div class="space-y-2"></div>`);
+  state.bookmarks.forEach((b, i) => {
+    const preview = b.text.slice(0, 280);
+    const ellipsis = b.text.length > 280 ? "..." : "";
+    list.appendChild(el(`<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3">
+      <div class="flex items-start justify-between gap-2">
+        <p class="text-xs leading-relaxed flex-1">${escapeHtml(preview)}${ellipsis}</p>
+        <button data-i="${i}" class="delBm shrink-0 rounded-md bg-rose-100 dark:bg-rose-900/40 px-2 py-1 text-[10px] text-rose-600 dark:text-rose-300">✕</button>
+      </div>
+      <div class="mt-1.5 flex items-center justify-between">
+        <span class="text-[10px] text-slate-400">${b.date ? new Date(b.date).toLocaleDateString() : ""}</span>
+        <button data-i="${i}" class="askBm rounded-md bg-slate-100 dark:bg-slate-800 px-2 py-1 text-[10px] text-teal-600 dark:text-teal-300">💬 ${t().askMore}</button>
+      </div>
+    </div>`));
+  });
+
+  list.querySelectorAll(".delBm").forEach(b => {
+    b.onclick = () => {
+      const i = parseInt(b.dataset.i);
+      state.bookmarks.splice(i, 1);
+      saveLS(LS.bookmarks, state.bookmarks);
+      render();
+    };
+  });
+  list.querySelectorAll(".askBm").forEach(b => {
+    b.onclick = () => {
+      const i = parseInt(b.dataset.i);
+      const text = state.bookmarks[i].text;
+      go("chat");
+      setTimeout(() => sendMessage(tr(
+        `Is topic par aur detail samjhao aur 3 practice questions do: "${text.slice(0, 200)}"`,
+        `Explain this in more detail and give 3 practice questions: "${text.slice(0, 200)}"`
+      )), 60);
+    };
+  });
+  wrap.appendChild(list);
+
+  const clrBtn = wrap.querySelector("#clearBm");
+  if (clrBtn) clrBtn.onclick = () => {
+    if (confirm(t().clearAllConfirm)) {
+      state.bookmarks = [];
+      saveLS(LS.bookmarks, state.bookmarks);
+      render();
+    }
+  };
+  return wrap;
+}
+
+// ===================================================================
+//  5. ANALYTICS + SYLLABUS TRACKER
+// ===================================================================
+function AnalyticsView() {
+  const wrap = el(`<div class="space-y-4"></div>`);
+  wrap.appendChild(el(`<div><h2 class="px-1 text-lg font-bold">📊 ${t().analytics}</h2>
+    <p class="px-1 text-xs text-slate-500 dark:text-slate-400">${t().analyticsHint}</p></div>`));
+
+  // Quiz performance summary
+  if (state.quizResults.length) {
+    const recent = state.quizResults.slice(0, 10).reverse();
+    const avgPct = Math.round(recent.reduce((a, r) => a + (r.score * 100 / r.total), 0) / recent.length);
+    const best = Math.max(...recent.map(r => r.score * 100 / r.total));
+    const worst = Math.min(...recent.map(r => r.score * 100 / r.total));
+
+    wrap.appendChild(el(`<div class="rounded-2xl bg-gradient-to-br from-teal-500 to-indigo-600 p-5 text-white">
+      <p class="text-xs opacity-80">${t().quizPerf}</p>
+      <div class="mt-2 grid grid-cols-3 gap-3 text-center">
+        <div><p class="text-2xl font-bold">${avgPct}%</p><p class="text-[10px] opacity-80">${t().avg}</p></div>
+        <div><p class="text-2xl font-bold">${Math.round(best)}%</p><p class="text-[10px] opacity-80">${t().best}</p></div>
+        <div><p class="text-2xl font-bold">${Math.round(worst)}%</p><p class="text-[10px] opacity-80">${t().lowest}</p></div>
+      </div>
+    </div>`));
+
+    // Bar chart of recent scores
+    const chartCard = el(`<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
+      <p class="mb-2 text-sm font-bold">📈 ${t().recentScores}</p>
+      <div class="flex items-end justify-between gap-1 h-32"></div>
+    </div>`);
+    const bars = chartCard.querySelector("div.flex");
+    recent.forEach(r => {
+      const pct = Math.round(r.score * 100 / r.total);
+      bars.appendChild(el(`<div class="flex-1 flex flex-col items-center gap-1">
+        <span class="text-[9px] font-semibold">${pct}%</span>
+        <div class="w-full rounded-t-md bg-gradient-to-t from-teal-500 to-indigo-500" style="height: ${pct}%"></div>
+        <span class="text-[9px] text-slate-400">${new Date(r.date).toLocaleDateString(undefined, { day: "numeric", month: "numeric" })}</span>
+      </div>`));
+    });
+    wrap.appendChild(chartCard);
+
+    // Subject-wise accuracy bars
+    const bySubj = {};
+    state.quizResults.forEach(r => {
+      if (!bySubj[r.subject]) bySubj[r.subject] = { total: 0, score: 0 };
+      bySubj[r.subject].total += r.total;
+      bySubj[r.subject].score += r.score;
+    });
+    const subCard = el(`<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
+      <p class="mb-2 text-sm font-bold">🎯 ${t().subjectAcc}</p>
+      <div class="space-y-2"></div>
+    </div>`);
+    const subList = subCard.querySelector("div.space-y-2");
+    Object.entries(bySubj).forEach(([subj, d]) => {
+      const pct = Math.round(d.score * 100 / d.total);
+      const color = pct >= 75 ? "from-emerald-500 to-teal-600" : pct >= 50 ? "from-amber-500 to-orange-600" : "from-rose-500 to-red-600";
+      subList.appendChild(el(`<div>
+        <div class="flex justify-between text-[11px] mb-1"><span>${escapeHtml(subj)}</span><span class="font-semibold">${pct}%</span></div>
+        <div class="h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+          <div class="h-full bg-gradient-to-r ${color}" style="width: ${pct}%"></div>
+        </div>
+      </div>`));
+    });
+    wrap.appendChild(subCard);
+  } else {
+    wrap.appendChild(el(`<div class="rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 p-4 text-center text-xs text-slate-500">
+      ${t().noQuizzes}
+    </div>`));
+  }
+
+  // Pomodoro stats summary
+  const pomo = state.pomoStats || { sessions: [], todayMinutes: 0, todayDate: "" };
+  const totalPomoMin = (pomo.sessions || []).reduce((a, s) => a + (s.minutes || 0), 0);
+  wrap.appendChild(el(`<div class="grid grid-cols-2 gap-3">
+    ${StatCard(t().totalFocusMin, totalPomoMin, "⏱")}
+    ${StatCard(t().totalFocusSess, (pomo.sessions || []).length, "🎯")}
+  </div>`));
+
+  // Syllabus Progress Tracker
+  wrap.appendChild(el(`<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
+    <h3 class="mb-2 text-sm font-bold">📚 ${t().syllabusTracker}</h3>
+    <p class="text-[11px] text-slate-500 mb-3">${t().syllabusHint}</p>
+    <div class="space-y-3" id="syllabusList"></div>
+  </div>`));
+  const tracker = wrap.querySelector("#syllabusList");
+
+  const STATUS = [
+    { id: 0, label: t().notStarted },
+    { id: 1, label: t().studying },
+    { id: 2, label: t().revised },
+    { id: 3, label: t().mastered },
+  ];
+
+  SUBJECTS.forEach(s => {
+    if (!state.syllabus[s.id]) state.syllabus[s.id] = {};
+    const subData = state.syllabus[s.id];
+    const total = s.chapters.length;
+    const mastered = s.chapters.filter(c => subData[c] === 3).length;
+    const pct = Math.round(mastered * 100 / total);
+
+    const subCard = el(`<div class="rounded-xl border border-slate-200 dark:border-slate-700 p-3">
+      <div class="flex items-center justify-between mb-1">
+        <p class="text-xs font-semibold">${s.icon} ${s.name}</p>
+        <span class="text-[10px] font-bold ${pct >= 75 ? "text-emerald-500" : pct >= 40 ? "text-amber-500" : "text-rose-500"}">${mastered}/${total} (${pct}%)</span>
+      </div>
+      <div class="h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden mb-2">
+        <div class="h-full bg-gradient-to-r from-emerald-500 to-teal-600" style="width: ${pct}%"></div>
+      </div>
+      <div class="space-y-1 chapters-list"></div>
+    </div>`);
+    const chapList = subCard.querySelector(".chapters-list");
+    s.chapters.forEach(c => {
+      const sid = subData[c] || 0;
+      const row = el(`<div class="flex items-center gap-1 text-[11px]">
+        <span class="flex-1 truncate">${escapeHtml(c)}</span>
+        <select data-subj="${s.id}" data-chap="${escapeHtml(c)}" class="rounded-md border border-slate-200 dark:border-slate-700 bg-transparent px-1 py-0.5 text-[10px]">
+          ${STATUS.map(st => `<option value="${st.id}" ${sid === st.id ? "selected" : ""}>${st.label}</option>`).join("")}
+        </select>
+      </div>`);
+      chapList.appendChild(row);
+    });
+    tracker.appendChild(subCard);
+  });
+
+  // Wire up chapter status changes
+  tracker.querySelectorAll("select").forEach(sel => {
+    sel.onchange = () => {
+      const subjId = sel.dataset.subj;
+      const chap = sel.dataset.chap;
+      const val = parseInt(sel.value);
+      if (!state.syllabus[subjId]) state.syllabus[subjId] = {};
+      state.syllabus[subjId][chap] = val;
+      saveLS(LS.syllabus, state.syllabus);
+      render();
+    };
+  });
+
+  // Overall progress
+  const totalChapters = SUBJECTS.reduce((a, s) => a + s.chapters.length, 0);
+  const totalMastered = SUBJECTS.reduce((a, s) => a + s.chapters.filter(c => (state.syllabus[s.id] || {})[c] === 3).length, 0);
+  const overallPct = Math.round(totalMastered * 100 / totalChapters);
+  wrap.appendChild(el(`<div class="rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 p-5 text-white text-center">
+    <p class="text-xs opacity-80">${t().overallMastery}</p>
+    <p class="text-4xl font-bold">${overallPct}%</p>
+    <p class="text-xs opacity-80">${totalMastered} / ${totalChapters} ${t().chaptersMastered}</p>
+  </div>`));
+
+  return wrap;
+}
+
+// ===================================================================
+//  BOOT — kick off the app
+// ===================================================================
 boot();
