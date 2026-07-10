@@ -3,16 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-  <meta name="theme-color" content="#0d9488">
+  <meta name="theme-color" content="#6c5ce7">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="MEC Study Buddy">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="version" content="2.0.0">
+  <meta name="version" content="3.0.0">
+  <meta name="description" content="AI-powered study companion for MEC students preparing for CA — Claymorphism premium UI">
   <title>MEC CA Study Buddy</title>
+
+  <!-- Premium font: Plus Jakarta Sans (rounded, friendly) + JetBrains Mono for code -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
   <link rel="icon" type="image/jpeg" href="assets/logo.jpeg">
   <link rel="apple-touch-icon" href="assets/logo.jpeg">
   <link rel="manifest" href="manifest.json">
+
+  <!-- Tailwind browser CDN (used for layout utilities only) -->
   <script
     src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.0/dist/index.global.js"
     integrity="sha384-nWTzRTCY/9V4Bo352ehygr1c4cnst4XN6lMR3fipakEQrhVpc0hEM5Dii3Amz0sT"
@@ -21,26 +30,70 @@
   <style type="text/tailwindcss">
     @custom-variant dark (&:where(.dark, .dark *));
   </style>
+
+  <!-- No-flash theme initialization: apply theme BEFORE first paint -->
   <script>
-    document.documentElement.classList.toggle(
-      'dark',
-      window.matchMedia('(prefers-color-scheme: dark)').matches
-    );
+    (function () {
+      try {
+        var saved = localStorage.getItem('mec_theme_v3');
+        var theme = saved || 'system';
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var isDark = theme === 'dark' || (theme === 'system' && prefersDark) || (!saved && prefersDark);
+        if (isDark) document.documentElement.classList.add('dark');
+        else document.documentElement.classList.remove('dark');
+        // Update meta theme-color
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute('content', isDark ? '#13152a' : '#e8ebf5');
+      } catch (e) {}
+    })();
   </script>
+
   <link rel="stylesheet" href="styles.css">
+
+  <!-- Mermaid for AI diagrams -->
   <script type="module">
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs';
-    mermaid.initialize({ startOnLoad: false, securityLevel: 'loose',
-      theme: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default' });
+    mermaid.initialize({
+      startOnLoad: false,
+      securityLevel: 'loose',
+      theme: document.documentElement.classList.contains('dark') ? 'dark' : 'default',
+      themeVariables: {
+        primaryColor: '#6c5ce7',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#a29bfe',
+        lineColor: '#a29bfe',
+        secondaryColor: '#f4f6fb',
+        tertiaryColor: '#fff'
+      }
+    });
     window.mermaid = mermaid;
+    // Re-init mermaid theme when document theme changes
+    window.__updateMermaidTheme = function (isDark) {
+      try {
+        mermaid.initialize({
+          startOnLoad: false,
+          securityLevel: 'loose',
+          theme: isDark ? 'dark' : 'default',
+          themeVariables: {
+            primaryColor: isDark ? '#a29bfe' : '#6c5ce7',
+            primaryTextColor: '#fff',
+            primaryBorderColor: '#a29bfe',
+            lineColor: '#a29bfe',
+            secondaryColor: isDark ? '#252845' : '#f4f6fb',
+            tertiaryColor: isDark ? '#2a2d4d' : '#fff'
+          }
+        });
+      } catch (e) {}
+    };
   </script>
+
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js').catch(() => {});
     }
   </script>
 </head>
-<body class="min-h-dvh text-sm antialiased bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100">
+<body class="min-h-dvh text-sm antialiased">
   <div id="app"></div>
   <script src="app.js"></script>
 </body>

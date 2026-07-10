@@ -359,6 +359,7 @@ let state = {
   lang: (cfg && cfg.lang) || "hi",
   view: "home",
   online: navigator.onLine,
+  theme: localStorage.getItem("mec_theme_v3") || "system",
   logs: JSON.parse(localStorage.getItem(LS.logs) || "[]"),
   chat: JSON.parse(localStorage.getItem(LS.chat) || "[]"),
   flashcards: JSON.parse(localStorage.getItem(LS.flashcards) || "[]"),
@@ -373,6 +374,39 @@ const saveLS = (k, v) => localStorage.setItem(k, JSON.stringify(v));
 
 // Translation helper: pick Hinglish or English string inline
 const tr = (hi, en) => (state.lang === "hi" ? hi : en);
+
+// ── Theme management (premium dark/light/system) ───────────────
+function effectiveTheme() {
+  if (state.theme === "dark") return "dark";
+  if (state.theme === "light") return "light";
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+function applyTheme() {
+  const eff = effectiveTheme();
+  document.documentElement.classList.toggle("dark", eff === "dark");
+  // Update meta theme-color for mobile status bar
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute("content", eff === "dark" ? "#13152a" : "#e8ebf5");
+  // Re-init mermaid theme if available
+  if (window.__updateMermaidTheme) window.__updateMermaidTheme(eff === "dark");
+}
+function cycleTheme() {
+  // system → light → dark → system
+  state.theme = state.theme === "system" ? "light" : state.theme === "light" ? "dark" : "system";
+  localStorage.setItem("mec_theme_v3", state.theme);
+  applyTheme();
+  render();
+}
+function themeIcon() {
+  return state.theme === "dark" ? "🌙" : state.theme === "light" ? "☀️" : "🖥️";
+}
+function themeLabel() {
+  return state.theme === "dark" ? "Dark" : state.theme === "light" ? "Light" : "Auto";
+}
+// React to system theme changes when in "system" mode
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+  if (state.theme === "system") { applyTheme(); if (session.unlocked) render(); }
+});
 
 // ── Generic helpers ────────────────────────────────────────────
 const el = (html) => {
@@ -481,6 +515,7 @@ window.addEventListener("unhandledrejection", (e) => {
 //  BOOT
 // ===================================================================
 async function boot() {
+  applyTheme(); // ensure theme is applied even before any view renders
   const baked = DEFAULT_BACKEND_URL && !DEFAULT_BACKEND_URL.startsWith("PASTE_");
   if (!cfg || !cfg.url) {
     if (baked) {
@@ -536,10 +571,10 @@ function shell(inner) {
     <div class="min-h-dvh flex flex-col items-center justify-center px-4 py-8">
       <div class="w-full max-w-md">
         <div class="mb-6 text-center">
-          <div class="mx-auto grid h-16 w-16 place-items-center rounded-3xl bg-gradient-to-br from-teal-500 to-indigo-600 text-3xl text-white shadow-lg">🎓</div>
-          <h1 class="mt-3 text-xl font-bold">MEC CA Study Buddy</h1>
+          <div class="mx-auto grid h-16 w-16 place-items-center rounded-3xl text-3xl text-white" style="background: var(--gradient-brand); box-shadow: var(--clay-shadow-lg);">🎓</div>
+          <h1 class="mt-3 text-xl font-bold text-gradient">MEC CA Study Buddy</h1>
         </div>
-        <div id="card" class="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xl"></div>
+        <div id="card" class="clay-card" style="padding: 1.5rem;"></div>
       </div>
     </div>`));
   document.getElementById("card").appendChild(inner);
@@ -547,10 +582,9 @@ function shell(inner) {
 
 function field(label, id, ph, type = "text", val = "", hint = "") {
   const safeVal = String(val).replace(/"/g, "&quot;");
-  return `<label class="mb-1 mt-3 block text-xs font-semibold">${label}</label>
-    <input id="${id}" type="${type}" value="${safeVal}" placeholder="${ph}" autocomplete="off"
-      class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2.5 outline-none focus:border-teal-500">
-    ${hint ? `<p class="mt-1 text-[11px] text-slate-400">${hint}</p>` : ""}`;
+  return `<label class="mb-1 mt-3 block text-xs font-semibold" style="color: var(--text);">${label}</label>
+    <input id="${id}" type="${type}" value="${safeVal}" placeholder="${ph}" autocomplete="off" class="clay-input">
+    ${hint ? `<p class="mt-1 text-[11px]" style="color: var(--text-mute);">${hint}</p>` : ""}`;
 }
 
 function renderSetup(msg = "") {
@@ -559,12 +593,12 @@ function renderSetup(msg = "") {
   // Step 1 — connect backend
   if (wiz.step === 1) {
     const inner = el(`<div>
-      <p class="text-[11px] font-semibold uppercase tracking-wide text-teal-600">${T.step} 1 / 3</p>
-      <h2 class="mt-1 text-lg font-bold">${T.s1Title}</h2>
-      <p class="mt-1 text-xs text-slate-500">${T.s1Hint}</p>
+      <p class="text-[11px] font-semibold uppercase tracking-wide" style="color: var(--brand);">${T.step} 1 / 3</p>
+      <h2 class="mt-1 text-lg font-bold" style="color: var(--text);">${T.s1Title}</h2>
+      <p class="mt-1 text-xs" style="color: var(--text-soft);">${T.s1Hint}</p>
       ${field("Apps Script URL", "wUrl", T.urlPh, "url", wiz.url)}
-      <p id="msg" class="mt-2 text-xs ${msg.includes("✓") ? "text-emerald-600" : "text-rose-500"}">${msg}</p>
-      <button id="testBtn" class="mt-3 w-full rounded-xl bg-gradient-to-r from-teal-500 to-indigo-600 py-2.5 font-semibold text-white">${T.testBtn}</button>
+      <p id="msg" class="mt-2 text-xs" style="color: ${msg.includes("✓") ? "var(--success)" : "var(--danger)"};">${msg}</p>
+      <button id="testBtn" class="clay-btn clay-btn-primary w-full">${T.testBtn}</button>
     </div>`);
     inner.querySelector("#testBtn").onclick = async () => {
       const url = inner.querySelector("#wUrl").value.trim();
@@ -589,21 +623,21 @@ function renderSetup(msg = "") {
   // Step 2 — backup + AI key + language
   if (wiz.step === 2) {
     const inner = el(`<div>
-      <p class="text-[11px] font-semibold uppercase tracking-wide text-teal-600">${T.step} 2 / 3</p>
-      <h2 class="mt-1 text-lg font-bold">${T.s2Title}</h2>
-      <p class="mt-1 text-xs text-slate-500">${T.s2Hint}</p>
+      <p class="text-[11px] font-semibold uppercase tracking-wide" style="color: var(--brand);">${T.step} 2 / 3</p>
+      <h2 class="mt-1 text-lg font-bold" style="color: var(--text);">${T.s2Title}</h2>
+      <p class="mt-1 text-xs" style="color: var(--text-soft);">${T.s2Hint}</p>
       ${field(T.nameLabel, "wName", "Yeshaswini", "text", wiz.studentName)}
       ${field(T.driveIdLabel, "wDrive", "1AbC...", "text", wiz.driveId)}
       ${field(T.photosIdLabel, "wPhotos", T.optional, "text", wiz.photosId)}
       ${field(T.groqLabel, "wGroq", "gsk_...", "text", wiz.groqKey, T.groqHint)}
-      <label class="mb-1 mt-3 block text-xs font-semibold">${T.langLabel}</label>
-      <select id="wLang" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2.5">
+      <label class="mb-1 mt-3 block text-xs font-semibold" style="color: var(--text);">${T.langLabel}</label>
+      <select id="wLang" class="clay-select">
         <option value="hi" ${wiz.lang === "hi" ? "selected" : ""}>🇮🇳 Hinglish</option>
         <option value="en" ${wiz.lang === "en" ? "selected" : ""}>🇬🇧 English</option>
       </select>
       <div class="mt-4 flex gap-2">
-        <button id="back" class="flex-1 rounded-xl border border-slate-300 dark:border-slate-700 py-2.5 font-semibold">${T.back}</button>
-        <button id="next" class="flex-1 rounded-xl bg-gradient-to-r from-teal-500 to-indigo-600 py-2.5 font-semibold text-white">${T.next}</button>
+        <button id="back" class="clay-btn clay-btn-ghost flex-1">${T.back}</button>
+        <button id="next" class="clay-btn clay-btn-primary flex-1">${T.next}</button>
       </div>
     </div>`);
     inner.querySelector("#back").onclick = () => { wiz.step = 1; renderSetup(); };
@@ -621,15 +655,15 @@ function renderSetup(msg = "") {
   // Step 3 — set PIN
   if (wiz.step === 3) {
     const inner = el(`<div>
-      <p class="text-[11px] font-semibold uppercase tracking-wide text-teal-600">${T.step} 3 / 3</p>
-      <h2 class="mt-1 text-lg font-bold">${T.s3Title}</h2>
-      <p class="mt-1 text-xs text-slate-500">${T.s3Hint}</p>
+      <p class="text-[11px] font-semibold uppercase tracking-wide" style="color: var(--brand);">${T.step} 3 / 3</p>
+      <h2 class="mt-1 text-lg font-bold" style="color: var(--text);">${T.s3Title}</h2>
+      <p class="mt-1 text-xs" style="color: var(--text-soft);">${T.s3Hint}</p>
       ${field(T.createPin, "wPin", "••••", "password")}
       ${field(T.confirmPin, "wPin2", "••••", "password")}
-      <p id="msg" class="mt-2 text-xs text-rose-500">${msg}</p>
+      <p id="msg" class="mt-2 text-xs" style="color: var(--danger);">${msg}</p>
       <div class="mt-4 flex gap-2">
-        <button id="back" class="flex-1 rounded-xl border border-slate-300 dark:border-slate-700 py-2.5 font-semibold">${T.back}</button>
-        <button id="fin" class="flex-1 rounded-xl bg-gradient-to-r from-teal-500 to-indigo-600 py-2.5 font-semibold text-white">${T.finishBtn}</button>
+        <button id="back" class="clay-btn clay-btn-ghost flex-1">${T.back}</button>
+        <button id="fin" class="clay-btn clay-btn-primary flex-1">${T.finishBtn}</button>
       </div>
     </div>`);
     inner.querySelectorAll('input[type=password]').forEach(i => { i.inputMode = "numeric"; });
@@ -681,14 +715,14 @@ function renderSetup3msg(m) {
 function renderLock(msg = "") {
   const T = t();
   const inner = el(`<div class="text-center">
-    <div class="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-slate-100 dark:bg-slate-800 text-2xl">🔒</div>
-    <h2 class="mt-3 text-lg font-bold">${T.lockTitle}</h2>
-    <p class="mt-1 text-xs text-slate-500">${msg || ""}</p>
+    <div class="mx-auto grid h-14 w-14 place-items-center rounded-2xl text-2xl" style="background: var(--surface); box-shadow: var(--clay-shadow-sm); color: var(--brand);">🔒</div>
+    <h2 class="mt-3 text-lg font-bold" style="color: var(--text);">${T.lockTitle}</h2>
+    <p class="mt-1 text-xs" style="color: var(--text-soft);">${msg || ""}</p>
     <input id="pinInp" type="password" inputmode="numeric" maxlength="6" placeholder="••••" autocomplete="off"
-      class="mx-auto mt-4 block w-40 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-3 text-center text-2xl tracking-[0.4em] outline-none focus:border-teal-500">
-    <p id="lmsg" class="mt-2 text-xs text-rose-500"></p>
-    <button id="unlock" class="mt-3 w-full rounded-xl bg-gradient-to-r from-teal-500 to-indigo-600 py-2.5 font-semibold text-white">${T.unlock}</button>
-    <button id="reset" class="mt-3 text-[11px] text-slate-400 hover:underline">${T.reset}</button>
+      class="clay-input mx-auto mt-4 block w-40 text-center text-2xl tracking-[0.4em]" style="letter-spacing: 0.4em;">
+    <p id="lmsg" class="mt-2 text-xs" style="color: var(--danger);"></p>
+    <button id="unlock" class="clay-btn clay-btn-primary w-full">${T.unlock}</button>
+    <button id="reset" class="mt-3 text-[11px] hover:underline" style="color: var(--text-mute); background: none; border: none; cursor: pointer;">${T.reset}</button>
   </div>`);
 
   const tryUnlock = async () => {
@@ -782,29 +816,39 @@ function render() {
 
 function Header() {
   const h = el(`
-    <header class="safe-top sticky top-0 z-20 border-b border-slate-200/70 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur">
+    <header class="clay-header safe-top sticky top-0 z-20">
       <div class="mx-auto flex w-full max-w-3xl items-center gap-3 px-4 py-3">
-        <div class="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-teal-500 to-indigo-600 text-white text-lg shadow">🎓</div>
-        <div class="min-w-0 flex-1"><h1 class="truncate text-base font-bold leading-tight">${t().appName}</h1>
-          <p class="truncate text-[11px] text-slate-500 dark:text-slate-400">${t().tagline}</p></div>
-        <button id="moreBtn" class="shrink-0 rounded-full border border-slate-300 dark:border-slate-700 px-3 py-1.5 text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-800" title="${t().more}">⚡ ${t().more}</button>
-        <button id="langBtn" class="shrink-0 rounded-full border border-slate-300 dark:border-slate-700 px-3 py-1.5 text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-800">
-          ${state.lang === "hi" ? "🇮🇳 Hinglish" : "🇬🇧 English"}</button>
-      </div></header>`);
+        <div class="grid h-10 w-10 shrink-0 place-items-center rounded-2xl text-white text-lg" style="background: var(--gradient-brand); box-shadow: var(--clay-shadow-sm);">🎓</div>
+        <div class="min-w-0 flex-1">
+          <h1 class="truncate text-base font-bold leading-tight" style="color: var(--text);">${t().appName}</h1>
+          <p class="truncate text-[11px]" style="color: var(--text-soft);">${t().tagline}</p>
+        </div>
+        <button id="themeBtn" class="clay-toggle shrink-0" title="Theme: ${themeLabel()}" aria-label="Toggle theme">
+          <span>${themeIcon()}</span><span class="hidden sm:inline">${themeLabel()}</span>
+        </button>
+        <button id="moreBtn" class="clay-toggle shrink-0" title="${t().more}">⚡ <span class="hidden sm:inline">${t().more}</span></button>
+        <button id="langBtn" class="clay-toggle shrink-0" aria-label="Change language">
+          ${state.lang === "hi" ? "🇮🇳" : "🇬🇧"}<span class="hidden sm:inline">${state.lang === "hi" ? "Hinglish" : "English"}</span>
+        </button>
+      </div>
+    </header>`);
   h.querySelector("#langBtn").onclick = () => {
     state.lang = state.lang === "hi" ? "en" : "hi";
     if (cfg) { cfg.lang = state.lang; saveLS(LS.cfg, cfg); }
     render();
   };
   h.querySelector("#moreBtn").onclick = () => openMoreSheet();
+  h.querySelector("#themeBtn").onclick = () => cycleTheme();
   return h;
 }
 
-// ── Stat card helper ───────────────────────────────────────────
+// ── Stat card helper (claymorphism) ─────────────────────────────
 function StatCard(label, value, icon) {
-  return `<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 text-center">
-    <div class="text-2xl">${icon}</div><div class="mt-1 text-xl font-extrabold">${value}</div>
-    <div class="text-[11px] text-slate-500 dark:text-slate-400">${label}</div></div>`;
+  return `<div class="stat-card">
+    <div class="stat-icon">${icon}</div>
+    <div class="stat-value">${value}</div>
+    <div class="stat-label">${label}</div>
+  </div>`;
 }
 
 // ===================================================================
@@ -818,46 +862,52 @@ function HomeView() {
 
   const wrap = el(`<div class="space-y-5"></div>`);
 
-  // Greeting card
-  wrap.appendChild(el(`<section class="rounded-3xl bg-gradient-to-br from-teal-500 via-cyan-600 to-indigo-600 p-5 text-white shadow-lg">
+  // Premium greeting card (gradient clay)
+  wrap.appendChild(el(`<section class="clay-card-gradient" style="background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 50%, #ff7eb6 100%); padding: 1.5rem;">
       <p class="text-sm opacity-90">${greet()}, ${escapeHtml(name)} 👋</p>
       <h2 class="mt-1 text-xl font-bold">${t().welcome}</h2>
-      <button id="goChat" class="mt-4 inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-2 text-sm font-semibold backdrop-blur hover:bg-white/30">💬 ${t().quickAsk}</button>
+      <button id="goChat" class="mt-4 clay-btn" style="background: rgba(255,255,255,0.2); color: #fff; backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.25);">💬 ${t().quickAsk}</button>
     </section>`));
 
-  // Stats
+  // Stats row
   wrap.appendChild(el(`<div class="grid grid-cols-3 gap-3">
       ${StatCard(t().streak, streak, "🔥")}
       ${StatCard(t().classesLogged, state.logs.length, "📚")}
       ${StatCard(t().topicsCovered, topics, "✅")}
     </div>`));
 
-  // Quick action grid
+  // Quick action grid — clay tiles with colorful icon wraps
   const acts = [
-    { v: "today", icon: "📝", label: t().logToday, c: "from-orange-400 to-amber-500" },
-    { v: "subjects", icon: "📖", label: t().myNotes, c: "from-teal-400 to-emerald-500" },
-    { v: "tricks", icon: "🧠", label: t().nav.tricks, c: "from-purple-400 to-pink-500" },
-    { v: "exam", icon: "🎯", label: t().examPrep, c: "from-rose-400 to-red-500" },
-    { v: "chat", icon: "🤖", label: t().nav.chat, c: "from-indigo-400 to-violet-500" },
+    { v: "today", icon: "📝", label: t().logToday, grad: "linear-gradient(135deg, #ffa94d, #ff7eb6)" },
+    { v: "subjects", icon: "📖", label: t().myNotes, grad: "linear-gradient(135deg, #00d4a3, #00b894)" },
+    { v: "tricks", icon: "🧠", label: t().nav.tricks, grad: "linear-gradient(135deg, #a29bfe, #6c5ce7)" },
+    { v: "exam", icon: "🎯", label: t().examPrep, grad: "linear-gradient(135deg, #ff5fa2, #ff6b81)" },
+    { v: "chat", icon: "🤖", label: t().nav.chat, grad: "linear-gradient(135deg, #54a0ff, #6c5ce7)" },
   ];
   const grid = el(`<div class="grid grid-cols-2 gap-3 sm:grid-cols-5"></div>`);
   acts.forEach(a => {
-    const b = el(`<button class="flex flex-col items-center gap-2 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 hover:shadow-md transition">
-        <span class="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br ${a.c} text-2xl text-white">${a.icon}</span>
-        <span class="text-xs font-semibold text-center">${a.label}</span></button>`);
+    const b = el(`<button class="action-tile">
+        <span class="action-icon-wrap" style="background: ${a.grad};">${a.icon}</span>
+        <span class="action-label">${a.label}</span>
+      </button>`);
     b.onclick = () => go(a.v);
     grid.appendChild(b);
   });
   wrap.appendChild(grid);
 
-  // Daily motivation
-  wrap.appendChild(el(`<section class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
-    <div class="flex items-start gap-3"><span class="text-2xl">💪</span>
-      <div><p class="text-[11px] font-semibold text-teal-600 dark:text-teal-400">${t().dailyMotivation}</p>
-        <p class="mt-1 text-sm leading-relaxed">"${state.lang === "hi" ? mot.hi : mot.en}"</p></div></div></section>`));
+  // Daily motivation card
+  wrap.appendChild(el(`<section class="clay-card">
+    <div class="flex items-start gap-3">
+      <span class="text-2xl">💪</span>
+      <div>
+        <p class="text-[11px] font-semibold" style="color: var(--brand);">${t().dailyMotivation}</p>
+        <p class="mt-1 text-sm leading-relaxed" style="color: var(--text);">"${state.lang === "hi" ? mot.hi : mot.en}"</p>
+      </div>
+    </div>
+  </section>`));
 
   // Recent classes
-  const recent = el(`<section><h3 class="mb-2 px-1 text-sm font-bold">${t().recent}</h3></section>`);
+  const recent = el(`<section><h3 class="mb-2 px-1 text-sm font-bold" style="color: var(--text);">${t().recent}</h3></section>`);
   recent.appendChild(LogList(state.logs.slice(0, 3)));
   wrap.appendChild(recent);
 
@@ -869,20 +919,36 @@ function HomeView() {
 //  SUBJECTS VIEW
 // ===================================================================
 function SubjectsView() {
-  const wrap = el(`<div class="space-y-4"><h2 class="px-1 text-lg font-bold">${t().subjectsTitle}</h2></div>`);
-  const grid = el(`<div class="grid grid-cols-1 gap-3 sm:grid-cols-2"></div>`);
+  const wrap = el(`<div class="space-y-4"><h2 class="px-1 text-lg font-bold" style="color: var(--text);">${t().subjectsTitle}</h2></div>`);
+  const grid = el(`<div class="grid grid-cols-1 gap-4 sm:grid-cols-2"></div>`);
+
+  // Map original Tailwind gradient names to our premium gradients
+  const gradMap = {
+    "from-orange-500 to-amber-600": "linear-gradient(135deg, #ffa94d, #ff7eb6)",
+    "from-rose-500 to-red-600": "linear-gradient(135deg, #ff5fa2, #ff6b81)",
+    "from-teal-500 to-emerald-600": "linear-gradient(135deg, #00d4a3, #00b894)",
+    "from-blue-500 to-indigo-600": "linear-gradient(135deg, #54a0ff, #6c5ce7)",
+    "from-fuchsia-500 to-purple-600": "linear-gradient(135deg, #a29bfe, #6c5ce7)",
+  };
 
   SUBJECTS.forEach(s => {
-    const card = el(`<div class="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-        <div class="flex items-center gap-3 bg-gradient-to-r ${s.color} p-4 text-white"><span class="text-3xl">${s.icon}</span>
-          <div><h3 class="font-bold">${s.name}</h3><p class="text-xs opacity-90">${s.tag} · ${s.chapters.length} chapters</p></div></div>
-        <div class="p-4"><div class="flex flex-wrap gap-1.5">
-            ${s.chapters.slice(0, 6).map(c => `<span class="rounded-full bg-slate-100 dark:bg-slate-800 px-2.5 py-1 text-[11px]">${escapeHtml(c)}</span>`).join("")}
-            ${s.chapters.length > 6 ? `<span class="rounded-full bg-slate-100 dark:bg-slate-800 px-2.5 py-1 text-[11px]">+${s.chapters.length - 6} more</span>` : ""}</div>
+    const grad = gradMap[s.color] || "linear-gradient(135deg, #6c5ce7, #a29bfe)";
+    const card = el(`<div class="subject-card">
+        <div class="subject-header" style="background: ${grad};">
+          <span class="text-3xl">${s.icon}</span>
+          <div><h3 class="font-bold">${s.name}</h3><p class="text-xs opacity-90">${s.tag} · ${s.chapters.length} chapters</p></div>
+        </div>
+        <div class="subject-body">
+          <div class="flex flex-wrap gap-1.5">
+            ${s.chapters.slice(0, 6).map(c => `<span class="clay-pill">${escapeHtml(c)}</span>`).join("")}
+            ${s.chapters.length > 6 ? `<span class="clay-pill">+${s.chapters.length - 6} more</span>` : ""}
+          </div>
           <div class="mt-3 flex gap-2">
-            <button class="askSub flex-1 rounded-xl bg-slate-900 dark:bg-white dark:text-slate-900 py-2 text-xs font-semibold text-white">${t().openChat}</button>
-            <button class="tricksSub flex-1 rounded-xl border border-slate-300 dark:border-slate-700 py-2 text-xs font-semibold">🧠 ${t().nav.tricks}</button>
-          </div></div></div>`);
+            <button class="askSub clay-btn clay-btn-primary flex-1" style="padding: 0.5rem 0.75rem; font-size: 0.75rem;">${t().openChat}</button>
+            <button class="tricksSub clay-btn clay-btn-ghost flex-1" style="padding: 0.5rem 0.75rem; font-size: 0.75rem;">🧠 ${t().nav.tricks}</button>
+          </div>
+        </div>
+      </div>`);
     card.querySelector(".askSub").onclick = () => {
       go("chat");
       setTimeout(() => sendMessage(tr(
@@ -905,29 +971,39 @@ let _fileList = [];
 
 function TodayView() {
   _fileList = [];
-  const wrap = el(`<div class="space-y-4"><div><h2 class="px-1 text-lg font-bold">📝 ${t().todayTitle}</h2>
-      <p class="px-1 text-xs text-slate-500 dark:text-slate-400">${t().todayHint}</p></div></div>`);
+  const wrap = el(`<div class="space-y-4">
+    <div>
+      <h2 class="px-1 text-lg font-bold" style="color: var(--text);">📝 ${t().todayTitle}</h2>
+      <p class="px-1 text-xs" style="color: var(--text-soft);">${t().todayHint}</p>
+    </div>
+  </div>`);
 
   const opts = SUBJECTS.map(s => `<option value="${s.name}">${s.icon} ${s.name}</option>`).join("");
-  const form = el(`<form id="logForm" class="space-y-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
-      <div><label class="mb-1 block text-xs font-semibold">${t().subject}</label>
-        <select name="subject" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2">${opts}</select></div>
-      <div><label class="mb-1 block text-xs font-semibold">${t().topic}</label>
-        <input name="topic" required class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2" placeholder="e.g. Demand Analysis"></div>
-      <div><label class="mb-1 block text-xs font-semibold">${t().note}</label>
-        <textarea name="note" rows="3" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2"></textarea></div>
-      <div class="rounded-xl border border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 p-3">
-        <p class="mb-2 text-center text-xs font-semibold text-slate-500 dark:text-slate-400">📎 ${t().uploadPhoto}</p>
+  const form = el(`<form id="logForm" class="clay-card space-y-3">
+      <div>
+        <label class="mb-1 block text-xs font-semibold" style="color: var(--text);">${t().subject}</label>
+        <select name="subject" class="clay-select">${opts}</select>
+      </div>
+      <div>
+        <label class="mb-1 block text-xs font-semibold" style="color: var(--text);">${t().topic}</label>
+        <input name="topic" required class="clay-input" placeholder="e.g. Demand Analysis">
+      </div>
+      <div>
+        <label class="mb-1 block text-xs font-semibold" style="color: var(--text);">${t().note}</label>
+        <textarea name="note" rows="3" class="clay-textarea"></textarea>
+      </div>
+      <div class="clay-inset">
+        <p class="mb-2 text-center text-xs font-semibold" style="color: var(--text-soft);">📎 ${t().uploadPhoto}</p>
         <div class="flex gap-2">
-          <button type="button" id="cameraBtn" class="flex-1 rounded-lg bg-gradient-to-r from-teal-500 to-cyan-600 py-2 text-xs font-semibold text-white">📷 ${t().camera}</button>
-          <button type="button" id="filesBtn" class="flex-1 rounded-lg bg-gradient-to-r from-indigo-500 to-violet-600 py-2 text-xs font-semibold text-white">📁 ${t().attachFiles}</button>
+          <button type="button" id="cameraBtn" class="clay-btn clay-btn-success flex-1" style="padding: 0.5rem; font-size: 0.75rem;">📷 ${t().camera}</button>
+          <button type="button" id="filesBtn" class="clay-btn clay-btn-primary flex-1" style="padding: 0.5rem; font-size: 0.75rem;">📁 ${t().attachFiles}</button>
         </div>
         <input id="cameraInp" type="file" accept="image/*" capture="environment" class="hidden">
         <input id="filesInp" type="file" accept="image/*,application/pdf,.doc,.docx,.ppt,.pptx,.txt" multiple class="hidden">
         <div id="filePreview" class="mt-2 flex flex-wrap gap-2"></div>
-        <p id="fileMsg" class="mt-1 text-center text-[11px] text-slate-400"></p>
+        <p id="fileMsg" class="mt-1 text-center text-[11px]" style="color: var(--text-mute);"></p>
       </div>
-      <button class="w-full rounded-xl bg-gradient-to-r from-teal-500 to-indigo-600 py-2.5 font-semibold text-white">${t().save}</button>
+      <button class="clay-btn clay-btn-primary w-full">${t().save}</button>
     </form>`);
 
   // Wire up file pickers
@@ -974,7 +1050,7 @@ function TodayView() {
 
   wrap.appendChild(form);
 
-  const list = el(`<section><h3 class="mb-2 px-1 text-sm font-bold">${t().recent}</h3></section>`);
+  const list = el(`<section><h3 class="mb-2 px-1 text-sm font-bold" style="color: var(--text);">${t().recent}</h3></section>`);
   list.appendChild(LogList(state.logs));
   wrap.appendChild(list);
   return wrap;
@@ -1006,9 +1082,9 @@ function renderFilePreview(ctx) {
   if (!_fileList.length) { msg.textContent = ""; return; }
   msg.textContent = `${_fileList.length} ${t().filesSelected}`;
   _fileList.forEach((f, i) => {
-    const card = el(`<div class="group relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
-      <div class="flex h-full w-full items-center justify-center text-lg font-bold text-slate-400">${f.type.startsWith("image/") ? "🖼" : "📄"}</div>
-      <button type="button" data-idx="${i}" class="remove-file absolute -right-1 -top-1 grid h-5 w-5 place-items-center rounded-full bg-rose-500 text-[10px] text-white shadow opacity-0 group-hover:opacity-100 transition">✕</button>
+    const card = el(`<div class="file-tile group relative h-16 w-16 shrink-0">
+      <div class="flex h-full w-full items-center justify-center text-lg font-bold" style="color: var(--text-mute);">${f.type.startsWith("image/") ? "🖼" : "📄"}</div>
+      <button type="button" data-idx="${i}" class="remove-file absolute -right-1 -top-1 grid h-5 w-5 place-items-center rounded-full text-[10px] text-white shadow opacity-0 group-hover:opacity-100 transition" style="background: var(--gradient-warm);">✕</button>
     </div>`);
     card.querySelector(".remove-file").onclick = () => {
       _fileList.splice(i, 1);
@@ -1019,19 +1095,19 @@ function renderFilePreview(ctx) {
 }
 
 function LogList(logs) {
-  if (!logs.length) return el(`<p class="rounded-xl border border-dashed border-slate-300 dark:border-slate-700 p-4 text-center text-xs text-slate-500">${t().noLogs}</p>`);
+  if (!logs.length) return el(`<p class="clay-card-flat p-4 text-center text-xs" style="color: var(--text-mute); border-style: dashed;">${t().noLogs}</p>`);
   const box = el(`<div class="space-y-2"></div>`);
   logs.forEach(l => {
     const sub = SUBJECTS.find(s => s.name === l.subject);
     const d = l.date ? formatDate(l.date) : "";
     const files = (l.files && l.files.length) ? l.files : [];
-    box.appendChild(el(`<div class="flex items-start gap-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3">
+    box.appendChild(el(`<div class="clay-card-soft flex items-start gap-3" style="padding: 0.75rem;">
         <span class="text-xl">${sub ? sub.icon : "📘"}</span>
         <div class="min-w-0 flex-1"><div class="flex items-center justify-between gap-2">
-            <p class="truncate font-semibold">${escapeHtml(l.topic || "")}</p><span class="shrink-0 text-[11px] text-slate-400">${d}</span></div>
-          <p class="text-[11px] text-slate-500">${escapeHtml(l.subject || "")}</p>
-          ${l.note ? `<p class="mt-1 text-xs text-slate-600 dark:text-slate-300">${escapeHtml(l.note)}</p>` : ""}
-          ${files.length ? `<div class="mt-1 flex flex-wrap gap-1">${files.map(url => `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-0.5 rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[10px] text-teal-600 dark:text-teal-400 hover:underline">📎 file</a>`).join("")}</div>` : ""}
+            <p class="truncate font-semibold" style="color: var(--text);">${escapeHtml(l.topic || "")}</p><span class="shrink-0 text-[11px]" style="color: var(--text-mute);">${d}</span></div>
+          <p class="text-[11px]" style="color: var(--text-soft);">${escapeHtml(l.subject || "")}</p>
+          ${l.note ? `<p class="mt-1 text-xs" style="color: var(--text-soft);">${escapeHtml(l.note)}</p>` : ""}
+          ${files.length ? `<div class="mt-1 flex flex-wrap gap-1">${files.map(url => `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" class="clay-pill" style="text-decoration: none; color: var(--brand);">📎 file</a>`).join("")}</div>` : ""}
         </div></div>`));
   });
   return box;
@@ -1041,15 +1117,15 @@ function LogList(logs) {
 //  EXAM VIEW
 // ===================================================================
 function ExamView() {
-  const wrap = el(`<div class="space-y-4"><div><h2 class="px-1 text-lg font-bold">${t().examTitle}</h2>
-      <p class="px-1 text-xs text-slate-500 dark:text-slate-400">${t().examHint}</p></div></div>`);
+  const wrap = el(`<div class="space-y-4"><div><h2 class="px-1 text-lg font-bold" style="color: var(--text);">${t().examTitle}</h2>
+      <p class="px-1 text-xs" style="color: var(--text-soft);">${t().examHint}</p></div></div>`);
 
-  const opts = SUBJECTS.map(s => `<label class="flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3">
-      <input type="checkbox" value="${s.name}" class="examSub h-4 w-4 accent-teal-600"><span>${s.icon} ${s.name}</span></label>`).join("");
+  const opts = SUBJECTS.map(s => `<label class="clay-card-soft flex cursor-pointer items-center gap-2" style="padding: 0.65rem 0.85rem;">
+      <input type="checkbox" value="${s.name}" class="examSub h-4 w-4" style="accent-color: var(--brand);"><span style="color: var(--text);">${s.icon} ${s.name}</span></label>`).join("");
 
   const card = el(`<div class="space-y-3"><div class="grid grid-cols-1 gap-2 sm:grid-cols-2">${opts}</div>
-      <div class="flex items-center gap-2"><input id="examDays" type="number" min="1" max="365" value="7" class="w-20 rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2 text-center"><span class="text-xs text-slate-500">days left</span></div>
-      <button id="planBtn" class="w-full rounded-xl bg-gradient-to-r from-rose-500 to-red-600 py-2.5 font-semibold text-white">🎯 ${t().makePlan}</button></div>`);
+      <div class="flex items-center gap-2"><input id="examDays" type="number" min="1" max="365" value="7" class="clay-input" style="width: 5rem; text-align: center;"><span class="text-xs" style="color: var(--text-soft);">days left</span></div>
+      <button id="planBtn" class="clay-btn clay-btn-danger w-full">🎯 ${t().makePlan}</button></div>`);
 
   card.querySelector("#planBtn").onclick = () => {
     const subs = [...card.querySelectorAll(".examSub:checked")].map(c => c.value);
@@ -1064,14 +1140,14 @@ function ExamView() {
   wrap.appendChild(card);
 
   // Model paper generator
-  const papers = el(`<div class="space-y-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
-      <div><h3 class="text-sm font-bold">📄 ${t().papersTitle}</h3>
-        <p class="text-xs text-slate-500 dark:text-slate-400">${t().papersHint}</p></div>
-      <select id="paperSub" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2">
+  const papers = el(`<div class="clay-card space-y-3">
+      <div><h3 class="text-sm font-bold" style="color: var(--text);">📄 ${t().papersTitle}</h3>
+        <p class="text-xs" style="color: var(--text-soft);">${t().papersHint}</p></div>
+      <select id="paperSub" class="clay-select">
         ${SUBJECTS.map(s => `<option value="${s.name}">${s.icon} ${s.name}</option>`).join("")}</select>
       <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
-        <button id="genPaper" class="rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 py-2.5 text-sm font-semibold text-white">📝 ${t().genPaper}</button>
-        <button id="findPrev" class="rounded-xl border border-slate-300 dark:border-slate-700 py-2.5 text-sm font-semibold">🔎 ${t().findPrev}</button>
+        <button id="genPaper" class="clay-btn clay-btn-primary">📝 ${t().genPaper}</button>
+        <button id="findPrev" class="clay-btn clay-btn-ghost">🔎 ${t().findPrev}</button>
       </div></div>`);
   papers.querySelector("#genPaper").onclick = () => {
     const sub = papers.querySelector("#paperSub").value;
@@ -1098,32 +1174,42 @@ function TricksView() {
   const T = t();
   const wrap = el(`<div class="space-y-4"></div>`);
 
-  wrap.appendChild(el(`<div><h2 class="px-1 text-lg font-bold">🧠 ${T.tricksTitle}</h2>
-    <p class="px-1 text-xs text-slate-500 dark:text-slate-400">${T.tricksHint}</p></div>`));
+  wrap.appendChild(el(`<div><h2 class="px-1 text-lg font-bold" style="color: var(--text);">🧠 ${T.tricksTitle}</h2>
+    <p class="px-1 text-xs" style="color: var(--text-soft);">${T.tricksHint}</p></div>`));
 
-  wrap.appendChild(el(`<section class="rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 p-4 text-white shadow-lg">
+  // Daily motivation — accent gradient clay card
+  wrap.appendChild(el(`<section class="clay-card-accent" style="background: linear-gradient(135deg, #a29bfe 0%, #ff7eb6 100%);">
     <p class="text-[10px] font-semibold uppercase tracking-wide opacity-80">💪 ${T.dailyMotivation}</p>
     <p class="mt-2 text-sm leading-relaxed font-medium">"${state.lang === "hi" ? mot.hi : mot.en}"</p>
   </section>`));
 
-  // Study tips
+  // Study tips card
   const tips = [T.tip1, T.tip2, T.tip3, T.tip4, T.tip5, T.tip6];
-  const tipsCard = el(`<section class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
-    <h3 class="mb-2 flex items-center gap-2 text-sm font-bold">📘 ${T.studyTips}</h3>
+  const tipsCard = el(`<section class="clay-card">
+    <h3 class="mb-2 flex items-center gap-2 text-sm font-bold" style="color: var(--text);">📘 ${T.studyTips}</h3>
     <div class="space-y-1.5"></div></section>`);
   const tipsBox = tipsCard.querySelector("div");
   tips.forEach((tip, i) => {
-    tipsBox.appendChild(el(`<div class="flex items-start gap-2 rounded-xl bg-slate-50 dark:bg-slate-800/50 p-2.5">
-      <span class="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-gradient-to-br from-teal-500 to-indigo-600 text-[11px] text-white font-bold">${i + 1}</span>
-      <p class="text-xs leading-relaxed">${tip}</p></div>`));
+    tipsBox.appendChild(el(`<div class="clay-inset flex items-start gap-2" style="padding: 0.65rem;">
+      <span class="grid h-6 w-6 shrink-0 place-items-center rounded-full text-[11px] text-white font-bold" style="background: var(--gradient-brand);">${i + 1}</span>
+      <p class="text-xs leading-relaxed" style="color: var(--text);">${tip}</p></div>`));
   });
   wrap.appendChild(tipsCard);
 
-  // Tricks accordion
-  const tricksWrap = el(`<section class="space-y-2"></section>`);
+  // Tricks accordion (subject cards)
+  const gradMap = {
+    "from-orange-500 to-amber-600": "linear-gradient(135deg, #ffa94d, #ff7eb6)",
+    "from-rose-500 to-red-600": "linear-gradient(135deg, #ff5fa2, #ff6b81)",
+    "from-teal-500 to-emerald-600": "linear-gradient(135deg, #00d4a3, #00b894)",
+    "from-blue-500 to-indigo-600": "linear-gradient(135deg, #54a0ff, #6c5ce7)",
+    "from-fuchsia-500 to-purple-600": "linear-gradient(135deg, #a29bfe, #6c5ce7)",
+  };
+
+  const tricksWrap = el(`<section class="space-y-3"></section>`);
   MATH_TRICKS.forEach((subj) => {
-    const subCard = el(`<div class="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-      <button class="subj-trigger flex w-full items-center gap-3 bg-gradient-to-r ${subj.color} p-3.5 text-white">
+    const grad = gradMap[subj.color] || "linear-gradient(135deg, #6c5ce7, #a29bfe)";
+    const subCard = el(`<div class="subject-card">
+      <button class="subj-trigger flex w-full items-center gap-3 p-3.5 text-white" style="background: ${grad}; border: none; cursor: pointer;">
         <span class="text-2xl">${subj.icon}</span>
         <div class="flex-1 text-left"><p class="font-bold text-sm">${subj.subject}</p>
           <p class="text-[11px] opacity-80">${subj.tricks.length} ${T.tricksCount}</p></div>
@@ -1134,15 +1220,15 @@ function TricksView() {
     const arrow = subCard.querySelector(".arrow");
 
     subj.tricks.forEach((trItem) => {
-      body.appendChild(el(`<div class="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/30 p-3 space-y-1.5">
-        <p class="text-xs font-bold text-teal-600 dark:text-teal-400">${trItem.title}</p>
-        <div class="rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2">
-          <code class="text-[12px] font-mono leading-relaxed whitespace-pre-wrap">${escapeHtml(trItem.formula)}</code>
+      body.appendChild(el(`<div class="clay-inset space-y-1.5" style="padding: 0.75rem;">
+        <p class="text-xs font-bold" style="color: var(--brand);">${trItem.title}</p>
+        <div class="clay-card-flat" style="padding: 0.5rem;">
+          <code class="text-[12px] font-mono leading-relaxed whitespace-pre-wrap" style="color: var(--text);">${escapeHtml(trItem.formula)}</code>
         </div>
-        <div class="flex items-start gap-1.5"><span class="shrink-0 text-[10px] font-bold text-amber-500">💡</span>
-          <p class="text-[11px] text-slate-600 dark:text-slate-300">${trItem.tip}</p></div>
-        ${trItem.example ? `<div class="flex items-start gap-1.5"><span class="shrink-0 text-[10px] font-bold text-emerald-500">📝</span>
-          <p class="text-[11px] text-slate-500 dark:text-slate-400">${trItem.example}</p></div>` : ""}
+        <div class="flex items-start gap-1.5"><span class="shrink-0 text-[10px] font-bold" style="color: var(--warning);">💡</span>
+          <p class="text-[11px]" style="color: var(--text-soft);">${trItem.tip}</p></div>
+        ${trItem.example ? `<div class="flex items-start gap-1.5"><span class="shrink-0 text-[10px] font-bold" style="color: var(--success);">📝</span>
+          <p class="text-[11px]" style="color: var(--text-mute);">${trItem.example}</p></div>` : ""}
       </div>`));
     });
 
@@ -1155,7 +1241,7 @@ function TricksView() {
   });
   wrap.appendChild(tricksWrap);
 
-  wrap.appendChild(el(`<button id="tricksAskBtn" class="w-full rounded-xl bg-gradient-to-r from-teal-500 to-indigo-600 py-3 font-semibold text-white text-sm">🤖 ${T.quickAsk}</button>`));
+  wrap.appendChild(el(`<button id="tricksAskBtn" class="clay-btn clay-btn-primary w-full">🤖 ${T.quickAsk}</button>`));
   wrap.querySelector("#tricksAskBtn").onclick = () => {
     go("chat");
     setTimeout(() => sendMessage(tr(
@@ -1173,16 +1259,18 @@ function TricksView() {
 function ChatView() {
   const wrap = el(`<div class="flex h-[calc(100dvh-9.5rem)] flex-col"></div>`);
 
-  const head = el(`<div class="mb-2 flex items-center justify-between px-1"><h2 class="text-lg font-bold">🤖 ${t().chatTitle}</h2>
-      <button id="clearMem" class="text-[11px] text-rose-500 hover:underline">${t().clearMem}</button></div>`);
+  const head = el(`<div class="mb-2 flex items-center justify-between px-1">
+      <h2 class="text-lg font-bold" style="color: var(--text);">🤖 ${t().chatTitle}</h2>
+      <button id="clearMem" class="clay-toggle" style="padding: 0.35rem 0.7rem; font-size: 0.7rem; color: var(--danger);">${t().clearMem}</button>
+    </div>`);
   head.querySelector("#clearMem").onclick = () => {
     if (confirm("Clear chat?")) { state.chat = []; saveLS(LS.chat, state.chat); render(); }
   };
   wrap.appendChild(head);
 
-  const scroll = el(`<div id="chatScroll" class="no-sb flex-1 space-y-3 overflow-y-auto rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3"></div>`);
+  const scroll = el(`<div id="chatScroll" class="no-sb clay-card flex-1 space-y-3 overflow-y-auto" style="padding: 0.85rem;"></div>`);
   if (!state.chat.length) {
-    scroll.appendChild(el(`<div class="grid h-full place-items-center text-center text-slate-400">
+    scroll.appendChild(el(`<div class="grid h-full place-items-center text-center" style="color: var(--text-mute);">
       <div><div class="text-4xl">🎓</div><p class="mt-2 text-xs">${tr("Apna pehla doubt pucho! Main 24×7 available hoon!", "Ask your first doubt! I'm 24×7 available!")}</p></div></div>`));
   } else {
     state.chat.forEach(m => scroll.appendChild(Bubble(m.role, m.content)));
@@ -1190,10 +1278,11 @@ function ChatView() {
   wrap.appendChild(scroll);
 
   const bar = el(`<form id="chatForm" class="safe-bottom mt-2 flex items-end gap-1.5">
-      <button type="button" id="micBtn" title="${t().micTip}" aria-label="${t().micTip}" class="grid h-11 w-9 shrink-0 place-items-center rounded-2xl border border-slate-300 dark:border-slate-700 text-lg">🎤</button>
-      <textarea id="chatInput" rows="1" placeholder="${t().chatPlaceholder}" class="max-h-28 flex-1 resize-none rounded-2xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3.5 py-2.5"></textarea>
-      <button type="button" id="diagBtn" title="${t().diagramTip}" aria-label="${t().diagramTip}" class="grid h-11 w-9 shrink-0 place-items-center rounded-2xl border border-slate-300 dark:border-slate-700 text-lg">📊</button>
-      <button type="submit" aria-label="Send" class="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-teal-500 to-indigo-600 text-white">➤</button></form>`);
+      <button type="button" id="micBtn" title="${t().micTip}" aria-label="${t().micTip}" class="clay-btn clay-btn-icon" style="width: 2.75rem; height: 2.75rem;">🎤</button>
+      <textarea id="chatInput" rows="1" placeholder="${t().chatPlaceholder}" class="clay-textarea" style="max-height: 7rem; resize: none; padding: 0.65rem 0.9rem;"></textarea>
+      <button type="button" id="diagBtn" title="${t().diagramTip}" aria-label="${t().diagramTip}" class="clay-btn clay-btn-icon" style="width: 2.75rem; height: 2.75rem;">📊</button>
+      <button type="submit" aria-label="Send" class="clay-btn clay-btn-primary clay-btn-icon" style="width: 2.75rem; height: 2.75rem;">➤</button>
+    </form>`);
 
   const inp = bar.querySelector("#chatInput");
   inp.addEventListener("input", () => {
@@ -1279,10 +1368,9 @@ function runMermaid() {
 function Bubble(role, content) {
   const me = role === "user";
   const bookmarkBtn = !me
-    ? `<button class="bmBtn mt-1.5 rounded-md bg-slate-200/60 dark:bg-slate-700/60 px-2 py-0.5 text-[10px] text-slate-600 dark:text-slate-300 hover:bg-amber-200 dark:hover:bg-amber-900/40" title="Save to Doubt Bookmarks">⭐ Save</button>`
+    ? `<button class="bmBtn clay-pill mt-1.5" style="padding: 0.2rem 0.55rem; font-size: 0.65rem;" title="Save to Doubt Bookmarks">⭐ Save</button>`
     : "";
-  return el(`<div class="flex ${me ? "justify-end" : "justify-start"}"><div class="max-w-[88%] rounded-2xl px-3.5 py-2.5 ${me
-      ? "bg-gradient-to-br from-teal-500 to-indigo-600 text-white rounded-br-sm" : "bg-slate-100 dark:bg-slate-800 rounded-bl-sm"}">
+  return el(`<div class="flex ${me ? "justify-end" : "justify-start"}"><div class="${me ? "bubble-user" : "bubble-ai"} max-w-[88%]">
       <div class="msg-body text-[13px] leading-relaxed">${me ? escapeHtml(content) : renderAssistant(content)}</div>${bookmarkBtn}</div></div>`);
 }
 
@@ -1320,7 +1408,7 @@ async function sendMessage(text) {
   if (scroll && scroll.querySelector(".place-items-center")) scroll.innerHTML = "";
   if (scroll) scroll.appendChild(Bubble("user", text));
 
-  const typing = el(`<div class="flex justify-start"><div class="typing rounded-2xl bg-slate-100 dark:bg-slate-800 px-4 py-3"><span></span><span></span><span></span></div></div>`);
+  const typing = el(`<div class="flex justify-start"><div class="bubble-ai typing"><span></span><span></span><span></span></div></div>`);
   if (scroll) scroll.appendChild(typing);
   scrollChat();
 
@@ -1358,13 +1446,13 @@ function BottomNav() {
     { v: "exam", icon: "🎯", label: t().nav.exam },
     { v: "chat", icon: "💬", label: t().nav.chat },
   ];
-  const nav = el(`<nav class="safe-bottom fixed inset-x-0 bottom-0 z-20 border-t border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur">
+  const nav = el(`<nav class="clay-nav safe-bottom fixed inset-x-0 bottom-0 z-20">
       <div class="mx-auto flex w-full max-w-3xl items-stretch justify-around px-1 pt-1.5"></div></nav>`);
   const row = nav.firstElementChild;
   items.forEach(it => {
     const active = state.view === it.v;
-    const b = el(`<button class="flex flex-1 flex-col items-center gap-0.5 rounded-xl py-1.5 ${active ? "nav-active" : "text-slate-500 dark:text-slate-400"}">
-        <span class="text-base ${active ? "scale-110" : ""} transition">${it.icon}</span><span class="text-[9px] font-semibold leading-tight text-center">${it.label}</span></button>`);
+    const b = el(`<button class="nav-btn ${active ? "active" : ""}" aria-label="${it.label}" aria-current="${active ? "page" : "false"}">
+        <span class="nav-icon">${it.icon}</span><span>${it.label}</span></button>`);
     b.onclick = () => go(it.v);
     row.appendChild(b);
   });
@@ -1388,21 +1476,21 @@ function openMoreSheet() {
     { v: "bookmarks", icon: "⭐", label: t().bookmarks, desc: tr("Saved AI explanations", "Saved AI explanations") },
     { v: "analytics", icon: "📊", label: t().analytics, desc: tr("Progress + syllabus tracker", "Progress + syllabus tracker") },
   ];
-  const overlay = el(`<div id="moreSheet" class="fixed inset-0 z-40 flex items-end justify-center bg-black/40">
-    <div class="w-full max-w-md rounded-t-3xl bg-white dark:bg-slate-900 p-5 pb-8 shadow-2xl view-enter">
+  const overlay = el(`<div id="moreSheet" class="clay-sheet-overlay fixed inset-0 z-40 flex items-end justify-center">
+    <div class="clay-sheet w-full max-w-md p-5 pb-8 view-enter">
       <div class="mb-3 flex items-center justify-between">
-        <h3 class="text-lg font-bold">${t().moreTitle}</h3>
-        <button id="closeMore" aria-label="Close" class="grid h-8 w-8 place-items-center rounded-full bg-slate-100 dark:bg-slate-800 text-lg">✕</button>
+        <h3 class="text-lg font-bold" style="color: var(--text);">${t().moreTitle}</h3>
+        <button id="closeMore" aria-label="Close" class="clay-btn clay-btn-icon" style="width: 2rem; height: 2rem; font-size: 0.85rem;">✕</button>
       </div>
       <div class="space-y-2"></div>
     </div>
   </div>`);
   const list = overlay.querySelector("div.space-y-2");
   items.forEach(it => {
-    const row = el(`<button class="flex w-full items-center gap-3 rounded-2xl border border-slate-200 dark:border-slate-800 p-3 text-left hover:bg-slate-50 dark:hover:bg-slate-800">
-      <span class="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-teal-500 to-indigo-600 text-xl text-white">${it.icon}</span>
-      <div class="flex-1"><p class="text-sm font-semibold">${it.label}</p><p class="text-[11px] text-slate-500">${it.desc}</p></div>
-      <span class="text-slate-400">›</span>
+    const row = el(`<button class="clay-card-soft flex w-full items-center gap-3" style="padding: 0.75rem; text-align: left;">
+      <span class="grid h-10 w-10 place-items-center rounded-xl text-xl text-white" style="background: var(--gradient-brand); box-shadow: var(--clay-shadow-sm);">${it.icon}</span>
+      <div class="flex-1"><p class="text-sm font-semibold" style="color: var(--text);">${it.label}</p><p class="text-[11px]" style="color: var(--text-soft);">${it.desc}</p></div>
+      <span style="color: var(--text-mute);">›</span>
     </button>`);
     row.onclick = () => { overlay.remove(); go(it.v); };
     list.appendChild(row);
@@ -1426,16 +1514,16 @@ function fmtTime(sec) {
 
 function FocusView() {
   const wrap = el(`<div class="space-y-4"></div>`);
-  wrap.appendChild(el(`<div><h2 class="px-1 text-lg font-bold">🍅 ${t().focus}</h2>
-    <p class="px-1 text-xs text-slate-500 dark:text-slate-400">${t().focusHint}</p></div>`));
+  wrap.appendChild(el(`<div><h2 class="px-1 text-lg font-bold" style="color: var(--text);">🍅 ${t().focus}</h2>
+    <p class="px-1 text-xs" style="color: var(--text-soft);">${t().focusHint}</p></div>`));
 
-  const card = el(`<div class="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 text-center">
-    <p id="pomoMode" class="text-xs font-semibold uppercase tracking-wide ${_pomo.mode === "work" ? "text-rose-500" : "text-emerald-500"}">${_pomo.mode === "work" ? t().focusTime : t().breakTime}</p>
-    <div id="pomoTime" class="my-4 font-mono text-6xl font-bold tracking-tight">${fmtTime(_pomo.remaining)}</div>
-    <div class="flex justify-center gap-2">
-      <button id="pomoStart" class="rounded-xl bg-gradient-to-r from-teal-500 to-indigo-600 px-6 py-2.5 font-semibold text-white">${_pomo.running ? t().pause : t().start}</button>
-      <button id="pomoReset" class="rounded-xl border border-slate-300 dark:border-slate-700 px-5 py-2.5 font-semibold">${t().resetLbl}</button>
-      <button id="pomoSkip" class="rounded-xl border border-slate-300 dark:border-slate-700 px-5 py-2.5 font-semibold">${t().skip}</button>
+  const card = el(`<div class="clay-card text-center" style="padding: 1.5rem;">
+    <p id="pomoMode" class="text-xs font-semibold uppercase tracking-wide" style="color: ${_pomo.mode === "work" ? "var(--danger)" : "var(--success)"};">${_pomo.mode === "work" ? t().focusTime : t().breakTime}</p>
+    <div id="pomoTime" class="my-4 font-mono text-6xl font-bold tracking-tight text-gradient">${fmtTime(_pomo.remaining)}</div>
+    <div class="flex justify-center gap-2 flex-wrap">
+      <button id="pomoStart" class="clay-btn clay-btn-primary">${_pomo.running ? t().pause : t().start}</button>
+      <button id="pomoReset" class="clay-btn clay-btn-ghost">${t().resetLbl}</button>
+      <button id="pomoSkip" class="clay-btn clay-btn-ghost">${t().skip}</button>
     </div>
   </div>`);
   wrap.appendChild(card);
@@ -1456,8 +1544,8 @@ function FocusView() {
     ${StatCard(t().totalSessions, totalSessions, "🏆")}
   </div>`));
 
-  wrap.appendChild(el(`<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 text-xs text-slate-600 dark:text-slate-300">
-    <p class="font-semibold text-slate-800 dark:text-slate-100 mb-1">${t().pomoTrickTitle}</p>
+  wrap.appendChild(el(`<div class="clay-card text-xs" style="color: var(--text-soft);">
+    <p class="font-semibold mb-1" style="color: var(--text);">${t().pomoTrickTitle}</p>
     ${t().pomoTrickBody}
   </div>`));
 
@@ -1471,7 +1559,7 @@ function FocusView() {
   function updateUI() {
     timeEl.textContent = fmtTime(_pomo.remaining);
     modeEl.textContent = _pomo.mode === "work" ? t().focusTime : t().breakTime;
-    modeEl.className = `text-xs font-semibold uppercase tracking-wide ${_pomo.mode === "work" ? "text-rose-500" : "text-emerald-500"}`;
+    modeEl.style.color = _pomo.mode === "work" ? "var(--danger)" : "var(--success)";
     startBtn.textContent = _pomo.running ? t().pause : t().start;
   }
 
@@ -1534,21 +1622,21 @@ function FocusView() {
 // ===================================================================
 function FlashcardsView() {
   const wrap = el(`<div class="space-y-4"></div>`);
-  wrap.appendChild(el(`<div><h2 class="px-1 text-lg font-bold">🃏 ${t().flashcards}</h2>
-    <p class="px-1 text-xs text-slate-500 dark:text-slate-400">${t().flashcardsHint}</p></div>`));
+  wrap.appendChild(el(`<div><h2 class="px-1 text-lg font-bold" style="color: var(--text);">🃏 ${t().flashcards}</h2>
+    <p class="px-1 text-xs" style="color: var(--text-soft);">${t().flashcardsHint}</p></div>`));
 
   // Add new card form
-  const addForm = el(`<form class="space-y-2 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
+  const addForm = el(`<form class="clay-card space-y-2" style="padding: 1rem;">
     <div class="flex items-center justify-between">
-      <h3 class="text-sm font-bold">➕ ${t().addCard}</h3>
-      <button type="button" id="aiFillBtn" class="rounded-lg bg-slate-100 dark:bg-slate-800 px-2 py-1 text-[10px] font-semibold">${t().aiFill}</button>
+      <h3 class="text-sm font-bold" style="color: var(--text);">➕ ${t().addCard}</h3>
+      <button type="button" id="aiFillBtn" class="clay-pill" style="cursor: pointer;">${t().aiFill}</button>
     </div>
-    <select id="fcSubj" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2 text-xs">
+    <select id="fcSubj" class="clay-select" style="font-size: 0.75rem;">
       ${SUBJECTS.map(s => `<option value="${s.name}">${s.icon} ${s.name}</option>`).join("")}
     </select>
-    <textarea id="fcFront" rows="2" placeholder="${t().frontLabel}" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2 text-xs"></textarea>
-    <textarea id="fcBack" rows="3" placeholder="${t().backLabel}" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2 text-xs"></textarea>
-    <button type="submit" class="w-full rounded-xl bg-gradient-to-r from-teal-500 to-indigo-600 py-2 text-xs font-semibold text-white">${t().saveCard}</button>
+    <textarea id="fcFront" rows="2" placeholder="${t().frontLabel}" class="clay-textarea" style="font-size: 0.75rem;"></textarea>
+    <textarea id="fcBack" rows="3" placeholder="${t().backLabel}" class="clay-textarea" style="font-size: 0.75rem;"></textarea>
+    <button type="submit" class="clay-btn clay-btn-primary w-full" style="font-size: 0.75rem; padding: 0.5rem;">${t().saveCard}</button>
   </form>`);
   wrap.appendChild(addForm);
 
@@ -1583,7 +1671,7 @@ function FlashcardsView() {
 
   // Empty state
   if (state.flashcards.length === 0) {
-    wrap.appendChild(el(`<div class="rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 p-6 text-center text-xs text-slate-500">
+    wrap.appendChild(el(`<div class="clay-card-flat p-6 text-center text-xs" style="color: var(--text-mute); border-style: dashed;">
       ${t().noFlashcards}
     </div>`));
     return wrap;
@@ -1594,21 +1682,21 @@ function FlashcardsView() {
   const queue = unknown.length ? unknown : state.flashcards;
   const current = queue[0];
 
-  const studyCard = el(`<div class="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
+  const studyCard = el(`<div class="clay-card" style="padding: 1.25rem;">
     <div class="mb-2 flex items-center justify-between">
-      <span class="rounded-full bg-slate-100 dark:bg-slate-800 px-2.5 py-1 text-[11px]">${escapeHtml(current.subject || "General")}</span>
-      <span class="text-[11px] text-slate-400">${t().tapToFlip}</span>
+      <span class="clay-pill">${escapeHtml(current.subject || "General")}</span>
+      <span class="text-[11px]" style="color: var(--text-mute);">${t().tapToFlip}</span>
     </div>
-    <div id="flipCard" class="cursor-pointer rounded-2xl bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 p-8 min-h-[180px] flex items-center justify-center text-center">
+    <div id="flipCard" class="cursor-pointer clay-inset p-8 min-h-[180px] flex items-center justify-center text-center" style="padding: 1.5rem;">
       <div>
-        <p class="text-[10px] font-semibold uppercase text-slate-400 mb-2">${t().front}</p>
-        <p class="text-lg font-bold leading-snug">${escapeHtml(current.front)}</p>
+        <p class="text-[10px] font-semibold uppercase mb-2" style="color: var(--text-mute);">${t().front}</p>
+        <p class="text-lg font-bold leading-snug" style="color: var(--text);">${escapeHtml(current.front)}</p>
       </div>
     </div>
     <div class="mt-3 flex gap-2">
-      <button id="fcKnown" class="flex-1 rounded-xl bg-emerald-500 py-2.5 text-xs font-semibold text-white">${t().knewIt}</button>
-      <button id="fcUnknown" class="flex-1 rounded-xl bg-rose-500 py-2.5 text-xs font-semibold text-white">${t().needReview}</button>
-      <button id="fcDelete" class="rounded-xl border border-slate-300 dark:border-slate-700 px-3 py-2.5 text-xs font-semibold">🗑</button>
+      <button id="fcKnown" class="clay-btn clay-btn-success flex-1" style="font-size: 0.75rem;">${t().knewIt}</button>
+      <button id="fcUnknown" class="clay-btn clay-btn-danger flex-1" style="font-size: 0.75rem;">${t().needReview}</button>
+      <button id="fcDelete" class="clay-btn clay-btn-ghost" style="padding: 0.5rem 0.75rem;">🗑</button>
     </div>
   </div>`);
 
@@ -1617,8 +1705,8 @@ function FlashcardsView() {
   flipEl.onclick = () => {
     flipped = !flipped;
     flipEl.innerHTML = flipped
-      ? `<div><p class="text-[10px] font-semibold uppercase text-slate-400 mb-2">${t().back}</p><p class="text-base leading-relaxed">${escapeHtml(current.back)}</p></div>`
-      : `<div><p class="text-[10px] font-semibold uppercase text-slate-400 mb-2">${t().front}</p><p class="text-lg font-bold leading-snug">${escapeHtml(current.front)}</p></div>`;
+      ? `<div><p class="text-[10px] font-semibold uppercase mb-2" style="color: var(--text-mute);">${t().back}</p><p class="text-base leading-relaxed" style="color: var(--text);">${escapeHtml(current.back)}</p></div>`
+      : `<div><p class="text-[10px] font-semibold uppercase mb-2" style="color: var(--text-mute);">${t().front}</p><p class="text-lg font-bold leading-snug" style="color: var(--text);">${escapeHtml(current.front)}</p></div>`;
   };
   studyCard.querySelector("#fcKnown").onclick = () => {
     current.known = true;
@@ -1646,11 +1734,11 @@ function FlashcardsView() {
   // Mastery progress
   const known = state.flashcards.filter(c => c.known).length;
   const pct = state.flashcards.length ? Math.round(known * 100 / state.flashcards.length) : 0;
-  wrap.appendChild(el(`<div class="rounded-2xl bg-gradient-to-br from-teal-500 to-indigo-600 p-4 text-white text-center">
+  wrap.appendChild(el(`<div class="clay-card-gradient text-center" style="background: linear-gradient(135deg, #00d4a3, #6c5ce7); padding: 1rem;">
     <p class="text-xs opacity-80">${t().cardsMastered}</p>
     <p class="text-3xl font-bold">${known} / ${state.flashcards.length}</p>
-    <div class="mt-2 h-2 rounded-full bg-white/20 overflow-hidden">
-      <div class="h-full bg-white" style="width: ${pct}%"></div>
+    <div class="clay-progress-track mt-2" style="background: rgba(255,255,255,0.25); height: 8px;">
+      <div class="clay-progress-fill" style="background: rgba(255,255,255,0.95); width: ${pct}%"></div>
     </div>
   </div>`));
 
@@ -1671,36 +1759,36 @@ function QuizView() {
   }
 
   // Otherwise show setup form
-  wrap.appendChild(el(`<div><h2 class="px-1 text-lg font-bold">❓ ${t().mockTest}</h2>
-    <p class="px-1 text-xs text-slate-500 dark:text-slate-400">${t().mockHint}</p></div>`));
+  wrap.appendChild(el(`<div><h2 class="px-1 text-lg font-bold" style="color: var(--text);">❓ ${t().mockTest}</h2>
+    <p class="px-1 text-xs" style="color: var(--text-soft);">${t().mockHint}</p></div>`));
 
-  const setup = el(`<div class="space-y-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
-    <div><label class="mb-1 block text-xs font-semibold">${t().subjectLbl}</label>
-      <select id="qSubj" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2">
+  const setup = el(`<div class="clay-card space-y-3" style="padding: 1rem;">
+    <div><label class="mb-1 block text-xs font-semibold" style="color: var(--text);">${t().subjectLbl}</label>
+      <select id="qSubj" class="clay-select">
         ${SUBJECTS.map(s => `<option value="${s.name}">${s.icon} ${s.name}</option>`).join("")}
       </select></div>
-    <div><label class="mb-1 block text-xs font-semibold">${t().topicOptional}</label>
-      <input id="qTopic" placeholder="${tr("e.g. Differentiation", "e.g. Differentiation")}" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2"></div>
-    <div><label class="mb-1 block text-xs font-semibold">${t().numQuestions}</label>
-      <select id="qCount" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2">
+    <div><label class="mb-1 block text-xs font-semibold" style="color: var(--text);">${t().topicOptional}</label>
+      <input id="qTopic" placeholder="${tr("e.g. Differentiation", "e.g. Differentiation")}" class="clay-input"></div>
+    <div><label class="mb-1 block text-xs font-semibold" style="color: var(--text);">${t().numQuestions}</label>
+      <select id="qCount" class="clay-select">
         <option value="5">5</option><option value="10">10</option><option value="15">15</option>
       </select></div>
-    <button id="genQuiz" class="w-full rounded-xl bg-gradient-to-r from-rose-500 to-red-600 py-2.5 font-semibold text-white">📝 ${t().genQuiz}</button>
+    <button id="genQuiz" class="clay-btn clay-btn-danger w-full">📝 ${t().genQuiz}</button>
   </div>`);
   wrap.appendChild(setup);
 
   if (state.quizResults.length) {
     const last = state.quizResults[0];
-    wrap.appendChild(el(`<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
-      <p class="text-xs font-semibold text-slate-500 mb-1">📊 ${t().lastQuiz}</p>
-      <p class="text-sm"><strong>${last.score}/${last.total}</strong> • ${escapeHtml(last.subject)} ${last.topic ? "· " + escapeHtml(last.topic) : ""} • ${new Date(last.date).toLocaleDateString()}</p>
+    wrap.appendChild(el(`<div class="clay-card-soft" style="padding: 0.85rem;">
+      <p class="text-xs font-semibold mb-1" style="color: var(--text-soft);">📊 ${t().lastQuiz}</p>
+      <p class="text-sm" style="color: var(--text);"><strong style="color: var(--brand);">${last.score}/${last.total}</strong> • ${escapeHtml(last.subject)} ${last.topic ? "· " + escapeHtml(last.topic) : ""} • ${new Date(last.date).toLocaleDateString()}</p>
     </div>`));
   }
 
   if (_quiz.loading) {
-    wrap.appendChild(el(`<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 text-center">
+    wrap.appendChild(el(`<div class="clay-card p-6 text-center">
       <div class="text-3xl mb-2">⏳</div>
-      <p class="text-sm">${t().quizLoading}</p>
+      <p class="text-sm" style="color: var(--text);">${t().quizLoading}</p>
     </div>`));
   }
 
@@ -1762,17 +1850,17 @@ function renderQuizActive(wrap) {
   const isLast = _quiz.current === total - 1;
 
   wrap.appendChild(el(`<div class="flex items-center justify-between">
-    <h2 class="text-lg font-bold">❓ ${t().mockTest}</h2>
-    <span class="rounded-full bg-slate-100 dark:bg-slate-800 px-3 py-1 text-xs font-semibold">${_quiz.current + 1} / ${total}</span>
+    <h2 class="text-lg font-bold" style="color: var(--text);">❓ ${t().mockTest}</h2>
+    <span class="clay-pill clay-pill-brand">${_quiz.current + 1} / ${total}</span>
   </div>`));
 
-  wrap.appendChild(el(`<div class="h-2 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
-    <div class="h-full bg-gradient-to-r from-teal-500 to-indigo-600 transition-all" style="width: ${Math.round(answered * 100 / total)}%"></div>
+  wrap.appendChild(el(`<div class="clay-progress-track">
+    <div class="clay-progress-fill" style="width: ${Math.round(answered * 100 / total)}%"></div>
   </div>`));
 
   const userAns = _quiz.answers[_quiz.current];
-  const card = el(`<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
-    <p class="mb-3 text-sm font-semibold leading-relaxed">${_quiz.current + 1}. ${escapeHtml(q.question)}</p>
+  const card = el(`<div class="clay-card" style="padding: 1.25rem;">
+    <p class="mb-3 text-sm font-semibold leading-relaxed" style="color: var(--text);">${_quiz.current + 1}. ${escapeHtml(q.question)}</p>
     <div class="space-y-2"></div>
   </div>`);
   const optsBox = card.querySelector("div.space-y-2");
@@ -1780,8 +1868,8 @@ function renderQuizActive(wrap) {
     const opt = q.options[letter];
     if (!opt) return;
     const selected = userAns === letter;
-    const b = el(`<button class="flex w-full items-center gap-3 rounded-xl border ${selected ? "border-teal-500 bg-teal-50 dark:bg-teal-900/30" : "border-slate-200 dark:border-slate-700"} p-3 text-left text-sm">
-      <span class="grid h-7 w-7 shrink-0 place-items-center rounded-full ${selected ? "bg-teal-500 text-white" : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"} font-bold text-xs">${letter}</span>
+    const b = el(`<button class="quiz-option ${selected ? "selected" : ""}">
+      <span class="opt-letter">${letter}</span>
       <span>${escapeHtml(opt)}</span>
     </button>`);
     b.onclick = () => { _quiz.answers[_quiz.current] = letter; render(); };
@@ -1791,10 +1879,10 @@ function renderQuizActive(wrap) {
 
   // Navigation
   const nav = el(`<div class="flex gap-2">
-    <button id="qPrev" class="flex-1 rounded-xl border border-slate-300 dark:border-slate-700 py-2.5 text-sm font-semibold ${_quiz.current === 0 ? "opacity-40 pointer-events-none" : ""}">← ${t().prev}</button>
+    <button id="qPrev" class="clay-btn clay-btn-ghost flex-1 ${_quiz.current === 0 ? "opacity-40 pointer-events-none" : ""}">← ${t().prev}</button>
     ${isLast
-      ? `<button id="qSubmit" class="flex-1 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 py-2.5 text-sm font-semibold text-white">✓ ${t().submitQuiz}</button>`
-      : `<button id="qNext" class="flex-1 rounded-xl bg-gradient-to-r from-teal-500 to-indigo-600 py-2.5 text-sm font-semibold text-white">${t().nextLbl} →</button>`}
+      ? `<button id="qSubmit" class="clay-btn clay-btn-success flex-1">✓ ${t().submitQuiz}</button>`
+      : `<button id="qNext" class="clay-btn clay-btn-primary flex-1">${t().nextLbl} →</button>`}
   </div>`);
   if (_quiz.current > 0) {
     nav.querySelector("#qPrev").onclick = () => { _quiz.current--; render(); };
@@ -1839,13 +1927,13 @@ function submitQuiz() {
 function BookmarksView() {
   const wrap = el(`<div class="space-y-4"></div>`);
   wrap.appendChild(el(`<div class="flex items-center justify-between">
-    <h2 class="px-1 text-lg font-bold">⭐ ${t().bookmarks}</h2>
-    ${state.bookmarks.length ? `<button id="clearBm" class="text-[11px] text-rose-500 hover:underline">${t().clearAll}</button>` : ""}
+    <h2 class="px-1 text-lg font-bold" style="color: var(--text);">⭐ ${t().bookmarks}</h2>
+    ${state.bookmarks.length ? `<button id="clearBm" class="clay-toggle" style="padding: 0.35rem 0.7rem; font-size: 0.7rem; color: var(--danger);">${t().clearAll}</button>` : ""}
   </div>
-  <p class="px-1 text-xs text-slate-500 dark:text-slate-400">${t().bookmarksHint}</p>`));
+  <p class="px-1 text-xs" style="color: var(--text-soft);">${t().bookmarksHint}</p>`));
 
   if (state.bookmarks.length === 0) {
-    wrap.appendChild(el(`<div class="rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 p-6 text-center text-xs text-slate-500">
+    wrap.appendChild(el(`<div class="clay-card-flat p-6 text-center text-xs" style="color: var(--text-mute); border-style: dashed;">
       ${t().noBookmarks}
     </div>`));
     return wrap;
@@ -1855,14 +1943,14 @@ function BookmarksView() {
   state.bookmarks.forEach((b, i) => {
     const preview = b.text.slice(0, 280);
     const ellipsis = b.text.length > 280 ? "..." : "";
-    list.appendChild(el(`<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3">
+    list.appendChild(el(`<div class="clay-card-soft" style="padding: 0.75rem;">
       <div class="flex items-start justify-between gap-2">
-        <p class="text-xs leading-relaxed flex-1">${escapeHtml(preview)}${ellipsis}</p>
-        <button data-i="${i}" class="delBm shrink-0 rounded-md bg-rose-100 dark:bg-rose-900/40 px-2 py-1 text-[10px] text-rose-600 dark:text-rose-300">✕</button>
+        <p class="text-xs leading-relaxed flex-1" style="color: var(--text);">${escapeHtml(preview)}${ellipsis}</p>
+        <button data-i="${i}" class="delBm shrink-0 clay-btn clay-btn-icon" style="width: 1.75rem; height: 1.75rem; font-size: 0.7rem; background: var(--gradient-warm); color: #fff;">✕</button>
       </div>
       <div class="mt-1.5 flex items-center justify-between">
-        <span class="text-[10px] text-slate-400">${b.date ? new Date(b.date).toLocaleDateString() : ""}</span>
-        <button data-i="${i}" class="askBm rounded-md bg-slate-100 dark:bg-slate-800 px-2 py-1 text-[10px] text-teal-600 dark:text-teal-300">💬 ${t().askMore}</button>
+        <span class="text-[10px]" style="color: var(--text-mute);">${b.date ? new Date(b.date).toLocaleDateString() : ""}</span>
+        <button data-i="${i}" class="askBm clay-pill" style="cursor: pointer; color: var(--brand);">💬 ${t().askMore}</button>
       </div>
     </div>`));
   });
@@ -1904,8 +1992,8 @@ function BookmarksView() {
 // ===================================================================
 function AnalyticsView() {
   const wrap = el(`<div class="space-y-4"></div>`);
-  wrap.appendChild(el(`<div><h2 class="px-1 text-lg font-bold">📊 ${t().analytics}</h2>
-    <p class="px-1 text-xs text-slate-500 dark:text-slate-400">${t().analyticsHint}</p></div>`));
+  wrap.appendChild(el(`<div><h2 class="px-1 text-lg font-bold" style="color: var(--text);">📊 ${t().analytics}</h2>
+    <p class="px-1 text-xs" style="color: var(--text-soft);">${t().analyticsHint}</p></div>`));
 
   // Quiz performance summary
   if (state.quizResults.length) {
@@ -1914,7 +2002,7 @@ function AnalyticsView() {
     const best = Math.max(...recent.map(r => r.score * 100 / r.total));
     const worst = Math.min(...recent.map(r => r.score * 100 / r.total));
 
-    wrap.appendChild(el(`<div class="rounded-2xl bg-gradient-to-br from-teal-500 to-indigo-600 p-5 text-white">
+    wrap.appendChild(el(`<div class="clay-card-gradient" style="background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%); padding: 1.25rem;">
       <p class="text-xs opacity-80">${t().quizPerf}</p>
       <div class="mt-2 grid grid-cols-3 gap-3 text-center">
         <div><p class="text-2xl font-bold">${avgPct}%</p><p class="text-[10px] opacity-80">${t().avg}</p></div>
@@ -1924,17 +2012,17 @@ function AnalyticsView() {
     </div>`));
 
     // Bar chart of recent scores
-    const chartCard = el(`<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
-      <p class="mb-2 text-sm font-bold">📈 ${t().recentScores}</p>
+    const chartCard = el(`<div class="clay-card">
+      <p class="mb-2 text-sm font-bold" style="color: var(--text);">📈 ${t().recentScores}</p>
       <div class="flex items-end justify-between gap-1 h-32"></div>
     </div>`);
     const bars = chartCard.querySelector("div.flex");
     recent.forEach(r => {
       const pct = Math.round(r.score * 100 / r.total);
       bars.appendChild(el(`<div class="flex-1 flex flex-col items-center gap-1">
-        <span class="text-[9px] font-semibold">${pct}%</span>
-        <div class="w-full rounded-t-md bg-gradient-to-t from-teal-500 to-indigo-500" style="height: ${pct}%"></div>
-        <span class="text-[9px] text-slate-400">${new Date(r.date).toLocaleDateString(undefined, { day: "numeric", month: "numeric" })}</span>
+        <span class="text-[9px] font-semibold" style="color: var(--text-soft);">${pct}%</span>
+        <div class="bar-fill w-full" style="height: ${pct}%"></div>
+        <span class="text-[9px]" style="color: var(--text-mute);">${new Date(r.date).toLocaleDateString(undefined, { day: "numeric", month: "numeric" })}</span>
       </div>`));
     });
     wrap.appendChild(chartCard);
@@ -1946,24 +2034,24 @@ function AnalyticsView() {
       bySubj[r.subject].total += r.total;
       bySubj[r.subject].score += r.score;
     });
-    const subCard = el(`<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
-      <p class="mb-2 text-sm font-bold">🎯 ${t().subjectAcc}</p>
+    const subCard = el(`<div class="clay-card">
+      <p class="mb-2 text-sm font-bold" style="color: var(--text);">🎯 ${t().subjectAcc}</p>
       <div class="space-y-2"></div>
     </div>`);
     const subList = subCard.querySelector("div.space-y-2");
     Object.entries(bySubj).forEach(([subj, d]) => {
       const pct = Math.round(d.score * 100 / d.total);
-      const color = pct >= 75 ? "from-emerald-500 to-teal-600" : pct >= 50 ? "from-amber-500 to-orange-600" : "from-rose-500 to-red-600";
+      const color = pct >= 75 ? "linear-gradient(90deg, #00d4a3, #00b894)" : pct >= 50 ? "linear-gradient(90deg, #ffa94d, #ff7eb6)" : "linear-gradient(90deg, #ff5fa2, #ff6b81)";
       subList.appendChild(el(`<div>
-        <div class="flex justify-between text-[11px] mb-1"><span>${escapeHtml(subj)}</span><span class="font-semibold">${pct}%</span></div>
-        <div class="h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
-          <div class="h-full bg-gradient-to-r ${color}" style="width: ${pct}%"></div>
+        <div class="flex justify-between text-[11px] mb-1"><span style="color: var(--text);">${escapeHtml(subj)}</span><span class="font-semibold" style="color: var(--text);">${pct}%</span></div>
+        <div class="clay-progress-track">
+          <div class="clay-progress-fill" style="background: ${color}; width: ${pct}%"></div>
         </div>
       </div>`));
     });
     wrap.appendChild(subCard);
   } else {
-    wrap.appendChild(el(`<div class="rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 p-4 text-center text-xs text-slate-500">
+    wrap.appendChild(el(`<div class="clay-card-flat p-4 text-center text-xs" style="color: var(--text-mute); border-style: dashed;">
       ${t().noQuizzes}
     </div>`));
   }
@@ -1977,9 +2065,9 @@ function AnalyticsView() {
   </div>`));
 
   // Syllabus Progress Tracker
-  wrap.appendChild(el(`<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
-    <h3 class="mb-2 text-sm font-bold">📚 ${t().syllabusTracker}</h3>
-    <p class="text-[11px] text-slate-500 mb-3">${t().syllabusHint}</p>
+  wrap.appendChild(el(`<div class="clay-card">
+    <h3 class="mb-2 text-sm font-bold" style="color: var(--text);">📚 ${t().syllabusTracker}</h3>
+    <p class="text-[11px] mb-3" style="color: var(--text-soft);">${t().syllabusHint}</p>
     <div class="space-y-3" id="syllabusList"></div>
   </div>`));
   const tracker = wrap.querySelector("#syllabusList");
@@ -1998,13 +2086,13 @@ function AnalyticsView() {
     const mastered = s.chapters.filter(c => subData[c] === 3).length;
     const pct = Math.round(mastered * 100 / total);
 
-    const subCard = el(`<div class="rounded-xl border border-slate-200 dark:border-slate-700 p-3">
+    const subCard = el(`<div class="clay-card-soft" style="padding: 0.75rem;">
       <div class="flex items-center justify-between mb-1">
-        <p class="text-xs font-semibold">${s.icon} ${s.name}</p>
-        <span class="text-[10px] font-bold ${pct >= 75 ? "text-emerald-500" : pct >= 40 ? "text-amber-500" : "text-rose-500"}">${mastered}/${total} (${pct}%)</span>
+        <p class="text-xs font-semibold" style="color: var(--text);">${s.icon} ${s.name}</p>
+        <span class="text-[10px] font-bold" style="color: ${pct >= 75 ? "var(--success)" : pct >= 40 ? "var(--warning)" : "var(--danger)"};">${mastered}/${total} (${pct}%)</span>
       </div>
-      <div class="h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden mb-2">
-        <div class="h-full bg-gradient-to-r from-emerald-500 to-teal-600" style="width: ${pct}%"></div>
+      <div class="clay-progress-track mb-2" style="height: 6px;">
+        <div class="clay-progress-fill" style="background: linear-gradient(90deg, #00d4a3, #00b894); width: ${pct}%"></div>
       </div>
       <div class="space-y-1 chapters-list"></div>
     </div>`);
@@ -2012,8 +2100,8 @@ function AnalyticsView() {
     s.chapters.forEach(c => {
       const sid = subData[c] || 0;
       const row = el(`<div class="flex items-center gap-1 text-[11px]">
-        <span class="flex-1 truncate">${escapeHtml(c)}</span>
-        <select data-subj="${s.id}" data-chap="${escapeHtml(c)}" class="rounded-md border border-slate-200 dark:border-slate-700 bg-transparent px-1 py-0.5 text-[10px]">
+        <span class="flex-1 truncate" style="color: var(--text);">${escapeHtml(c)}</span>
+        <select data-subj="${s.id}" data-chap="${escapeHtml(c)}" class="clay-select-mini">
           ${STATUS.map(st => `<option value="${st.id}" ${sid === st.id ? "selected" : ""}>${st.label}</option>`).join("")}
         </select>
       </div>`);
@@ -2039,7 +2127,7 @@ function AnalyticsView() {
   const totalChapters = SUBJECTS.reduce((a, s) => a + s.chapters.length, 0);
   const totalMastered = SUBJECTS.reduce((a, s) => a + s.chapters.filter(c => (state.syllabus[s.id] || {})[c] === 3).length, 0);
   const overallPct = Math.round(totalMastered * 100 / totalChapters);
-  wrap.appendChild(el(`<div class="rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 p-5 text-white text-center">
+  wrap.appendChild(el(`<div class="clay-card-gradient text-center" style="background: linear-gradient(135deg, #a29bfe 0%, #ff7eb6 100%); padding: 1.25rem;">
     <p class="text-xs opacity-80">${t().overallMastery}</p>
     <p class="text-4xl font-bold">${overallPct}%</p>
     <p class="text-xs opacity-80">${totalMastered} / ${totalChapters} ${t().chaptersMastered}</p>
