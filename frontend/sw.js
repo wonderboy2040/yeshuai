@@ -1,12 +1,12 @@
 /* ===================================================================
-   MEC CA Study Buddy — Service Worker (v3)
+   MEC CA Study Buddy — Service Worker (v3.1)
    Strategy:
      • HTML / JS / CSS → network-first (always get latest)
      • Logo / images / manifest → cache-first (rarely change)
      • Google / Groq API calls → bypass cache (always network)
    =================================================================== */
 
-const CACHE = "mec-cache-v3";
+const CACHE = "mec-cache-v3.1";
 const ASSETS = [
   ".",
   "index.html",

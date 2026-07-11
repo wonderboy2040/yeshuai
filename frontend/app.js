@@ -1003,7 +1003,7 @@ function TodayView() {
         <div id="filePreview" class="mt-2 flex flex-wrap gap-2"></div>
         <p id="fileMsg" class="mt-1 text-center text-[11px]" style="color: var(--text-mute);"></p>
       </div>
-      <button class="clay-btn clay-btn-primary w-full">${t().save}</button>
+      <button type="submit" id="saveLogBtn" class="clay-btn clay-btn-primary w-full">${t().save}</button>
     </form>`);
 
   // Wire up file pickers
@@ -1018,8 +1018,21 @@ function TodayView() {
     e.preventDefault();
     const fd = new FormData(form);
     const topic = sanitize(fd.get("topic") || "");
-    if (!topic) return;
-    const btn = form.querySelector('button[type="submit"]');
+    if (!topic) {
+      // Visual feedback for empty topic instead of silent return
+      const topicInp = form.querySelector('input[name="topic"]');
+      if (topicInp) {
+        topicInp.focus();
+        topicInp.style.borderColor = "var(--danger)";
+        topicInp.style.boxShadow = "0 0 0 3px rgba(255, 107, 129, 0.18)";
+        setTimeout(() => {
+          topicInp.style.borderColor = "";
+          topicInp.style.boxShadow = "";
+        }, 2000);
+      }
+      return;
+    }
+    const btn = form.querySelector("#saveLogBtn");
     btn.disabled = true; btn.textContent = t().saving;
 
     // Upload files first (each in parallel for speed)
@@ -1028,7 +1041,7 @@ function TodayView() {
       try {
         const r = await api("upload", { filename: f.name, mime: f.type, data: dataUrl });
         return (r && r.ok && r.link) ? r.link : null;
-      } catch (e) { return null; }
+      } catch (err) { return null; }
     }));
     const validLinks = uploaded.filter(Boolean);
 
@@ -1039,13 +1052,24 @@ function TodayView() {
       date: new Date().toISOString(),
       files: validLinks,
     };
+    // Save locally first (instant feedback, works offline)
     state.logs.unshift(entry);
     saveLS(LS.logs, state.logs);
-    try { await api("log", { entry }); } catch (e) { /* silent — saved locally */ }
+
+    // Try backend sync — show clear status to user
+    let syncOk = true;
+    try {
+      const r = await api("log", { entry });
+      if (!r || r.ok === false) syncOk = false;
+    } catch (err) {
+      syncOk = false;
+    }
 
     _fileList = [];
-    btn.textContent = t().saved;
-    setTimeout(() => go("today"), 700);
+    btn.textContent = syncOk ? t().saved : (state.lang === "hi" ? "✓ Local save (offline)" : "✓ Saved locally (offline)");
+    // Reset form for next entry
+    form.reset();
+    setTimeout(() => go("today"), 900);
   };
 
   wrap.appendChild(form);
