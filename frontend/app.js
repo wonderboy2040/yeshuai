@@ -7,7 +7,7 @@
    Maths Tricks, Pomodoro Timer, Flashcards, MCQ Mock Test,
    Doubt Bookmarks, Performance Analytics, Syllabus Tracker.
    ---------------------------------------------------------------
-   Version: 2.1.0 (cleaned-up release)
+   Version: 3.1.0
    =================================================================== */
 
 // ── Config ─────────────────────────────────────────────────────
@@ -446,13 +446,18 @@ function formatDate(d) {
 
 // Minimal markdown → HTML (paragraphs, bold, code, lists, headings)
 function mdToHtml(s) {
-  return s
+  // Convert markdown to HTML with proper list grouping
+  let html = s
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
     .replace(/^### (.*)$/gm, "<h3>$1</h3>")
     .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
     .replace(/`(.+?)`/g, "<code>$1</code>")
-    .replace(/^\s*[-*] (.*)$/gm, "<li>$1</li>")
-    .replace(/(<li>.*<\/li>)/s, "<ul>$1</ul>")
+    .replace(/^\s*[-*] (.*)$/gm, "<li>$1</li>");
+
+  // Wrap consecutive <li> groups in <ul> (handles multiple separate lists)
+  html = html.replace(/(<li>[\s\S]*?<\/li>)(\s*(?!<li>))/g, (m, items) => "<ul>" + items + "</ul>");
+
+  return html
     .replace(/\n{2,}/g, "</p><p>")
     .replace(/\n/g, "<br>")
     .replace(/^(.*)$/s, "<p>$1</p>");
@@ -1484,6 +1489,11 @@ function BottomNav() {
 }
 
 function go(v) {
+  // Clear Pomodoro timer if running when switching views
+  if (_pomo.running) {
+    clearInterval(_pomo.timer);
+    _pomo.running = false;
+  }
   state.view = v;
   render();
   window.scrollTo({ top: 0 });

@@ -259,7 +259,7 @@ function buildSystemPrompt(lang, memory) {
 }
 
 function callGroq(key, messages) {
-  var payload = JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: messages,
+  var payload = JSON.stringify({ model: 'qwen/qwen3.6-27b', messages: messages,
                                  temperature: 0.6, max_tokens: 1024 });
   var res = UrlFetchApp.fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'post', contentType: 'application/json',
@@ -281,7 +281,7 @@ function callGemini(key, messages) {
   var convo = messages.filter(function (m) { return m.role !== 'system'; })
                       .map(function (m) { return (m.role === 'assistant' ? 'ASSISTANT' : 'USER') + ': ' + m.content; }).join('\n');
   var prompt = sys + '\n\n' + convo + '\nASSISTANT:';
-  var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + key;
+  var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=' + key;
   var res = UrlFetchApp.fetch(url, {
     method: 'post', contentType: 'application/json',
     payload: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
