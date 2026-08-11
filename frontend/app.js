@@ -11,7 +11,7 @@
    =================================================================== */
 
 // ── Config ─────────────────────────────────────────────────────
-const DEFAULT_BACKEND_URL = "https://script.google.com/macros/s/AKfycbxLTvO6v7h-c_PBoDozByo4FOAJ7Gk7WqbsroObPXLnAkNvExbJ-Fc6rMCNHlSyxx-I/exec";
+const DEFAULT_BACKEND_URL = "https://script.google.com/macros/s/AKfycbz_CXPiQvhBhRc1tncGmRo7PacpjUWyonMA6fKh5EUDLX4WWRQJHmDYOt9L-SGSMUoG/exec";
 const FETCH_TIMEOUT = 25000;
 const MAX_CHAT_HISTORY = 100;
 const MAX_RETRIES = 2;
@@ -189,111 +189,181 @@ const I18N = {
 
 // ── Maths Tricks Data ──────────────────────────────────────────
 const MATH_TRICKS = [
-  { id: "ia", subject: "Maths Paper-IA", color: "from-orange-500 to-amber-600", icon: "📐",
+  {
+    id: "ia", subject: "Maths Paper-IA", color: "from-orange-500 to-amber-600", icon: "📐",
     tricks: [
-      { title: "Functions — Domain & Range", formula: "f(x) = √(x) → domain x≥0, range y≥0",
+      {
+        title: "Functions — Domain & Range", formula: "f(x) = √(x) → domain x≥0, range y≥0",
         tip: "Denominator zero na ho, andar ka negative na ho — yahi domain ka rule hai",
-        example: "f(x)=1/(x-2) → domain: x≠2" },
-      { title: "Matrices — Multiplication", formula: "(m×n) × (n×p) = (m×p)",
+        example: "f(x)=1/(x-2) → domain: x≠2"
+      },
+      {
+        title: "Matrices — Multiplication", formula: "(m×n) × (n×p) = (m×p)",
         tip: "Row × Column multiply + add karo. Inner dimensions must match!",
-        example: "2×3 matrix × 3×2 = 2×2 result" },
-      { title: "Determinants — 2×2", formula: "det[a b; c d] = ad - bc",
+        example: "2×3 matrix × 3×2 = 2×2 result"
+      },
+      {
+        title: "Determinants — 2×2", formula: "det[a b; c d] = ad - bc",
         tip: "Cross multiply karo: (a×d) - (b×c). Yaad rakho: diagonal multiply minus cross",
-        example: "det[2 3; 4 5] = 2×5 - 3×4 = 10-12 = -2" },
-      { title: "Vectors — Dot Product", formula: "a·b = |a||b|cosθ = a₁b₁ + a₂b₂ + a₃b₃",
+        example: "det[2 3; 4 5] = 2×5 - 3×4 = 10-12 = -2"
+      },
+      {
+        title: "Vectors — Dot Product", formula: "a·b = |a||b|cosθ = a₁b₁ + a₂b₂ + a₃b₃",
         tip: "Angle nikalna ho to: cosθ = (a·b)/(|a||b|). Dot product = 0 means perpendicular",
-        example: "a=(1,2), b=(3,4) → a·b = 1×3 + 2×4 = 11" },
-      { title: "Trigonometry — sin²θ + cos²θ = 1", formula: "sin²θ + cos²θ = 1, sec²θ - tan²θ = 1",
+        example: "a=(1,2), b=(3,4) → a·b = 1×3 + 2×4 = 11"
+      },
+      {
+        title: "Trigonometry — sin²θ + cos²θ = 1", formula: "sin²θ + cos²θ = 1, sec²θ - tan²θ = 1",
         tip: "Ye teen identities hamesha TRUE hain. Kisi bhi θ ke liye!",
-        example: "sinθ=3/5, to cosθ = √(1-9/25) = 4/5" },
-      { title: "Trig — sin(A+B) Formula", formula: "sin(A+B) = sinA·cosB + cosA·sinB",
+        example: "sinθ=3/5, to cosθ = √(1-9/25) = 4/5"
+      },
+      {
+        title: "Trig — sin(A+B) Formula", formula: "sin(A+B) = sinA·cosB + cosA·sinB",
         tip: "sin(A-B) = sinA·cosB - cosA·sinB. Plus for +, minus for -",
-        example: "sin(90°+θ) = sin90·cosθ + cos90·sinθ = cosθ" },
-      { title: "Hyperbolic Functions", formula: "sinh x = (eˣ - e⁻ˣ)/2, cosh x = (eˣ + e⁻ˣ)/2",
+        example: "sin(90°+θ) = sin90·cosθ + cos90·sinθ = cosθ"
+      },
+      {
+        title: "Hyperbolic Functions", formula: "sinh x = (eˣ - e⁻ˣ)/2, cosh x = (eˣ + e⁻ˣ)/2",
         tip: "Hyperbolic = normal trig ka 'imaginary' version. cosh²x - sinh²x = 1",
-        example: "sinh(0) = (1-1)/2 = 0, cosh(0) = (1+1)/2 = 1" },
-      { title: "Properties of Triangles", formula: "A = ½bc·sinA, sine rule: a/sinA = b/sinB = c/sinC",
+        example: "sinh(0) = (1-1)/2 = 0, cosh(0) = (1+1)/2 = 1"
+      },
+      {
+        title: "Properties of Triangles", formula: "A = ½bc·sinA, sine rule: a/sinA = b/sinB = c/sinC",
         tip: "Area nikalne ke 3 formulas: ½×base×height, ½ab·sinC, Heron's formula",
-        example: "Triangle with sides a=7,b=8,c=9 → semi-perimeter s=12 → Area = √(12×5×4×3)" },
-    ] },
-  { id: "ib", subject: "Maths Paper-IB", color: "from-rose-500 to-red-600", icon: "📊",
+        example: "Triangle with sides a=7,b=8,c=9 → semi-perimeter s=12 → Area = √(12×5×4×3)"
+      },
+    ]
+  },
+  {
+    id: "ib", subject: "Maths Paper-IB", color: "from-rose-500 to-red-600", icon: "📊",
     tricks: [
-      { title: "Straight Line — Slope", formula: "m = (y₂-y₁)/(x₂-x₁), line: y - y₁ = m(x - x₁)",
+      {
+        title: "Straight Line — Slope", formula: "m = (y₂-y₁)/(x₂-x₁), line: y - y₁ = m(x - x₁)",
         tip: "Parallel lines: m₁ = m₂. Perpendicular: m₁·m₂ = -1",
-        example: "(1,2) aur (3,6) se slope = (6-2)/(3-1) = 4/2 = 2" },
-      { title: "Distance Formula", formula: "d = √[(x₂-x₁)² + (y₂-y₁)²]",
+        example: "(1,2) aur (3,6) se slope = (6-2)/(3-1) = 4/2 = 2"
+      },
+      {
+        title: "Distance Formula", formula: "d = √[(x₂-x₁)² + (y₂-y₁)²]",
         tip: "Pythagoras ka formula hai — aajao distance nikal lo",
-        example: "(1,2) to (4,6): d = √(9+16) = √25 = 5" },
-      { title: "Differentiation — Power Rule", formula: "d/dx(xⁿ) = n·xⁿ⁻¹",
+        example: "(1,2) to (4,6): d = √(9+16) = √25 = 5"
+      },
+      {
+        title: "Differentiation — Power Rule", formula: "d/dx(xⁿ) = n·xⁿ⁻¹",
         tip: "Power neeche aata hai, power ek kam ho jata hai. Simple!",
-        example: "d/dx(x⁵) = 5x⁴, d/dx(√x) = d/dx(x^½) = ½x^(-½)" },
-      { title: "Differentiation — Product Rule", formula: "(uv)' = u'v + uv'",
+        example: "d/dx(x⁵) = 5x⁴, d/dx(√x) = d/dx(x^½) = ½x^(-½)"
+      },
+      {
+        title: "Differentiation — Product Rule", formula: "(uv)' = u'v + uv'",
         tip: "Pehle ka derivative × dusra + pehla × dusre ka derivative",
-        example: "d/dx(x²·sinx) = 2x·sinx + x²·cosx" },
-      { title: "Limits — Standard Limit", formula: "lim(x→0) sin x / x = 1",
+        example: "d/dx(x²·sinx) = 2x·sinx + x²·cosx"
+      },
+      {
+        title: "Limits — Standard Limit", formula: "lim(x→0) sin x / x = 1",
         tip: "Ye standard limit hai. x→0 tab hi use karo, x→π pe nahi!",
-        example: "lim(x→0) sin(2x)/(3x) = lim(2·sin(2x)/(2x))/3 = 2/3" },
-      { title: "Continuity Check", formula: "lim(x→a⁻) f(x) = lim(x→a⁺) f(x) = f(a)",
+        example: "lim(x→0) sin(2x)/(3x) = lim(2·sin(2x)/(2x))/3 = 2/3"
+      },
+      {
+        title: "Continuity Check", formula: "lim(x→a⁻) f(x) = lim(x→a⁺) f(x) = f(a)",
         tip: "Teeno equal honge tabhi function continuous hai. Warna discontinuity!",
-        example: "f(x) = {x² if x<2, 4 if x=2, 3x-2 if x>2} → check at x=2" },
-      { title: "3D — Direction Cosines", formula: "l² + m² + n² = 1",
+        example: "f(x) = {x² if x<2, 4 if x=2, 3x-2 if x>2} → check at x=2"
+      },
+      {
+        title: "3D — Direction Cosines", formula: "l² + m² + n² = 1",
         tip: "Direction cosines hamesha yahi satisfy karte hain. Sum of squares = 1",
-        example: "l=½, m=½, n=√(1-¼-¼) = 1/√2" },
-    ] },
-  { id: "eco", subject: "Economics", color: "from-teal-500 to-emerald-600", icon: "💰",
+        example: "l=½, m=½, n=√(1-¼-¼) = 1/√2"
+      },
+    ]
+  },
+  {
+    id: "eco", subject: "Economics", color: "from-teal-500 to-emerald-600", icon: "💰",
     tricks: [
-      { title: "Demand & Supply Equilibrium", formula: "Qd = Qs → Equilibrium price+quantity",
+      {
+        title: "Demand & Supply Equilibrium", formula: "Qd = Qs → Equilibrium price+quantity",
         tip: "Demand curve = buyer's willingness. Supply curve = seller's willingness. Dono milte hain equilibrium pe",
-        example: "Qd = 100-2P, Qs = 3P → 100-2P = 3P → P=20, Q=60" },
-      { title: "Elasticity of Demand", formula: "Ed = %ΔQd / %ΔP",
+        example: "Qd = 100-2P, Qs = 3P → 100-2P = 3P → P=20, Q=60"
+      },
+      {
+        title: "Elasticity of Demand", formula: "Ed = %ΔQd / %ΔP",
         tip: "Ed > 1 = elastic (luxury). Ed < 1 = inelastic (necessity). Revenue = P × Q",
-        example: "Price 10 se 12 (20%↑), demand 100 se 80 (20%↓) → Ed = 1" },
-      { title: "National Income — GDP", formula: "GDP = C + I + G + (X-M)",
+        example: "Price 10 se 12 (20%↑), demand 100 se 80 (20%↓) → Ed = 1"
+      },
+      {
+        title: "National Income — GDP", formula: "GDP = C + I + G + (X-M)",
         tip: "Consumption + Investment + Govt Spending + Net Exports. Yhi economy ka size hai",
-        example: "C=500, I=200, G=300, X=150, M=100 → GDP = 1050" },
-      { title: "Money Multiplier", formula: "Money Multiplier = 1 / CRR",
+        example: "C=500, I=200, G=300, X=150, M=100 → GDP = 1050"
+      },
+      {
+        title: "Money Multiplier", formula: "Money Multiplier = 1 / CRR",
         tip: "CRR jitna kam, utna zyada money creation. Banks lend karte hain, money multiply hota hai",
-        example: "CRR=10% → Multiplier=10. ₹100 deposit creates ₹1000 money" },
-      { title: "Inflation — CPI & WPI", formula: "Inflation Rate = (CPI₂-CPI₁)/CPI₁ × 100",
+        example: "CRR=10% → Multiplier=10. ₹100 deposit creates ₹1000 money"
+      },
+      {
+        title: "Inflation — CPI & WPI", formula: "Inflation Rate = (CPI₂-CPI₁)/CPI₁ × 100",
         tip: "CPI = consumer basket. WPI = wholesale. RBI inflation target = 4% (±2%)",
-        example: "CPI 120 se 126 → Inflation = 6/120 × 100 = 5%" },
-    ] },
-  { id: "commerce", subject: "Commerce", color: "from-blue-500 to-indigo-600", icon: "🏦",
+        example: "CPI 120 se 126 → Inflation = 6/120 × 100 = 5%"
+      },
+    ]
+  },
+  {
+    id: "commerce", subject: "Commerce", color: "from-blue-500 to-indigo-600", icon: "🏦",
     tricks: [
-      { title: "Forms of Business Organisation", formula: "Sole Proprietor (1) | Partnership (2-50) | Company (Joint Stock)",
+      {
+        title: "Forms of Business Organisation", formula: "Sole Proprietor (1) | Partnership (2-50) | Company (Joint Stock)",
         tip: "Sole Proprietorship features unlimited liability. Joint Stock Company features a separate legal entity and limited liability.",
-        example: "Local retail store = Sole Proprietorship. Tata Motors = Joint Stock Company" },
-      { title: "Trade Classification", formula: "Trade = Home Trade (Wholesale, Retail) + Foreign Trade (Import, Export, Entrepot)",
+        example: "Local retail store = Sole Proprietorship. Tata Motors = Joint Stock Company"
+      },
+      {
+        title: "Trade Classification", formula: "Trade = Home Trade (Wholesale, Retail) + Foreign Trade (Import, Export, Entrepot)",
         tip: "Entrepot trade means importing goods from one country to export them to another country.",
-        example: "Importing raw materials from Dubai, processing in India, and exporting to UK" },
-      { title: "Business Finance Sources", formula: "Long Term (Equity, Debentures) | Short Term (Bank Overdraft, Trade Credit)",
+        example: "Importing raw materials from Dubai, processing in India, and exporting to UK"
+      },
+      {
+        title: "Business Finance Sources", formula: "Long Term (Equity, Debentures) | Short Term (Bank Overdraft, Trade Credit)",
         tip: "Equity shares carry voting rights but no fixed dividend. Debentures carry fixed interest but no voting rights.",
-        example: "Issuing equity shares to construct a new corporate office (Long-term)" },
-      { title: "MSME Classification", formula: "Micro (Inv ≤ 1cr, T/O ≤ 5cr) | Small (Inv ≤ 10cr, T/O ≤ 50cr) | Medium (Inv ≤ 50cr, T/O ≤ 250cr)",
+        example: "Issuing equity shares to construct a new corporate office (Long-term)"
+      },
+      {
+        title: "MSME Classification", formula: "Micro (Inv ≤ 1cr, T/O ≤ 5cr) | Small (Inv ≤ 10cr, T/O ≤ 50cr) | Medium (Inv ≤ 50cr, T/O ≤ 250cr)",
         tip: "MSME criteria are now uniform for both manufacturing and services sector based on investment and turnover.",
-        example: "A firm with ₹80 Lakh investment and ₹3 Crore turnover is a Micro enterprise" },
-      { title: "E-Commerce Types", formula: "B2B (Business-to-Business) | B2C (Business-to-Consumer) | C2C (Consumer-to-Consumer)",
+        example: "A firm with ₹80 Lakh investment and ₹3 Crore turnover is a Micro enterprise"
+      },
+      {
+        title: "E-Commerce Types", formula: "B2B (Business-to-Business) | B2C (Business-to-Consumer) | C2C (Consumer-to-Consumer)",
         tip: "C2C involves direct transaction between consumers, usually facilitated by an online marketplace.",
-        example: "Amazon = B2C. Alibaba = B2B. OLX/eBay = C2C" },
-    ] },
-  { id: "accounts", subject: "Accountancy", color: "from-fuchsia-500 to-purple-600", icon: "🧮",
+        example: "Amazon = B2C. Alibaba = B2B. OLX/eBay = C2C"
+      },
+    ]
+  },
+  {
+    id: "accounts", subject: "Accountancy", color: "from-fuchsia-500 to-purple-600", icon: "🧮",
     tricks: [
-      { title: "Accounting Equation", formula: "Assets = Liabilities + Capital",
+      {
+        title: "Accounting Equation", formula: "Assets = Liabilities + Capital",
         tip: "Dono sides hamesha equal hone chahiye. Business transaction se is balance pe koi farq nahi padta.",
-        example: "Started business with cash ₹50,000 → Cash (Asset) +50,000 & Capital +50,000" },
-      { title: "Golden Rules of Accounting", formula: "Real: Debit what comes in, Credit what goes out\nPersonal: Debit the receiver, Credit the giver\nNominal: Debit expenses & losses, Credit incomes & gains",
+        example: "Started business with cash ₹50,000 → Cash (Asset) +50,000 & Capital +50,000"
+      },
+      {
+        title: "Golden Rules of Accounting", formula: "Real: Debit what comes in, Credit what goes out\nPersonal: Debit the receiver, Credit the giver\nNominal: Debit expenses & losses, Credit incomes & gains",
         tip: "Rule pehle identify karo (Asset = Real, Person = Personal, Expense/Income = Nominal) phir entry banao.",
-        example: "Paid salary ₹5,000 → Salary (Nominal - Debit) & Cash (Real - Credit)" },
-      { title: "Bank Reconciliation Statement (BRS)", formula: "Cash Book Balance +/- Adjustments = Pass Book Balance",
+        example: "Paid salary ₹5,000 → Salary (Nominal - Debit) & Cash (Real - Credit)"
+      },
+      {
+        title: "Bank Reconciliation Statement (BRS)", formula: "Cash Book Balance +/- Adjustments = Pass Book Balance",
         tip: "Agar Cash Book se shuru kar rahe ho: jo items Pass Book ko badhate hain unhe (+) karo, jo kam karte hain unhe (-) karo.",
-        example: "Cheque issued but not presented → Add (+) to Cash Book balance to reach Pass Book balance" },
-      { title: "Depreciation — Straight Line Method (SLM)", formula: "Annual Depreciation = (Asset Cost - Scrap Value) / Useful Life",
+        example: "Cheque issued but not presented → Add (+) to Cash Book balance to reach Pass Book balance"
+      },
+      {
+        title: "Depreciation — Straight Line Method (SLM)", formula: "Annual Depreciation = (Asset Cost - Scrap Value) / Useful Life",
         tip: "SLM me har saal depreciation ki amount SAME rehti hai. Depreciation rate = (Depreciation / Cost) * 100",
-        example: "Cost ₹1,00,000, Scrap ₹10,000, Life 10 years → Depreciation = ₹9,000 per year" },
-      { title: "Bills of Exchange — Due Date Calculation", formula: "Due Date = Date of Drawing + Bill Term + 3 Days of Grace",
+        example: "Cost ₹1,00,000, Scrap ₹10,000, Life 10 years → Depreciation = ₹9,000 per year"
+      },
+      {
+        title: "Bills of Exchange — Due Date Calculation", formula: "Due Date = Date of Drawing + Bill Term + 3 Days of Grace",
         tip: "Hamesha 3 days of grace add karna mat bhoolna, chahe koi bhi scenario ho (unless public holiday)!",
-        example: "Bill drawn on Jan 1 for 2 months → Due Date is March 1 + 3 days = March 4" }
-    ] },
+        example: "Bill drawn on Jan 1 for 2 months → Due Date is March 1 + 3 days = March 4"
+      }
+    ]
+  },
 ];
 
 // ── Motivational Quotes (Hinglish + English) ───────────────────
@@ -312,34 +382,44 @@ const MOTIVATIONS = [
 
 // ── Subject Catalog ────────────────────────────────────────────
 const SUBJECTS = [
-  { id: "maths1a", name: "Maths Paper-IA", icon: "📐", color: "from-orange-500 to-amber-600",
+  {
+    id: "maths1a", name: "Maths Paper-IA", icon: "📐", color: "from-orange-500 to-amber-600",
     tag: "Algebra · Vector Algebra · Trigonometry",
-    chapters: ["Functions","Mathematical Induction","Matrices","Addition of Vectors","Product of Vectors",
-               "Trigonometric Ratios upto Transformations","Trigonometric Equations","Inverse Trigonometric Functions",
-               "Hyperbolic Functions","Properties of Triangles"] },
-  { id: "maths1b", name: "Maths Paper-IB", icon: "📊", color: "from-rose-500 to-red-600",
+    chapters: ["Functions", "Mathematical Induction", "Matrices", "Addition of Vectors", "Product of Vectors",
+      "Trigonometric Ratios upto Transformations", "Trigonometric Equations", "Inverse Trigonometric Functions",
+      "Hyperbolic Functions", "Properties of Triangles"]
+  },
+  {
+    id: "maths1b", name: "Maths Paper-IB", icon: "📊", color: "from-rose-500 to-red-600",
     tag: "Coordinate Geometry · Calculus",
-    chapters: ["Locus","Transformation of Axes","The Straight Line","Pair of Straight Lines",
-               "Three Dimensional Coordinates","Direction Cosines & Direction Ratios","The Plane",
-               "Limits & Continuity","Differentiation","Applications of Derivatives"] },
-  { id: "eco", name: "Economics", icon: "💰", color: "from-teal-500 to-emerald-600",
+    chapters: ["Locus", "Transformation of Axes", "The Straight Line", "Pair of Straight Lines",
+      "Three Dimensional Coordinates", "Direction Cosines & Direction Ratios", "The Plane",
+      "Limits & Continuity", "Differentiation", "Applications of Derivatives"]
+  },
+  {
+    id: "eco", name: "Economics", icon: "💰", color: "from-teal-500 to-emerald-600",
     tag: "Micro & Macro Economics",
-    chapters: ["Introduction to Economics","Theories of Consumer Behaviour","Demand Analysis","Production Analysis",
-               "Market Analysis","Theories of Distribution","National Income Analysis",
-               "Theories of Employment & Public Finance","Money, Banking & Inflation","Basic Statistics for Economics"] },
-  { id: "commerce", name: "Commerce", icon: "🏦", color: "from-blue-500 to-indigo-600",
+    chapters: ["Introduction to Economics", "Theories of Consumer Behaviour", "Demand Analysis", "Production Analysis",
+      "Market Analysis", "Theories of Distribution", "National Income Analysis",
+      "Theories of Employment & Public Finance", "Money, Banking & Inflation", "Basic Statistics for Economics"]
+  },
+  {
+    id: "commerce", name: "Commerce", icon: "🏦", color: "from-blue-500 to-indigo-600",
     tag: "Business Organisation & Finance",
-    chapters: ["Concept of Business","Business Activities & Functions",
-               "Sole Proprietorship, Joint Hindu Family Business & Co-operative Societies","Partnership",
-               "Joint Stock Company","Formation of a Company","Commencement of Business","Business Finance",
-               "Sources of Business Finance","Micro, Small & Medium Enterprises (MSME)",
-               "Multinational Companies (MNCs)","Current Trends in Business (E-business)"] },
-  { id: "accounts", name: "Accountancy", icon: "🧮", color: "from-fuchsia-500 to-purple-600",
+    chapters: ["Concept of Business", "Business Activities & Functions",
+      "Sole Proprietorship, Joint Hindu Family Business & Co-operative Societies", "Partnership",
+      "Joint Stock Company", "Formation of a Company", "Commencement of Business", "Business Finance",
+      "Sources of Business Finance", "Micro, Small & Medium Enterprises (MSME)",
+      "Multinational Companies (MNCs)", "Current Trends in Business (E-business)"]
+  },
+  {
+    id: "accounts", name: "Accountancy", icon: "🧮", color: "from-fuchsia-500 to-purple-600",
     tag: "Principles of Accounting · Ledger · Final Accounts",
     chapters: ["Introduction to Accounting", "Journal and Ledger", "Subsidiary Books", "Cash Book",
-               "Bank Reconciliation Statement (BRS)", "Trial Balance and Rectification of Errors",
-               "Depreciation Accounting", "Bills of Exchange", "Final Accounts of Sole Trader",
-               "Computerised Accounting"] },
+      "Bank Reconciliation Statement (BRS)", "Trial Balance and Rectification of Errors",
+      "Depreciation Accounting", "Bills of Exchange", "Final Accounts of Sole Trader",
+      "Computerised Accounting"]
+  },
 ];
 
 // ── State & Storage ────────────────────────────────────────────
@@ -564,8 +644,10 @@ async function loadServerLogs() {
 //  SETUP WIZARD
 // ===================================================================
 function newWizard() {
-  return { step: 1, url: "", status: null, driveId: "", photosId: "",
-           groqKey: "", lang: "hi", pin: "", pin2: "", studentName: "" };
+  return {
+    step: 1, url: "", status: null, driveId: "", photosId: "",
+    groqKey: "", lang: "hi", pin: "", pin2: "", studentName: ""
+  };
 }
 let wiz = newWizard();
 
@@ -1359,7 +1441,7 @@ function startVoice(inp, btn) {
     inp.value = txt;
     inp.dispatchEvent(new Event("input"));
   };
-  rec.onerror = () => {};
+  rec.onerror = () => { };
   rec.onend = () => {
     btn.classList.remove("animate-pulse", "text-rose-500");
     window.__rec = null;
@@ -1606,12 +1688,12 @@ function FocusView() {
       saveLS(LS.pomoStats, stats);
       _pomo.mode = "break";
       _pomo.remaining = POMO_BREAK_SEC;
-      try { navigator.vibrate && navigator.vibrate(200); } catch (e) {}
+      try { navigator.vibrate && navigator.vibrate(200); } catch (e) { }
       alert(t().workDone);
     } else {
       _pomo.mode = "work";
       _pomo.remaining = POMO_WORK_SEC;
-      try { navigator.vibrate && navigator.vibrate([100, 50, 100]); } catch (e) {}
+      try { navigator.vibrate && navigator.vibrate([100, 50, 100]); } catch (e) { }
       alert(t().breakOver);
     }
   }
