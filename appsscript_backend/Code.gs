@@ -117,6 +117,13 @@ function sanitize(str) {
   return String(str || '').replace(/[=@+]|[\u0000-\u001f]/g, '').trim();
 }
 
+
+// Strip <think>...</think> blocks from AI reasoning models
+// Qwen/DeepSeek emit chain-of-thought blocks -- remove so student sees clean answer only
+function stripThinkBlocks(text) {
+  if (!text) return text;
+  return text.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+}
 /* ---------- Google Sheet (memory) ---------- */
 function ss() { return SpreadsheetApp.getActiveSpreadsheet(); }
 
@@ -262,7 +269,8 @@ function callGroq(key, messages) {
     messages: messages,
     temperature: 0.6,
     max_tokens: 2048,
-    top_p: 0.9
+    top_p: 0.9,
+    reasoning_effort: 'none'
   });
   var res = UrlFetchApp.fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'post', contentType: 'application/json',
@@ -275,7 +283,7 @@ function callGroq(key, messages) {
   if (data.error) throw (data.error.message || JSON.stringify(data.error));
   if (!data.choices || !data.choices[0] || !data.choices[0].message)
     throw 'empty_groq_response';
-  return data.choices[0].message.content.trim();
+  return stripThinkBlocks(data.choices[0].message.content.trim());
 }
 
 function callGemini(key, messages) {
@@ -302,7 +310,7 @@ function callGemini(key, messages) {
   if (data.error) throw data.error.message;
   if (!data.candidates || !data.candidates[0] || !data.candidates[0].content)
     throw 'empty_gemini_response';
-  return data.candidates[0].content.parts[0].text.trim();
+  return stripThinkBlocks(data.candidates[0].content.parts[0].text.trim());
 }
 
 /* ---------- photo/notes upload (Google Drive) ---------- */

@@ -11,7 +11,7 @@
    =================================================================== */
 
 // ── Config ─────────────────────────────────────────────────────
-const DEFAULT_BACKEND_URL = "https://script.google.com/macros/s/AKfycbz_CXPiQvhBhRc1tncGmRo7PacpjUWyonMA6fKh5EUDLX4WWRQJHmDYOt9L-SGSMUoG/exec";
+const DEFAULT_BACKEND_URL = "https://script.google.com/macros/s/AKfycbwLA6U2H4gZUE0gG__iihi3vHhVo2gWsQCyB21RyJrtUKUm0gc3yiE8pA4rE1Mfo2fa/exec";
 const FETCH_TIMEOUT = 25000;
 const MAX_CHAT_HISTORY = 100;
 const MAX_RETRIES = 2;
